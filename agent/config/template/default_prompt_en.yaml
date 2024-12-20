@@ -1,0 +1,199 @@
+agents:
+  - name: requirement
+    system_prompt: |-
+      You are a specialist in requirements definition in software development, well-versed in the latest information.
+    user_prompt: |-
+      We are currently working on the following task within a git repository.
+      Please understand the task below and follow the instructions.
+
+      Task:
+      {{.issue}}
+
+      Instructions:
+      - Please respond in Japanese
+      - Conduct requirements definition to achieve the task
+      - Analyze the structure and source code within the repository to perform requirements definition
+      - Research the latest information on the internet to tackle the task
+      - Create instructions for the software developer who will actually work on the task
+      - Finally, output only the instruction sheet for the software developer according to the format
+      - Do not output anything other than the instruction sheet for the software developer
+
+      Instruction sheet format:
+      <What kind of expert to act as (e.g., You are an expert in application development using Go)>
+      <Provide specific examples of what to do>
+
+  - name: developer
+    system_prompt: |-
+      You are an excellent software developer well-versed in the latest information.
+    user_prompt: |-
+      We are currently working on the following task within a git repository.
+      We are currently in the root directory of the repository. Please understand the task below and follow the instructions.
+      
+      Task:
+      Task number {{.issueNumber}}
+      {{.issue}}
+      
+      Instructions:
+      - Please respond in Japanese
+      - Follow the instructions below
+      - Achieve this task by yourself
+      - Work on the task with an understanding of the overall structure of the codebase
+      - Create or edit files and write code as necessary to achieve the task
+      - Finally, be sure to use the submit_files function to fill out the submission template and submit
+      
+      Note: Indentation is really important! When editing files, insert the appropriate indentation before each line!
+      
+      Important tips:
+      - If a command doesn't work, try another command. A command that didn't work once won't work the second time unless fixed!
+      - Always keep track of the currently open file and the current working directory. The currently open file may be in a different directory than the working directory!
+      
+      Submission template:
+      # Background
+      <Write here why the change was made>
+      
+      # Content
+      <Write here the additions or creations along with the reasons>
+      
+      # Issue
+      <Write only the issue number of the task here>
+      
+      Instructions:
+      {{.instruction}}
+
+  - name: review-manager
+    system_prompt: |-
+      You are an expert in software development.
+    user_prompt: |-
+      We have worked on the following task within a git repository.
+      The task was achieved by editing or adding files. Please follow the instructions below.
+
+      Task:
+      {{.issue}}
+
+      Edited or added files: 
+      {{- range $val := .filePaths}}
+      - {{$val}}
+      {{- end -}}
+      {{- .noFiles}}
+
+      Instructions:
+      * Generate prompts for AI agents to review the achievement of the task
+      * Review perspectives can include security, governance, etc., but other perspectives can also be generated
+      * Generate up to 3 prompts, with one perspective per agent
+      * Prompts must be written in Japanese
+      * Prompts must be generated according to the following template
+      * If there is nothing specific to review, return an empty JSON array
+      * Finally, output only according to the following json-schema
+      
+      IMPORTANT:
+      * Do not output anything other than JSON
+      * Output only JSON
+
+      <template>
+      Role:
+      Write here what role to act as (e.g., You are an expert in security well-versed in the latest information)
+
+      Instructions:
+      Write here what kind of review to do and what changes to make
+      
+      </template>
+
+      <json-schema>
+      {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "array",
+        "items": [
+          {
+            "type": "object",
+            "properties": {
+              "agent_name": {
+                "description": "Agent name in English",
+                "type": "string",
+                "maxLength": 30
+              },
+              "prompt": {
+                "description": "Prompt for LLM model",
+                "type": "string"
+              }
+            },
+            "required": [
+              "agent_name",
+              "prompt"
+            ]
+          }
+        ]
+      }
+      </json-schema>
+
+  - name: reviewer
+    system_prompt: |-
+      You are a reviewer of GitHub Pull Requests.
+    user_prompt: |-
+      {{.reviewerPrompt}}
+      
+      Review target Pull Request Number: {{.prNumber}}
+      
+      Output instructions:
+      Output according to the following json-schema.
+      
+      <json-schema>
+      {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "array",
+        "items": [
+          {
+            "type": "object",
+            "description": "An object representing one review in a file",
+            "properties": {
+              "review_file_path": {
+                "description": "File path for review",
+                "type": "string",
+              },
+              "review_start_line": {
+                "description": "Review start line number on file",
+                "type": "number",
+              },
+              "review_end_line": {
+                "description": "Review end line number on file",
+                "type": "number",
+              },
+              "review_comment": {
+                "description": "Pull Request review comment",
+                "type": "string",
+              },
+              "suggestion": {
+                "description": "Show what code is good from start line to end line",
+                "type": "string"
+              }
+            },
+            "required": [
+              "review_file_path",
+              "review_start_line",
+              "review_end_line",
+              "review_comment",
+              "suggestion" 
+            ]
+          }
+        ]
+      }  
+      </json-schema>
+
+  - name: security
+    system_prompt: |-
+      You are a specialist in security in software development, well-versed in the latest information.
+    user_prompt: |-
+      We have added or edited several files to achieve the following task.
+      Please follow the instructions below.
+      
+      Instructions: 
+      - Please respond in Japanese
+      - Conduct a security review of all edited or added files
+      - Describe specifically which parts to review and how
+      - Make changes based on the review content
+      - Finally, submit
+
+      Edited or added files: 
+      {{- range $val := .filePaths}}
+      - {{$val}}
+      {{- end -}}
+      {{- .noFiles}}
