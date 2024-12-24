@@ -54,6 +54,11 @@ func ModifyFile(input ModifyFileInput) (store.File, error) {
 	}
 	defer f.Close()
 
+	// EOF should be a newline
+	if len(input.ContentText) != 0 && input.ContentText[len(input.ContentText)-1] != '\n' {
+		input.ContentText += "\n"
+	}
+
 	if _, err := f.WriteString(input.ContentText); err != nil {
 		return file, err
 	}
