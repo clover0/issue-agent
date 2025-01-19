@@ -55,6 +55,10 @@ func ParseIssueInput(flags []string) (IssueInputs, error) {
 }
 
 func MergeIssueInputConfig(conf config.Config, inputs IssueInputs) config.Config {
+	if inputs.Common.LogLevel != "" {
+		conf.LogLevel = inputs.Common.LogLevel
+	}
+
 	if inputs.Common.Language != "" {
 		conf.Language = inputs.Common.Language
 	}
