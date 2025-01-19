@@ -95,8 +95,8 @@ func OrchestrateAgents(
 	}
 
 	if *conf.Agent.SkipReviewAgents {
-		lo.Info("Skip review agents\n")
-		lo.Info("Agents finished successfully!\n")
+		lo.Info("skip review agents\n")
+		lo.Info("agents finished work\n")
 		return nil
 	}
 
@@ -217,7 +217,7 @@ func OrchestrateAgents(
 		lo.Info("Finish %s\n", p.AgentName)
 	}
 
-	lo.Info("Agents finished successfully!\n")
+	lo.Info("agents finished work\n")
 
 	return nil
 }

@@ -51,7 +51,7 @@ func NewAgent(
 
 func (a *Agent) Work() (lastOutput string, err error) {
 	ctx := context.Background()
-	a.logg.Info("[%s]start agent work\n", a.name)
+	a.logg.Info("[%s]agent starts work\n", a.name)
 
 	completionInput := models.StartCompletionInput{
 		Model:           a.parameter.Model,

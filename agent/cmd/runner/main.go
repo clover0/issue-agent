@@ -116,6 +116,7 @@ func main() {
 	if err := cmd.Wait(); err != nil {
 		if exitErr, ok := err.(*exec.ExitError); ok && exitErr.ExitCode() != 0 {
 			fmt.Printf("Process exited with error: %v\n", err)
+			os.Exit(exitErr.ExitCode())
 		}
 	}
 }
