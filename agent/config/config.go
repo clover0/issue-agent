@@ -55,7 +55,11 @@ func isValidLogLevel(fl validator.FieldLevel) bool {
 	return false
 }
 
-func LoadDefault() (Config, error) {
+func LoadDefault(passedConfig bool) (Config, error) {
+	if !passedConfig {
+		return Load("")
+	}
+
 	cf, err := Load(ConfigFilePath)
 	if err != nil {
 		return cf, err

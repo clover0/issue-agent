@@ -20,7 +20,7 @@ func IssueCommand(flags []string) error {
 		return fmt.Errorf("failed to parse input: %w", err)
 	}
 
-	conf, err := config.LoadDefault()
+	conf, err := config.LoadDefault(isPassedConfig(cliIn.Common.Config))
 	if err != nil {
 		return fmt.Errorf("failed to load config: %w", err)
 	}
@@ -68,6 +68,10 @@ func IssueCommand(flags []string) error {
 	}
 
 	return agent.OrchestrateAgents(ctx, lo, conf, issLoader, cliIn.BaseBranch, issue, cliIn.WorkRepository, gh)
+}
+
+func isPassedConfig(configPath string) bool {
+	return configPath != ""
 }
 
 func newGitHub() *github.Client {
