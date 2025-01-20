@@ -6,14 +6,14 @@ At your repository root, create a `issue_agent.yml` file with the following cont
 # Communication language
 # English, Japanese...
 # Default is English
-language: "Japanese"
+language: "English"
 
-# Required
-workdir: "/tmp/repositories/github-issue-agent"
+# Default is /tmp/repositories
+workdir: "/tmp/repositories"
 
-# Required
+# Default is info
 # debug, info, error
-log_level: "debug"
+log_level: "info"
 
 agent:
   # Default prompt template is embed config.
@@ -21,12 +21,12 @@ agent:
   # e.g) config/prompt_template_en.yml
   prompt_path: ""
 
-  # Default prompt template is embed config.
-  #  prompt_path: "prompt_en.yml"
-
+  # Required
   # LLM model name
-  model: "gpt-4o"
-  #  model: "claude-3-5-sonnet-20241022"
+  # The recommend model is Claude 3.5 Sonnet
+  # If you use AWS Bedrock, please set the Model ID
+  #   e.g) anthropic.claude-3-5-sonnet-20241022-v2:0
+  model: "claude-3-5-sonnet-latest"
 
   # Maximum steps to run agent
   # The following are defined as 1 step
@@ -34,14 +34,16 @@ agent:
   # - execution function
   max_steps: 70
 
+  # Skip review agents
+  # Default is true
   skip_review_agents: true
 
   git:
-    # Required
-    user_name: "t.koenuma2@gmail.com"
+    # git user name
+    user_name: "github-actions[bot]"
 
-    # Required
-    user_email: "takeshi.koenuma"
+    # git user email
+    user_email: "41898282+github-actions[bot]@users.noreply.github.com"
 
   # GitHub environment for agent
   github:
@@ -53,15 +55,14 @@ agent:
 
     # Required
     # Repositories owner to operate
-    #    owner: "clover0"
-    owner: "reiwa5"
+    owner: ""
 
   # Allow agent to use function.
   # Belows are the default functions.
   allow_functions:
     - get_pull_request
-    #- get_web_page_from_url
-    #- get_web_search_result
+    # - get_web_page_from_url
+    # - get_web_search_result
     - list_files
     - modify_file
     - open_file

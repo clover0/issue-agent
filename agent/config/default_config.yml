@@ -56,8 +56,8 @@ agent:
   # Belows are the default functions.
   allow_functions:
     - get_pull_request
-    - get_web_page_from_url
-    - get_web_search_result
+    # - get_web_page_from_url
+    # - get_web_search_result
     - list_files
     - modify_file
     - open_file
