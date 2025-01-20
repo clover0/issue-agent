@@ -7,4 +7,4 @@ Claude is strongly recommended!
     - gpt-4o
     - gpt-4o-mini
 - Anthropic models
-    - (⭐️Recommended!) claude-3-5-sonnet-latest
+    - claude-3-5-sonnet-latest (⭐️Strongly Recommended!) 

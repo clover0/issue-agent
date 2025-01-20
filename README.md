@@ -13,7 +13,7 @@ Large Language Model(LLM) based agent, the agent autonomously attempts to solve 
 ## Install
 
 - [Your Machine](https://clover0.github.io/issue-agent/getting-started/installation/)
-- [GitHub Action](https://clover0.github.io/issue-agent/getting-started/installation/) is comming soon!
+- [GitHub Action](https://github.com/clover0/setup-issue-agent)
 
 
 ## Documentation
@@ -27,7 +27,7 @@ The following models are supported.
   - gpt-4o
   - gpt-4o-mini
 - Anthropic models
-  - claude-3-5-sonnet
+  - claude-3-5-sonnet-latest (⭐️Strongly Recommended!)
 - AWS Bedrock Claude models
   - claude-3-5-sonnet v2 (ModelID = anthropic.claude-3-5-sonnet-20241022-v2:0)
   - claude-3-5-sonnet v1 (ModelID = anthropic.claude-3-5-sonnet-20240620-v1:0)
