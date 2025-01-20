@@ -1,4 +1,4 @@
-# Concept
+# Core Concept
 
 ## Design Principles
 

@@ -37,12 +37,14 @@ nav:
       - getting-started/setup.md
       - getting-started/usage.md
   - Consept:
-      - core-concept/concept.md
+      - Core: core-concept/concept.md
+      - Architecture: core-concept/arch.md
   - Configuration:
       - Command: configuration/command.md
       - YAML: configuration/yaml.md
       - Models: configuration/models.md
       - Functions: configuration/functions.md
+      - GitHub Action: configuration/github-action.md
 
 plugins:
   - minify:

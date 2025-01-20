@@ -18,7 +18,7 @@ What we mean by secure here are the following:
 
 ### What the Issue Agent can and cannot do
 
-* ✅ Pull requests only be created in the repository configured in the configuration file (Setup)
+* ✅ Pull requests only be created in the repository configured in the configuration file or CLI flags
 * ✅ To read an issue in one GitHub repository and submit a PR to that repository
 * 🚫 Interactive development work between an Agent and the human who directs the Agent
 * 🚫 Commits or pull request to an unconfigured repository
