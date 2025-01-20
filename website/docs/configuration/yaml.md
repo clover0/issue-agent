@@ -24,7 +24,7 @@ agent:
   # Required
   # LLM model name
   # The recommend model is Claude 3.5 Sonnet
-  # If you use AWS Bedrock, please set the Model ID
+  # If you use AWS Bedrock, set the Model ID
   #   e.g) anthropic.claude-3-5-sonnet-20241022-v2:0
   model: "claude-3-5-sonnet-latest"
 
