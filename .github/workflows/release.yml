@@ -70,13 +70,13 @@ jobs:
           echo "name=$image" >> "$GITHUB_OUTPUT"
           echo "digest=$sha_digest" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/attest-build-provenance@7668571508540a607bdfd90a87a560489fe372eb # v2.1.0
+      - uses: actions/attest-build-provenance@520d128f165991a6c774bcb264f323e3d70747f4 # v2.2.0
         with:
           subject-name: ghcr.io/clover0/issue-agent
           subject-digest: ${{ steps.digest-amd64.outputs.digest }}
           push-to-registry: true
 
-      - uses: actions/attest-build-provenance@7668571508540a607bdfd90a87a560489fe372eb # v2.1.0
+      - uses: actions/attest-build-provenance@520d128f165991a6c774bcb264f323e3d70747f4 # v2.2.0
         with:
           subject-name: ghcr.io/clover0/issue-agent
           subject-digest: ${{ steps.digest-arm64.outputs.digest }}
