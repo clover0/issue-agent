@@ -65,6 +65,7 @@ func main() {
 		awsDockerEnvs = append(awsDockerEnvs, "-e", "AWS_SESSION_TOKEN="+awsKeys.SessionToken)
 	}
 
+	// TODO: changeable image name
 	imageName := "ghcr.io/clover0/issue-agent"
 	imageTag := containerImageTag
 	dockerEnvs := passEnvs()
