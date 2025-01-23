@@ -5,10 +5,11 @@ import (
 	"strings"
 
 	"github.com/clover0/issue-agent/logger"
+	"github.com/clover0/issue-agent/util"
 )
 
 func SelectForwarder(lo logger.Logger, model string) LLMForwarder {
-	if strings.Contains(model, "anthropic.claude-3-5-sonnet") {
+	if util.IsAWSBedrockModel(model) {
 		return NewBedrockLLMForwarder(lo)
 	}
 	if strings.HasPrefix(model, "gpt") {

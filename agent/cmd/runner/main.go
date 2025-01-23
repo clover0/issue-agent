@@ -17,6 +17,7 @@ import (
 	"github.com/clover0/issue-agent/cli"
 	"github.com/clover0/issue-agent/config"
 	"github.com/clover0/issue-agent/logger"
+	"github.com/clover0/issue-agent/util"
 )
 
 const defaultConfigPath = "./issue_agent.yml"
@@ -52,12 +53,12 @@ func main() {
 	}
 
 	var awsDockerEnvs []string
-	if flags.Common.AWSProfile != "" {
-		awsKeys, err := getAWSKeys(flags.Common.AWSProfile, flags.Common.AWSRegion)
+	if util.IsAWSBedrockModel(flags.Common.Model) || util.IsAWSBedrockModel(conf.Agent.Model) {
+		lo.Info("detected using AWS Bedrock, so setup AWS session\n")
+		awsKeys, err := getAWSKeys(lo, flags.Common.AWSProfile, flags.Common.AWSRegion)
 		if err != nil {
 			panic(err)
 		}
-		lo.Info("using AWS credentials from %s profile\n", flags.Common.AWSProfile)
 		awsDockerEnvs = append(awsDockerEnvs, "-e", "AWS_REGION="+awsKeys.Region)
 		awsDockerEnvs = append(awsDockerEnvs, "-e", "AWS_ACCESS_KEY_ID="+awsKeys.AccessKeyID)
 		awsDockerEnvs = append(awsDockerEnvs, "-e", "AWS_SECRET_ACCESS_KEY="+awsKeys.SecretAccessKey)
@@ -235,11 +236,12 @@ type awsCredentials struct {
 	SessionToken    string
 }
 
-func getAWSKeys(profile string, region string) (awsCredentials, error) {
+func getAWSKeys(lo logger.Logger, profile string, region string) (awsCredentials, error) {
 	ctx := context.Background()
 
 	var opts []func(*awsconfig.LoadOptions) error
 	if profile != "" {
+		lo.Info("using AWS credentials from %s profile\n", profile)
 		opts = append(opts, awsconfig.WithSharedConfigProfile(profile))
 	}
 
