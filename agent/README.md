@@ -10,7 +10,7 @@ var containerImageTag = "dev-release
 make image/release
 
 # run 
-GITHUB_TOKEN=$(gh auth token) \                                                                                                                                      08:26:58
+GITHUB_TOKEN=$(gh auth token) \
 ANTHROPIC_API_KEY="key" \
 OPENAI_API_KEY="key" \
   go run cmd/runner/main.go issue \
