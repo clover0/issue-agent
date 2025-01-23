@@ -58,7 +58,7 @@ jobs:
         run: docker build -t issue-agent-ci:${{ github.sha }} build/ -f release.Dockerfile
 
       - name: Test running container
-        run: docker run --rm issue-agent-ci:${{ github.sha }} issue-agent version
+        run: docker run --rm issue-agent-ci:${{ github.sha }} version
 
   lint:
     name: Lint
