@@ -9,7 +9,7 @@ require (
 	github.com/aws/smithy-go v1.22.1
 	github.com/go-playground/validator/v10 v10.24.0
 	github.com/google/go-github/v66 v66.0.0
-	github.com/openai/openai-go v0.1.0-alpha.38
+	github.com/openai/openai-go v0.1.0-alpha.49
 	golang.org/x/net v0.34.0
 	gopkg.in/yaml.v3 v3.0.1
 )
