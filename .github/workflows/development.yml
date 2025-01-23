@@ -51,8 +51,11 @@ jobs:
       - name: Install dependencies
         run: go mod tidy
 
+      - name: Build agent
+        run: DIST=$(pwd)/build/agent make build/agent
+
       - name: Build docker image locally
-        run: docker build -t issue-agent-ci:${{ github.sha }} . -f release.Dockerfile
+        run: docker build -t issue-agent-ci:${{ github.sha }} build/ -f release.Dockerfile
 
       - name: Test running container
         run: docker run --rm issue-agent-ci:${{ github.sha }} issue-agent version

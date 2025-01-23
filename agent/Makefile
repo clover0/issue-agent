@@ -6,6 +6,9 @@ $(TEMPDIR):
 build: $(TEMPDIR)
 	cd cmd/runner && go build -o ../../$(TEMPDIR)/build/agent
 
+build/agent:
+	cd cmd/agent && go build -o $(DIST)
+
 .PHONY: test
 run/test:
 	go test ./... -v -parallel 4 -race
