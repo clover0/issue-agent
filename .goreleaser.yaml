@@ -109,7 +109,7 @@ archives:
       {{- if .Arm }}v{{ .Arm }}{{ end }}
 
 release:
-  prerelease: true
+  prerelease: auto
   replace_existing_artifacts: true
 
 brews:
