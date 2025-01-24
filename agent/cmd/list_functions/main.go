@@ -36,6 +36,7 @@ func main() {
 			}
 			out += fmt.Sprintf("    %s\n", propKey)
 			out += fmt.Sprintf("        %s\n", propValues["description"])
+			out += "\n"
 		}
 	}
 

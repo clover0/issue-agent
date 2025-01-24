@@ -13,22 +13,22 @@ const FuncModifyFile = "modify_file"
 func InitModifyFileFunction() Function {
 	f := Function{
 		Name: FuncModifyFile,
-		Description: strings.ReplaceAll(`Modify the file at output_path with the contents of content_text.
- Modified file must be full content including modified content`, "\n", ""),
+		Description: strings.ReplaceAll(`Modify the file at path with the contents of content_text.
+ Modified file must be full file content including modified content`, "\n", ""),
 		Func: ModifyFile,
 		Parameters: map[string]interface{}{
 			"type": "object",
 			"properties": map[string]interface{}{
-				"output_path": map[string]interface{}{
+				"path": map[string]interface{}{
 					"type":        "string",
-					"description": "Path of the file to be modified to the new content",
+					"description": "Path of the file to be modified",
 				},
 				"content_text": map[string]interface{}{
 					"type":        "string",
 					"description": "The new content of the file",
 				},
 			},
-			"required":             []string{"output_path", "content_text"},
+			"required":             []string{"path", "content_text"},
 			"additionalProperties": false,
 		},
 	}
@@ -39,19 +39,19 @@ func InitModifyFileFunction() Function {
 }
 
 type ModifyFileInput struct {
-	OutputPath  string `json:"output_path"`
+	Path        string `json:"path"`
 	ContentText string `json:"content_text"`
 }
 
 func ModifyFile(input ModifyFileInput) (store.File, error) {
-	if err := guardPath(input.OutputPath); err != nil {
+	if err := guardPath(input.Path); err != nil {
 		return store.File{}, err
 	}
 
 	var file store.File
-	f, err := os.Create(input.OutputPath)
+	f, err := os.Create(input.Path)
 	if err != nil {
-		return file, fmt.Errorf("modify %s: %w", input.OutputPath, err)
+		return file, fmt.Errorf("modify %s: %w", input.Path, err)
 	}
 	defer f.Close()
 
@@ -65,7 +65,7 @@ func ModifyFile(input ModifyFileInput) (store.File, error) {
 	}
 
 	return store.File{
-		Path:    input.OutputPath,
+		Path:    input.Path,
 		Content: input.ContentText,
 	}, nil
 }

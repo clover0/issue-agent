@@ -13,12 +13,12 @@ const FuncPutFile = "put_file"
 func InitPutFileFunction() Function {
 	f := Function{
 		Name:        FuncPutFile,
-		Description: "Put new content to the file",
+		Description: "Put new file content to path",
 		Func:        PutFile,
 		Parameters: map[string]interface{}{
 			"type": "object",
 			"properties": map[string]interface{}{
-				"output_path": map[string]interface{}{
+				"path": map[string]interface{}{
 					"type":        "string",
 					"description": "Path of the file to be changed to the new content",
 				},
@@ -27,7 +27,7 @@ func InitPutFileFunction() Function {
 					"description": "The new content of the file",
 				},
 			},
-			"required":             []string{"output_path", "content_text"},
+			"required":             []string{"path", "content_text"},
 			"additionalProperties": false,
 		},
 	}
@@ -38,24 +38,24 @@ func InitPutFileFunction() Function {
 }
 
 type PutFileInput struct {
-	OutputPath  string `json:"output_path"`
+	Path        string `json:"path"`
 	ContentText string `json:"content_text"`
 }
 
 func PutFile(input PutFileInput) (store.File, error) {
-	if err := guardPath(input.OutputPath); err != nil {
+	if err := guardPath(input.Path); err != nil {
 		return store.File{}, err
 	}
 
 	var file store.File
-	baseDir := filepath.Dir(input.OutputPath)
+	baseDir := filepath.Dir(input.Path)
 	if err := os.MkdirAll(baseDir, 0755); err != nil {
 		return file, fmt.Errorf("mkdir all %s error: %w", baseDir, err)
 	}
 
-	f, err := os.Create(input.OutputPath)
+	f, err := os.Create(input.Path)
 	if err != nil {
-		return file, fmt.Errorf("putting %s: %w", input.OutputPath, err)
+		return file, fmt.Errorf("putting %s: %w", input.Path, err)
 	}
 	defer f.Close()
 
@@ -69,7 +69,7 @@ func PutFile(input PutFileInput) (store.File, error) {
 	}
 
 	return store.File{
-		Path:    input.OutputPath,
+		Path:    input.Path,
 		Content: input.ContentText,
 	}, nil
 }
