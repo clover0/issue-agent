@@ -1,0 +1,7 @@
+[tagpr]
+	vPrefix = true
+	releaseBranch = main
+	versionFile = -
+	changelog = false
+	release = draft
+	commitPrefix = [release]
