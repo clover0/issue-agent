@@ -37,7 +37,7 @@ func (a BedrockLLMForwarder) StartForward(input StartCompletionInput) ([]LLMMess
 
 	history = append(history, initialHistory...)
 
-	a.Bedrock.logger.Info(logger.Green(fmt.Sprintf("model: %s, sending message...\n", input.Model)))
+	a.Bedrock.logger.Info(logger.Green(fmt.Sprintf("model: %s, sending message\n", input.Model)))
 	a.Bedrock.logger.Debug("system prompt:\n%s\n", input.SystemPrompt)
 	a.Bedrock.logger.Debug("user prompt:\n%s\n", input.StartUserPrompt)
 	resp, err := a.Bedrock.Messages.Create(context.TODO(),
@@ -58,7 +58,7 @@ func (a BedrockLLMForwarder) StartForward(input StartCompletionInput) ([]LLMMess
 	history = append(history, assistantHist)
 
 	a.Bedrock.logger.Info(logger.Yellow("returned messages:\n"))
-	a.showDebugMessage(history[len(history)-1])
+	assistantHist.ShowAssistantMessage(a.Bedrock.logger)
 
 	return history, nil
 }
@@ -164,7 +164,7 @@ func (a BedrockLLMForwarder) ForwardLLM(
 		Content: content,
 	})
 
-	a.Bedrock.logger.Info(logger.Green(fmt.Sprintf("model: %s, sending message...\n", input.Model)))
+	a.Bedrock.logger.Info(logger.Green(fmt.Sprintf("model: %s, sending message\n", input.Model)))
 	a.Bedrock.logger.Debug("%s\n", newMsg.RawContent)
 
 	resp, err := a.Bedrock.Messages.Create(
@@ -183,8 +183,8 @@ func (a BedrockLLMForwarder) ForwardLLM(
 	}
 	history = append(history, assistantHist)
 
-	a.Bedrock.logger.Info(logger.Yellow("returned messages:\n"))
-	a.showDebugMessage(history[len(history)-1])
+	a.Bedrock.logger.Info(logger.Yellow("LLM returned messages:\n"))
+	assistantHist.ShowAssistantMessage(a.Bedrock.logger)
 
 	return history, nil
 }
@@ -244,6 +244,11 @@ func (a BedrockLLMForwarder) buildAssistantHistory(bedrockResp bedrockruntime.Co
 		FinishReason:      convertBedrockStopReasonToReason(bedrockResp.StopReason),
 		RawContent:        text,
 		ReturnedToolCalls: toolCalls,
+		Usage: LLMUsage{
+			InputToken:  *bedrockResp.Usage.InputTokens,
+			OutputToken: *bedrockResp.Usage.OutputTokens,
+			TotalToken:  *bedrockResp.Usage.TotalTokens,
+		},
 	}, nil
 }
 
@@ -291,17 +296,5 @@ func convertBedrockStopReasonToReason(reason types.StopReason) MessageFinishReas
 		return FinishLengthOver
 	default:
 		panic(fmt.Sprintf("unknown finish reason: %s", reason))
-	}
-}
-
-// TODO: refactor with openai debugging
-func (a BedrockLLMForwarder) showDebugMessage(m LLMMessage) {
-	a.Bedrock.logger.Debug(fmt.Sprintf("finish_reason: %s, role: %s, message.content: %s\n",
-		m.FinishReason, m.Role, m.RawContent,
-	))
-	a.Bedrock.logger.Debug("tools:\n")
-	for _, t := range m.ReturnedToolCalls {
-		a.Bedrock.logger.Debug(fmt.Sprintf("id: %s, function_name:%s, function_args:%s\n",
-			t.ToolCallerID, t.ToolName, t.Argument))
 	}
 }

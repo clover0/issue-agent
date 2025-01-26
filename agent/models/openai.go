@@ -3,6 +3,8 @@ package models
 // TODO: make no open-ai dependency
 // The openai-go library is too large for the purposes of this project.
 
+// TODO: move logic to communicate with LLM to the OpenAILLMForwarder struct
+
 import (
 	"context"
 	"errors"
@@ -65,7 +67,7 @@ func (o OpenAI) StartCompletion(ctx context.Context, input StartCompletionInput)
 	params, historyInitial := o.createCompletionParams(input)
 	history = append(history, historyInitial...)
 
-	o.logger.Info(logger.Green(fmt.Sprintf("model: %s, sending message...\n", input.Model)))
+	o.logger.Info(logger.Green(fmt.Sprintf("model: %s, sending message\n", input.Model)))
 	o.logger.Debug("system prompt:\n%s\n", input.SystemPrompt)
 	o.logger.Debug("user prompt:\n%s\n", input.StartUserPrompt)
 	chat, err := o.client.Chat.Completions.New(ctx, params)
@@ -80,6 +82,11 @@ func (o OpenAI) StartCompletion(ctx context.Context, input StartCompletionInput)
 		FinishReason:      convertToFinishReason(msg.FinishReason),
 		ReturnedToolCalls: convertToToolCalls(msg.Message.ToolCalls),
 		RawMessageStruct:  msg.Message,
+		Usage: LLMUsage{
+			InputToken:  int32(chat.Usage.PromptTokens),
+			OutputToken: int32(chat.Usage.CompletionTokens),
+			TotalToken:  int32(chat.Usage.TotalTokens),
+		},
 	}
 	history = append(history, lastMsg)
 
@@ -88,7 +95,7 @@ func (o OpenAI) StartCompletion(ctx context.Context, input StartCompletionInput)
 	))
 
 	o.logger.Info(logger.Yellow("returned messages:\n"))
-	o.debugShowChoice(history)
+	lastMsg.ShowAssistantMessage(o.logger)
 
 	return history, nil
 }
@@ -165,11 +172,16 @@ func (o OpenAI) ContinueCompletion(
 		FinishReason:      convertToFinishReason(msg.FinishReason),
 		ReturnedToolCalls: convertToToolCalls(msg.Message.ToolCalls),
 		RawMessageStruct:  msg.Message,
+		Usage: LLMUsage{
+			InputToken:  int32(chat.Usage.PromptTokens),
+			OutputToken: int32(chat.Usage.CompletionTokens),
+			TotalToken:  int32(chat.Usage.TotalTokens),
+		},
 	}
 	history = append(history, lastMsg)
 
 	o.logger.Info(logger.Yellow("returned messages:\n"))
-	o.debugShowChoice(history)
+	lastMsg.ShowAssistantMessage(o.logger)
 
 	return history, nil
 }
@@ -228,17 +240,5 @@ func (o OpenAI) debugShowSendingMsg(param openai.ChatCompletionNewParams) {
 		o.logger.Info(logger.Green(fmt.Sprintf("model: %s, sending messages:\n", param.Model.String())))
 		// TODO: show all messages. But now, show only the last message
 		o.logger.Debug(fmt.Sprintf("%s\n", param.Messages.Value[len(param.Messages.Value)-1]))
-	}
-}
-
-func (o OpenAI) debugShowChoice(history []LLMMessage) {
-	last := history[len(history)-1]
-	o.logger.Debug(fmt.Sprintf("finish_reason: %s, role: %s, message.content: %s\n",
-		last.FinishReason, last.Role, last.RawContent,
-	))
-	o.logger.Debug("tools:\n")
-	for _, t := range last.ReturnedToolCalls {
-		o.logger.Debug(fmt.Sprintf("id: %s, function_name:%s, function_args:%s\n",
-			t.ToolCallerID, t.ToolName, t.Argument))
 	}
 }

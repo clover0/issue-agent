@@ -30,7 +30,7 @@ func (a AnthropicLLMForwarder) StartForward(input StartCompletionInput) ([]LLMMe
 	params, initialHistory := a.createParams(input)
 	history = append(history, initialHistory...)
 
-	a.anthropic.logger.Info(logger.Green(fmt.Sprintf("model: %s, sending message...\n", input.Model)))
+	a.anthropic.logger.Info(logger.Green(fmt.Sprintf("model: %s, sending message\n", input.Model)))
 	a.anthropic.logger.Debug("system prompt:\n%s\n", input.SystemPrompt)
 	a.anthropic.logger.Debug("user prompt:\n%s\n", input.StartUserPrompt)
 	resp, err := a.anthropic.Messages.Create(context.TODO(), params)
@@ -58,15 +58,21 @@ func (a AnthropicLLMForwarder) StartForward(input StartCompletionInput) ([]LLMMe
 			})
 		}
 	}
-	history = append(history, LLMMessage{
+	lastMsg := LLMMessage{
 		Role:              LLMAssistant,
-		FinishReason:      convertAnthoropicStopReasonToReason(resp.StopReason),
+		FinishReason:      convertAnthropicStopReasonToReason(resp.StopReason),
 		RawContent:        text,
 		ReturnedToolCalls: toolCalls,
-	})
+		Usage: LLMUsage{
+			InputToken:  int32(resp.Usage.InputTokens),
+			OutputToken: int32(resp.Usage.OutputTokens),
+			TotalToken:  int32(resp.Usage.InputTokens + resp.Usage.OutputTokens),
+		},
+	}
+	history = append(history, lastMsg)
 
 	a.anthropic.logger.Info(logger.Yellow("returned messages:\n"))
-	a.showDebugMessage(history[len(history)-1])
+	lastMsg.ShowAssistantMessage(a.anthropic.logger)
 
 	return history, nil
 }
@@ -171,7 +177,7 @@ func (a AnthropicLLMForwarder) ForwardLLM(
 		"content": content,
 	})
 
-	a.anthropic.logger.Info(logger.Green(fmt.Sprintf("model: %s, sending message...\n", input.Model)))
+	a.anthropic.logger.Info(logger.Green(fmt.Sprintf("model: %s, sending message\n", input.Model)))
 	a.anthropic.logger.Debug("%s\n", newMsg.RawContent)
 
 	resp, err := a.anthropic.Messages.Create(context.TODO(), params)
@@ -200,15 +206,22 @@ func (a AnthropicLLMForwarder) ForwardLLM(
 			})
 		}
 	}
-	history = append(history, LLMMessage{
+
+	lastMsg := LLMMessage{
 		Role:              LLMAssistant,
-		FinishReason:      convertAnthoropicStopReasonToReason(resp.StopReason),
+		FinishReason:      convertAnthropicStopReasonToReason(resp.StopReason),
 		RawContent:        text,
 		ReturnedToolCalls: toolCalls,
-	})
+		Usage: LLMUsage{
+			InputToken:  int32(resp.Usage.InputTokens),
+			OutputToken: int32(resp.Usage.OutputTokens),
+			TotalToken:  int32(resp.Usage.InputTokens + resp.Usage.OutputTokens),
+		},
+	}
+	history = append(history, lastMsg)
 
 	a.anthropic.logger.Info(logger.Yellow("returned messages:\n"))
-	a.showDebugMessage(history[len(history)-1])
+	lastMsg.ShowAssistantMessage(a.anthropic.logger)
 
 	return history, nil
 }
@@ -272,7 +285,7 @@ func (a AnthropicLLMForwarder) createParams(input StartCompletionInput) (J, []LL
 }
 
 // TODO: refactor to shared multi models
-func convertAnthoropicStopReasonToReason(reason string) MessageFinishReason {
+func convertAnthropicStopReasonToReason(reason string) MessageFinishReason {
 	switch reason {
 	case "end_turn":
 		return FinishStop
@@ -284,17 +297,5 @@ func convertAnthoropicStopReasonToReason(reason string) MessageFinishReason {
 		return FinishToolCalls
 	default:
 		return FinishToolCalls
-	}
-}
-
-// TODO: refactor with openai debugging
-func (a AnthropicLLMForwarder) showDebugMessage(m LLMMessage) {
-	a.anthropic.logger.Debug(fmt.Sprintf("finish_reason: %s, role: %s, message.content: %s\n",
-		m.FinishReason, m.Role, m.RawContent,
-	))
-	a.anthropic.logger.Debug("tools:\n")
-	for _, t := range m.ReturnedToolCalls {
-		a.anthropic.logger.Debug(fmt.Sprintf("id: %s, function_name:%s, function_args:%s\n",
-			t.ToolCallerID, t.ToolName, t.Argument))
 	}
 }
