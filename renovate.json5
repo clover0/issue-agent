@@ -4,7 +4,6 @@
     "config:recommended"
   ],
   automerge: false,
-  timezone: "JST",
   addLabels: ["dependencies", "renovate"],
   branchPrefix: "renovate/"
 }
