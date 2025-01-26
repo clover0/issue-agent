@@ -8,10 +8,10 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/bedrockruntime"
 	"github.com/aws/aws-sdk-go-v2/service/bedrockruntime/document"
 	"github.com/aws/aws-sdk-go-v2/service/bedrockruntime/types"
-	"github.com/aws/smithy-go/ptr"
 
 	"github.com/clover0/issue-agent/logger"
 	"github.com/clover0/issue-agent/step"
+	"github.com/clover0/issue-agent/util/pointer"
 )
 
 // TODO: refactor using ptr package
@@ -89,8 +89,8 @@ func (a BedrockLLMForwarder) ForwardLLM(
 					}
 					msg.Content = append(msg.Content, &types.ContentBlockMemberToolUse{
 						Value: types.ToolUseBlock{
-							ToolUseId: ptr.String(v.ToolCallerID),
-							Name:      ptr.String(v.ToolName),
+							ToolUseId: &v.ToolCallerID,
+							Name:      &v.ToolName,
 							Input:     document.NewLazyDocument(inputMap),
 						},
 					})
@@ -110,7 +110,7 @@ func (a BedrockLLMForwarder) ForwardLLM(
 		case LLMTool:
 			msg.Role = types.ConversationRoleUser
 			toolResult := types.ToolResultBlock{
-				ToolUseId: ptr.String(h.RespondToolCall.ToolCallerID),
+				ToolUseId: &h.RespondToolCall.ToolCallerID,
 			}
 			toolResult.Content = append(toolResult.Content, &types.ToolResultContentBlockMemberText{Value: h.RawContent})
 			msg.Content = append(msg.Content, &types.ContentBlockMemberToolResult{Value: toolResult})
@@ -130,7 +130,7 @@ func (a BedrockLLMForwarder) ForwardLLM(
 		if v.ToolCallerID != "" {
 			content[i] = &types.ContentBlockMemberToolResult{
 				Value: types.ToolResultBlock{
-					ToolUseId: ptr.String(v.ToolCallerID),
+					ToolUseId: &v.ToolCallerID,
 					Content: []types.ToolResultContentBlock{
 						&types.ToolResultContentBlockMemberText{
 							Value: v.Content,
@@ -255,8 +255,8 @@ func (a BedrockLLMForwarder) buildStartParams(input StartCompletionInput) ([]typ
 	for i, f := range input.Functions {
 		tools[i] = &types.ToolMemberToolSpec{
 			Value: types.ToolSpecification{
-				Name:        ptr.String(f.Name.String()),
-				Description: ptr.String(f.Description),
+				Name:        pointer.String(f.Name.String()),
+				Description: &f.Description,
 				InputSchema: &types.ToolInputSchemaMemberJson{
 					Value: document.NewLazyDocument(f.Parameters),
 				},

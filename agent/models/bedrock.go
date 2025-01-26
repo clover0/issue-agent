@@ -5,14 +5,13 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/aws/aws-sdk-go-v2/service/bedrockruntime/types"
-	"github.com/aws/smithy-go/ptr"
-
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/bedrockruntime"
+	"github.com/aws/aws-sdk-go-v2/service/bedrockruntime/types"
 
 	"github.com/clover0/issue-agent/logger"
+	"github.com/clover0/issue-agent/util/pointer"
 )
 
 type BedrockClient struct {
@@ -62,7 +61,7 @@ func (s *BedrockMessageService) Create(
 		// todo: changeable models
 		ModelId: aws.String(modelID),
 		InferenceConfig: &types.InferenceConfiguration{
-			Temperature: ptr.Float32(0),
+			Temperature: pointer.Float32(0),
 		},
 		System:     []types.SystemContentBlock{&types.SystemContentBlockMemberText{Value: systemMessage}},
 		Messages:   messages,
