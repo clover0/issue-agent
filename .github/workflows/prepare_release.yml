@@ -1,7 +1,9 @@
 name: Prepare for Release
+
 on:
   push:
     branches: ["main"]
+
 jobs:
   tagpr:
     runs-on: ubuntu-latest
