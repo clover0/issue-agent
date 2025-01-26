@@ -60,6 +60,7 @@ func OrchestrateAgents(
 		functions.AllFunctions(),
 		func(e functions.Function) string { return e.Name.String() },
 	), ","))
+	lo.Info("agents make a pull request to %s/%s\n", conf.Agent.GitHub.Owner, workRepository)
 
 	submitServiceCaller := agithub.NewSubmitFileGitHubService(conf.Agent.GitHub.Owner, workRepository, gh, lo).
 		Caller(ctx, functions.SubmitFilesServiceInput{
@@ -218,7 +219,7 @@ func OrchestrateAgents(
 		); err != nil {
 			lo.Error("failed to create pull request review: %s. but agent continue to work\n", err)
 		}
-		lo.Info("Finish %s\n", p.AgentName)
+		lo.Info("finish %s\n", p.AgentName)
 	}
 
 	lo.Info("agents finished work\n")
