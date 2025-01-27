@@ -46,6 +46,9 @@ func InitializeFunctions(
 	if allowFunction(allowFunctions, FuncSearchFiles) {
 		InitSearchFilesFunction()
 	}
+	if allowFunction(allowFunctions, FuncRemoveFile) {
+		InitRemoveFileFunction()
+	}
 }
 
 func allowFunction(allowFunctions []string, name string) bool {
@@ -117,6 +120,8 @@ func ExecFunction(l logger.Logger, store *libstore.Store, funcName FuncName, arg
 	for _, o := range optArg {
 		o(option)
 	}
+
+	// TODO: make large switch statement smaller
 	switch funcName {
 	case FuncOpenFile:
 		l.Info("functions: do %s\n", FuncOpenFile)
@@ -237,6 +242,18 @@ func ExecFunction(l logger.Logger, store *libstore.Store, funcName FuncName, arg
 			return "", err
 		}
 		return strings.Join(r, "\n"), nil
+
+	case FuncRemoveFile:
+		l.Info("functions: do %s\n", FuncRemoveFile)
+		input := RemoveFileInput{}
+		if err := marshalFuncArgs(argsJson, &input); err != nil {
+			return "", fmt.Errorf("failed to unmarshal args: %w", err)
+		}
+		err := RemoveFile(input)
+		if err != nil {
+			return "", err
+		}
+		return defaultSuccessReturning, nil
 	}
 
 	return "", errors.New("function not found")

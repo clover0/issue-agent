@@ -69,4 +69,5 @@ agent:
     - put_file
     - submit_files
     - search_files
+    - remove_file
 ```

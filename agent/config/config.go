@@ -157,8 +157,8 @@ func setDefaults(conf Config) Config {
 			"modify_file",
 			"open_file",
 			"put_file",
-			"submit_files",
 			"search_files",
+			"remove_file",
 		}
 	}
 
