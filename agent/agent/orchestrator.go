@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/google/go-github/v66/github"
+	"github.com/google/go-github/v68/github"
 
 	"github.com/clover0/issue-agent/config"
 	"github.com/clover0/issue-agent/functions"
@@ -18,6 +18,7 @@ import (
 	libprompt "github.com/clover0/issue-agent/prompt"
 	"github.com/clover0/issue-agent/store"
 	"github.com/clover0/issue-agent/util"
+	"github.com/clover0/issue-agent/util/pointer"
 )
 
 // OrchestrateAgents orchestrates agents
@@ -186,7 +187,7 @@ func OrchestrateAgents(
 		// TODO: move to agithub package
 		var comments []*github.DraftReviewComment
 		for _, r := range reviews {
-			startLine := github.Int(r.ReviewStartLine)
+			startLine := pointer.Ptr(r.ReviewStartLine)
 			if *startLine == 0 {
 				*startLine = 1
 			}
@@ -200,11 +201,11 @@ func OrchestrateAgents(
 				body += "\n\n```suggestion\n" + r.Suggestion + "\n```\n"
 			}
 			comments = append(comments, &github.DraftReviewComment{
-				Path:      github.String(r.ReviewFilePath),
-				Body:      github.String(body),
+				Path:      pointer.Ptr(r.ReviewFilePath),
+				Body:      pointer.Ptr(body),
 				StartLine: startLine,
-				Line:      github.Int(r.ReviewEndLine),
-				Side:      github.String("RIGHT"),
+				Line:      pointer.Ptr(r.ReviewEndLine),
+				Side:      pointer.Ptr("RIGHT"),
 			})
 		}
 
@@ -213,7 +214,7 @@ func OrchestrateAgents(
 			workRepository,
 			submittedPRNumber,
 			&github.PullRequestReviewRequest{
-				Event:    github.String("COMMENT"),
+				Event:    pointer.Ptr("COMMENT"),
 				Comments: comments,
 			},
 		); err != nil {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/google/go-github/v66/github"
+	"github.com/google/go-github/v68/github"
 
 	"github.com/clover0/issue-agent/functions"
 	"github.com/clover0/issue-agent/functions/agit"

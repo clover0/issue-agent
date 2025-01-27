@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/google/go-github/v66/github"
+	"github.com/google/go-github/v68/github"
 
 	"github.com/clover0/issue-agent/agent"
 	"github.com/clover0/issue-agent/config"
