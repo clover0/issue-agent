@@ -111,6 +111,8 @@ jobs:
       actions: read
       id-token: write
       packages: write
+    # we must use the tag reference
+    # https://github.com/slsa-framework/slsa-github-generator/blob/v2.0.0/internal/builders/container/README.md#referencing-the-slsa-generator
     uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v2.0.0
     with:
       image: ghcr.io/clover0/issue-agent
@@ -125,6 +127,8 @@ jobs:
       actions: read
       id-token: write
       packages: write
+    # we must use the tag reference
+    # https://github.com/slsa-framework/slsa-github-generator/blob/v2.0.0/internal/builders/container/README.md#referencing-the-slsa-generator
     uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v2.0.0
     with:
       image: ghcr.io/clover0/issue-agent

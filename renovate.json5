@@ -5,5 +5,14 @@
   ],
   automerge: false,
   addLabels: ["dependencies", "renovate"],
-  branchPrefix: "renovate/"
+  branchPrefix: "renovate/",
+  packageRules: [
+    {
+      // we must use the tag reference
+      // https://github.com/slsa-framework/slsa-github-generator/blob/v2.0.0/internal/builders/container/README.md#referencing-the-slsa-generator
+      matchDepNames: ["slsa-framework/slsa-github-generator"],
+      matchUpdateTypes: ["pinDigest"],
+      enabled: false
+    }
+  ]
 }
