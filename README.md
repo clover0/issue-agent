@@ -1,6 +1,6 @@
 <p align="center">
   <h1 align="center">Issue Agent</h1>
-  <p align="center">- An AI Agent that quickly solves simple issues</p>
+  <p align="center">An AI Agent that quickly solves simple issues</p>
 </p>
 
 ---
