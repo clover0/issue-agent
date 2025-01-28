@@ -2,14 +2,22 @@
 
 ## Design Principles
 
-* **Secure by Limiting**: Ensure security by limiting functionality and avoiding the execution of 
-various shell commands within the Agent environment. We want AI to do well, or rather control well.
+**Secure by restricting**:
 
-* **Simple, small things**: We do not do any interactive development work with the Agents,
-but only give initial instructions to them to work on the tasks and deliver the results.
-The goal is to do development work with a granularity that can be resolved by instructing the Agent once,
-rather than us having to open an editor to make changes and create a Pull Request.
+Ensure security by restricting functionality and preventing the execution of  
+shell commands within the Agent environment. 
+Instead of trying to have AI handle complex tasks well through detailed instructions, 
+the focus should be on limiting what it is allowed to do.
 
-* **No interactive, quick work**:
-  It is not that we want to spend our time talking with Agents, but to ask Agents to perform tasks that are necessary but have been difficult to automate so far,
-so that we can make the best use of our time.
+
+**Simple, small things**: 
+
+We do not engage in interactive development with the Agents.  
+Instead, we provide them with initial instructions to complete tasks and deliver results.  
+The goal is to structure development tasks with sufficient granularity so they can be completed by instructing the Agent once,  
+without requiring us to open an editor, make changes, or create a Pull Request.
+
+**No interactive, quick work**:
+
+Our goal is not to spend time interacting with Agents, but to delegate tasks that are essential yet have been challenging to automate,  
+allowing us to optimize how we use our time.

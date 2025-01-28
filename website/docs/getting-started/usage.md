@@ -1,14 +1,14 @@
 # Usage
 
 ## Run Standard
-You decide what GitHub issue you want to resolve
+Choose the GitHub issue you want to resolve.
 
-Example:
+### Example
 
-- GitHub working repository `clover0/example-repository`
-- GitHub issue number 123 to solve
-- Base branch `main` to create a pull request
-- LLM is Anthropic Claude 3.5 Sonnet
+- GitHub Repository: `clover0/example-repository`
+- Issue Number: 123 to solve
+- Base Branch: `main` to create a pull request
+- LLM: Anthropic Claude 3.5 Sonnet
 
 ```shell
 $ issue-agent create-pr clover0/example-repository/issues/123 \
@@ -17,8 +17,10 @@ $ issue-agent create-pr clover0/example-repository/issues/123 \
 ```
 
 ## Run with Environment Variables
+You can use environment variables to run the `issue-agent` in a single line.
 
-With environment variables in one line. [`gh` CLI is useful](https://github.com/cli/cli#installation).
+The [`gh` CLI](https://github.com/cli/cli#installation) is particularly useful for managing tokens.
+
 ```shell
 $ GITHUB_TOKEN=$(gh auth token) \
   ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY} \
@@ -27,10 +29,9 @@ $ GITHUB_TOKEN=$(gh auth token) \
     --model claude-3-5-sonnet-latest \
 ```
 
-OPENAI_API_KEY or ANTHROPIC_API_KEY environment variable is required
-
 
 ## Run AWS Bedrock with SSO session
+You can also execute the `issue-agent` command using AWS Bedrock with an SSO session.
 
 ```sh
 $ GITHUB_TOKEN=$(gh auth token) \
@@ -42,6 +43,6 @@ issue-agent create-pr clover0/example-repository/issues/123 \
 ```
 
 
-## Branch
+## Branch Naming
 
-Working branch is created automatically. `agent-` is added to the branch prefix.
+The working branch is created automatically with a prefix of `agent-`.

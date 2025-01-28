@@ -3,17 +3,17 @@
 ## Overview
 ![overview.png](overview.png)
 
-1. We run runner on host machine or GitHub Actions
-2. Runner starts the agent container with Docker
-3. Agent container executes the agent binary
-4. Agent binary communicates with LLM
-5. Agent only executes the limited functions
-6. Finally, agent creates a pull request to GitHub
+1. We run the runner on the host machine or GitHub Actions
+2. The runner starts the agent container using Docker
+3. The agent container executes the agent binary
+4. The agent binary communicates with LLM
+5. The agent only executes the restricted functions
+6. Finally, the agent creates a pull request to GitHub
 
 
 ## Runner
 
-Runner is a program that runs the agent container simply for users.
+The runner is a program that simply runs the agent container for users.
 
 
 ## Use Docker Container
@@ -23,8 +23,9 @@ Containers are used to isolate the file system, processes, and other resources f
 We commonly use Docker for this purpose.
 
 
-## Limited Functions
+## Restricted Functions
 
 Instead of executing a shell on the agent, function calling is used to process responses from the LLM.
 
-To prevent unintended information leakage to external sources or the execution of unsafe commands, shell execution is avoided.
+To prevent unintended information leakage to external sources or the execution of unsafe commands, 
+shell execution is strictly avoided.

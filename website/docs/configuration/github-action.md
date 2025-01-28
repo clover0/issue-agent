@@ -1,4 +1,4 @@
-# GitHub Action
-Example usage with GitHub Action.
+# GitHub Actions
+Examples of usage with GitHub Actions.
 
-[GitHub Action Cookbook](https://github.com/clover0/setup-issue-agent?tab=readme-ov-file#github-action-cookbook)
+[GitHub Actions Cookbook](https://github.com/clover0/setup-issue-agent?tab=readme-ov-file#github-action-cookbook)
