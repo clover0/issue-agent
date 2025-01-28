@@ -11,7 +11,7 @@ func main() {
 	// TODO:
 	//lo := logger.NewDefaultLogger()
 	lo := logger.NewPrinter("info")
-	lo.Info("start agent on container...\n")
+	lo.Info("start agent in container...\n")
 
 	if err := cli.Execute(); err != nil {
 		lo.Error("failed to execute command: %s\n", err)

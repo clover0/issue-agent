@@ -7,21 +7,20 @@ import (
 	"github.com/clover0/issue-agent/logger"
 )
 
+const noCommand = "no-command"
+
 // Parse parses the command and others from os.Args
 // issue-agent <command> others
-func Parse() (command string, others []string, err error) {
+func Parse() (command string, others []string) {
 	if len(os.Args) < 2 {
-		return "", nil, fmt.Errorf("command is required")
+		return noCommand, []string{}
 	}
 
-	return os.Args[1], os.Args[2:], nil
+	return os.Args[1], os.Args[2:]
 }
 
 func Execute() error {
-	command, others, err := Parse()
-	if err != nil {
-		return fmt.Errorf("failed to parse input: %w", err)
-	}
+	command, others := Parse()
 
 	lo := logger.NewPrinter("info")
 	switch command {
