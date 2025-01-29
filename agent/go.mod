@@ -8,7 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/bedrockruntime v1.24.1
 	github.com/go-playground/validator/v10 v10.24.0
 	github.com/google/go-github/v68 v68.0.0
-	github.com/openai/openai-go v0.1.0-alpha.49
+	github.com/openai/openai-go v0.1.0-alpha.50
 	golang.org/x/net v0.34.0
 	gopkg.in/yaml.v3 v3.0.1
 )
