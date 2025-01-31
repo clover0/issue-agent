@@ -52,9 +52,15 @@ func OrchestrateAgents(
 		return err
 	}
 
+	// check if the base branch exists
+	ghservice := agithub.NewGitHubService(conf.Agent.GitHub.Owner, workRepository, gh, lo)
+	if _, err = ghservice.GetBranch(baseBranch); err != nil {
+		return err
+	}
+
 	functions.InitializeFunctions(
 		*conf.Agent.GitHub.NoSubmit,
-		agithub.NewGitHubService(conf.Agent.GitHub.Owner, workRepository, gh, lo),
+		ghservice,
 		conf.Agent.AllowFunctions,
 	)
 	lo.Info("allowed functions: %s\n", strings.Join(util.Map(

@@ -54,3 +54,15 @@ func (s GitHubService) GetPullRequest(prNumber string) (functions.GetPullRequest
 		Content: pr.GetBody(),
 	}, nil
 }
+
+func (s GitHubService) GetBranch(branchName string) (string, error) {
+	c := context.Background()
+	branch, resp, err := s.client.Repositories.GetBranch(c, s.owner, s.repository, branchName, 0)
+	if err != nil {
+		if resp != nil && resp.StatusCode == 404 {
+			return "", fmt.Errorf("branch %s not found : %w", branchName, err)
+		}
+		return "", fmt.Errorf("failed to get branch: %w", err)
+	}
+	return branch.GetName(), nil
+}
