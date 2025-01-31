@@ -36,7 +36,7 @@ nav:
       - getting-started/installation.md
       - getting-started/setup.md
       - getting-started/usage.md
-  - Consept:
+  - Concept:
       - Core: core-concept/concept.md
       - Architecture: core-concept/arch.md
   - Configuration:
