@@ -83,6 +83,8 @@ github.com/openai/openai-go v0.1.0-alpha.49 h1:58Wnz1ElmAShgJ9jJQq4XDVzCAuTjK9Yi
 github.com/openai/openai-go v0.1.0-alpha.49/go.mod h1:3SdE6BffOX9HPEQv8IL/fi3LYZ5TUpRYaqGQZbyk11A=
 github.com/openai/openai-go v0.1.0-alpha.50 h1:ZxC7Uq0RvkZIxNIpKpcKwkahhyinEUCfgbjMQeVnEv8=
 github.com/openai/openai-go v0.1.0-alpha.50/go.mod h1:3SdE6BffOX9HPEQv8IL/fi3LYZ5TUpRYaqGQZbyk11A=
+github.com/openai/openai-go v0.1.0-alpha.51 h1:/iuF8QoWt4x9yoEr6AdMsSBc2SglamxA/a7wClrDrqw=
+github.com/openai/openai-go v0.1.0-alpha.51/go.mod h1:3SdE6BffOX9HPEQv8IL/fi3LYZ5TUpRYaqGQZbyk11A=
 github.com/pkg/diff v0.0.0-20210226163009-20ebb0f2a09e/go.mod h1:pJLUxLENpZxwdsKMEsNbx1VGcRFpLqf3715MtcvvzbA=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
