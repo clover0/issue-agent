@@ -37,9 +37,10 @@ type Config struct {
 			UserEmail string `yaml:"user_email"`
 		} `yaml:"git"`
 		GitHub struct {
-			NoSubmit        *bool  `yaml:"no_submit"`
-			CloneRepository *bool  `yaml:"clone_repository"`
-			Owner           string `yaml:"owner" validate:"required"`
+			NoSubmit        *bool    `yaml:"no_submit"`
+			CloneRepository *bool    `yaml:"clone_repository"`
+			Owner           string   `yaml:"owner" validate:"required"`
+			PRLabels        []string `yaml:"pr_labels"`
 		}
 		AllowFunctions []string `yaml:"allow_functions"`
 	} `yaml:"agent" validate:"required"`

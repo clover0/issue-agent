@@ -108,6 +108,18 @@ func (s SubmitFileGitHubService) Caller(
 		if err != nil {
 			return submitFileOut, errorf("failed to create PR: %w", err)
 		}
+
+		if len(callerInput.PRLabels) > 0 {
+			if _, _, err = s.client.Issues.AddLabelsToIssue(
+				ctx,
+				s.owner,
+				s.repository,
+				*pr.Number,
+				callerInput.PRLabels); err != nil {
+				return submitFileOut, errorf("failed to add labels(%s) to PR: %w", callerInput.PRLabels, err)
+			}
+		}
+
 		s.logger.Debug(fmt.Sprintf("created PR: %v\n", pr.URL))
 
 		return functions.SubmitFilesOutput{

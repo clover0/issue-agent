@@ -6,6 +6,7 @@ type SubmitFilesServiceInput struct {
 	BaseBranch string
 	GitEmail   string
 	GitName    string
+	PRLabels   []string
 }
 
 type SubmitFilesCallerType func(input SubmitFilesInput) (SubmitFilesOutput, error)

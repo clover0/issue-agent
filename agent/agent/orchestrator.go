@@ -74,6 +74,7 @@ func OrchestrateAgents(
 			BaseBranch: baseBranch,
 			GitEmail:   conf.Agent.Git.UserEmail,
 			GitName:    conf.Agent.Git.UserName,
+			PRLabels:   conf.Agent.GitHub.PRLabels,
 		})
 
 	dataStore := store.NewStore()
