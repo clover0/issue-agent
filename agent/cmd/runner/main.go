@@ -26,30 +26,37 @@ const defaultConfigPath = "./issue_agent.yml"
 // ldflags "-X github.com/clover0/issue-agent/main.containerImageTag=v0.0.1"
 var containerImageTag = "dev"
 
-// Use the docker command to start a container and execute the agent binary
 func main() {
 	lo := logger.NewPrinter("info")
+	if err := run(lo); err != nil {
+		lo.Error("error running agent: %v\n", err)
+		os.Exit(1)
+	}
+}
+
+// Use the docker command to start a container and execute the agent binary
+func run(lo logger.Logger) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	configPath, err := getConfigPathOrDefault()
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	conf, err := config.Load(configPath)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	promptPath, err := getPromptPath(conf)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	flags, err := parseArgs(lo)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	var awsDockerEnvs []string
@@ -57,7 +64,7 @@ func main() {
 		lo.Info("detected using AWS Bedrock, so setup AWS session\n")
 		awsKeys, err := getAWSKeys(lo, flags.Common.AWSProfile, flags.Common.AWSRegion)
 		if err != nil {
-			panic(err)
+			return err
 		}
 		awsDockerEnvs = append(awsDockerEnvs, "-e", "AWS_REGION="+awsKeys.Region)
 		awsDockerEnvs = append(awsDockerEnvs, "-e", "AWS_ACCESS_KEY_ID="+awsKeys.AccessKeyID)
@@ -82,7 +89,7 @@ func main() {
 	if len(promptPath) > 0 {
 		path, err := filepath.Abs(conf.Agent.PromptPath)
 		if err != nil {
-			panic(err)
+			return err
 		}
 		args = append(args, "-v", path+":"+config.PromptFilePath)
 	}
@@ -103,7 +110,7 @@ func main() {
 
 	if err := cmd.Start(); err != nil {
 		lo.Info("Error running container:", err)
-		panic(err)
+		return err
 	}
 
 	sigChan := make(chan os.Signal, 1)
@@ -123,9 +130,11 @@ func main() {
 	if err := cmd.Wait(); err != nil {
 		if exitErr, ok := err.(*exec.ExitError); ok && exitErr.ExitCode() != 0 {
 			lo.Info("Process exited with error: %v\n", err)
-			os.Exit(exitErr.ExitCode())
+			return err
 		}
 	}
+
+	return nil
 }
 
 func parseArgs(lo logger.Logger) (*cli.CreatePRInput, error) {
@@ -164,8 +173,8 @@ func dockerCmd() string {
 
 func stopContainer(containerName string) {
 	cmd := exec.Command(dockerCmd(), "kill", containerName)
-	bytes, _ := cmd.CombinedOutput()
-	fmt.Println(string(bytes))
+	output, _ := cmd.CombinedOutput()
+	fmt.Println(string(output))
 }
 
 func getConfigPathOrDefault() (string, error) {
