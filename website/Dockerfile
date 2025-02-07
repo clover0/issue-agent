@@ -1,4 +1,4 @@
-FROM python:3.13-slim-bookworm@sha256:a569688edb9acf677e8356c3db3eac4b56773e9859f83086d0d580c985cccc9b
+FROM python:3.13-slim-bookworm@sha256:ae9f9ac89467077ed1efefb6d9042132d28134ba201b2820227d46c9effd3174
 
 RUN pip install mkdocs
 RUN pip install mkdocs-material
