@@ -28,11 +28,11 @@ type Config struct {
 	WorkDir  string `yaml:"workdir"`
 	LogLevel string `yaml:"log_level" validate:"log_level"`
 	Agent    struct {
-		PromptPath       string `yaml:"prompt_path"`
-		Model            string `yaml:"model" validate:"required"`
-		MaxSteps         int    `yaml:"max_steps" validate:"gte=0"`
-		SkipReviewAgents *bool  `yaml:"skip_review_agents"`
-		Git              struct {
+		PromptPath   string `yaml:"prompt_path"`
+		Model        string `yaml:"model" validate:"required"`
+		MaxSteps     int    `yaml:"max_steps" validate:"gte=0"`
+		ReviewAgents int    `yaml:"review_agents"`
+		Git          struct {
 			UserName  string `yaml:"user_name"`
 			UserEmail string `yaml:"user_email"`
 		} `yaml:"git"`
@@ -140,11 +140,6 @@ func setDefaults(conf Config) Config {
 	if conf.Agent.GitHub.CloneRepository == nil {
 		clone := true
 		conf.Agent.GitHub.CloneRepository = &clone
-	}
-
-	if conf.Agent.SkipReviewAgents == nil {
-		skip := true
-		conf.Agent.SkipReviewAgents = &skip
 	}
 
 	// TODO: default value

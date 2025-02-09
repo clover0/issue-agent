@@ -30,5 +30,8 @@ Command and Flags
       Default: info.
     --model
       LLM name. For the model name, check the documentation of each LLM provider.
+    --review_agents
+      The number of agents to review. A value greater than 0 will review to the created PR.
+      Default: 0
 
 ```

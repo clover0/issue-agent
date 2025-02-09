@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"text/template"
 
+	"github.com/clover0/issue-agent/config"
 	"github.com/clover0/issue-agent/loader"
 )
 
@@ -37,12 +38,13 @@ func BuildDeveloperPrompt(promptTpl PromptTemplate, language string, issueLoader
 	})
 }
 
-func BuildReviewManagerPrompt(promptTpl PromptTemplate, language string, issue loader.Issue, changedFilesPath []string) (Prompt, error) {
+func BuildReviewManagerPrompt(promptTpl PromptTemplate, cnf config.Config, issue loader.Issue, changedFilesPath []string) (Prompt, error) {
 	m := make(map[string]any)
 
-	m["Language"] = language
+	m["Language"] = cnf.Language
 	m["filePaths"] = changedFilesPath
 	m["issue"] = issue.Content
+	m["reviewAgents"] = cnf.Agent.ReviewAgents
 
 	m["noFiles"] = ""
 	if len(changedFilesPath) == 0 {

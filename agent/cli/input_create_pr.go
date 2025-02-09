@@ -43,6 +43,10 @@ func (c *CreatePRInput) MergeConfig(conf config.Config) config.Config {
 		conf.Agent.GitHub.Owner = c.GitHubOwner
 	}
 
+	if c.Common.ReviewAgents > 0 {
+		conf.Agent.ReviewAgents = c.Common.ReviewAgents
+	}
+
 	return conf
 }
 
