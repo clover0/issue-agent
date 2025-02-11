@@ -34,7 +34,9 @@ agent:
   # - execution function
   max_steps: 50
 
-  # The number of agents to review. A value greater than 0 will review to the created PR.
+  # The number of agents to review.
+  # If a value greater than 0 is specified, 
+  # then that number of reviews will be performed by agents with different roles.
   # Default is 0
   review_agents: 0
 

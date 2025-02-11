@@ -31,7 +31,8 @@ Command and Flags
     --model
       LLM name. For the model name, check the documentation of each LLM provider.
     --review_agents
-      The number of agents to review. A value greater than 0 will review to the created PR.
+      The number of agents to review.
+      If a value greater than 0 is specified, then that number of reviews will be performed by agents with different roles.
       Default: 0
 
 ```
