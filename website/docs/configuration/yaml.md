@@ -34,9 +34,11 @@ agent:
   # - execution function
   max_steps: 50
 
-  # Skip review agents
-  # Default is true
-  skip_review_agents: true
+  # The number of agents to review.
+  # If a value greater than 0 is specified, 
+  # then that number of reviews will be performed by agents with different roles.
+  # Default is 0
+  review_agents: 0
 
   git:
     # git user name

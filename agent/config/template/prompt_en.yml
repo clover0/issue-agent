@@ -108,10 +108,10 @@ agents:
 
       <instructions>
       * Generate a prompt (=prompt) for an AI agent to review the achievement of the issue
-      * Review perspectives can include security, governance, etc., but other perspectives are also acceptable
-      * Assign one perspective per agent and generate a maximum of one prompt
+      * Review perspectives can include security, governance, etc..., but other perspectives are also acceptable
+      * Assign one perspective per agent and generate a maximum of {{ .reviewAgents }} prompts
       * The prompt must be written in {{.Language}}
-      * Finally, output only the JSON adhering to the json-schema below
+      * Finally, output only the JSON structure following json-schema below
       </instructions>
 
       <template>
@@ -187,7 +187,7 @@ agents:
                 "type": "string",
               },
               "suggestion": {
-                "description": "Write any proposed changes from start_line to end_line",
+                "description": "Write any proposed changes with JSON encoded from start_line to end_line",
                 "type": "string"
               }
             },

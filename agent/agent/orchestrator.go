@@ -107,7 +107,7 @@ func OrchestrateAgents(
 		return err
 	}
 
-	if *conf.Agent.SkipReviewAgents {
+	if conf.Agent.ReviewAgents == 0 {
 		lo.Info("skip review agents\n")
 		lo.Info("agents finished work\n")
 		return nil
@@ -119,7 +119,7 @@ func OrchestrateAgents(
 	}
 	submittedPRNumber := dataStore.GetSubmission(store.LastSubmissionKey).PullRequestNumber
 
-	prompt, err = libprompt.BuildReviewManagerPrompt(promptTemplate, conf.Language, issue, util.Map(developerAgent.ChangedFiles(), func(f store.File) string { return f.Path }))
+	prompt, err = libprompt.BuildReviewManagerPrompt(promptTemplate, conf, issue, util.Map(developerAgent.ChangedFiles(), func(f store.File) string { return f.Path }))
 	if err != nil {
 		lo.Error("failed to build review manager prompt: %s\n", err)
 		return err
@@ -141,8 +141,8 @@ func OrchestrateAgents(
 		Prompt    string `json:"prompt"`
 	}
 
-	// TODO: refactor
-	// parse json output for revwier agents
+	// FIXME: these code is fragile
+	// parse json output for reviewer agents
 	// expected output:
 	//   text text text...
 	//   [{"agent_name": "agent1", "prompt": "prompt1"}, ...]
@@ -150,7 +150,9 @@ func OrchestrateAgents(
 	var prompts []agentPrompt
 	jsonStart := strings.Index(output, "[")   // find JSON start
 	jsonEnd := strings.LastIndex(output, "]") // find JSON end
-	outBuff := bytes.NewBufferString(output[jsonStart : jsonEnd+1])
+	jsonLike := output[jsonStart : jsonEnd+1]
+	jsonLike = strings.ReplaceAll(jsonLike, "\n", `\\n`)
+	outBuff := bytes.NewBufferString(jsonLike)
 	if err := json.Unmarshal(outBuff.Bytes(), &prompts); err != nil {
 		lo.Error("failed to unmarshal output: %s\n", err)
 		return err
@@ -185,7 +187,8 @@ func OrchestrateAgents(
 		}
 		jsonStart := strings.Index(output, "[")   // find JSON start
 		jsonEnd := strings.LastIndex(output, "]") // find JSON end
-		outBuff := bytes.NewBufferString(output[jsonStart : jsonEnd+1])
+		jsonStr := strings.ReplaceAll(output[jsonStart:jsonEnd+1], "\n", `\\n`)
+		outBuff := bytes.NewBufferString(jsonStr)
 		if err := json.Unmarshal(outBuff.Bytes(), &reviews); err != nil {
 			lo.Error("failed to unmarshal output: %s\n", err)
 			return err
