@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/clover0/issue-agent/functions"
@@ -13,15 +14,15 @@ type OpenAILLMForwarder struct {
 	openai OpenAI
 }
 
-func NewOpenAILLMForwarder(l logger.Logger) LLMForwarder {
+func NewOpenAILLMForwarder(l logger.Logger) (LLMForwarder, error) {
 	apiKey, ok := os.LookupEnv("OPENAI_API_KEY")
 	if !ok {
-		panic("OPENAI_API_KEY is not set")
+		return nil, fmt.Errorf("OPENAI_API_KEY is not set")
 	}
 
 	return OpenAILLMForwarder{
 		openai: NewOpenAI(l, apiKey),
-	}
+	}, nil
 }
 
 func (o OpenAILLMForwarder) StartForward(input StartCompletionInput) ([]LLMMessage, error) {

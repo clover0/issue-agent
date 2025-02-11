@@ -48,7 +48,10 @@ func CreatePR(flags []string) error {
 		return err
 	}
 
-	gh := newGitHub()
+	gh, err := newGitHub()
+	if err != nil {
+		return fmt.Errorf("failed to create GitHub client: %w", err)
+	}
 
 	ctx := context.Background()
 	var issLoader loader.Loader
@@ -76,10 +79,10 @@ func isPassedConfig(configPath string) bool {
 	return configPath != ""
 }
 
-func newGitHub() *github.Client {
+func newGitHub() (*github.Client, error) {
 	token, ok := os.LookupEnv("GITHUB_TOKEN")
 	if !ok {
-		panic("GITHUB_TOKEN is not set")
+		return nil, fmt.Errorf("GITHUB_TOKEN is not set")
 	}
-	return github.NewClient(nil).WithAuthToken(token)
+	return github.NewClient(nil).WithAuthToken(token), nil
 }
