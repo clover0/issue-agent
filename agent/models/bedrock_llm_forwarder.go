@@ -20,15 +20,14 @@ type BedrockLLMForwarder struct {
 	Bedrock BedrockClient
 }
 
-func NewBedrockLLMForwarder(l logger.Logger) LLMForwarder {
+func NewBedrockLLMForwarder(l logger.Logger) (LLMForwarder, error) {
 	bed, err := NewBedrock(l)
 	if err != nil {
-		l.Error("failed to create bedrock client: %v", err)
-		panic(err)
+		return nil, err
 	}
 	return BedrockLLMForwarder{
 		Bedrock: bed,
-	}
+	}, nil
 }
 
 func (a BedrockLLMForwarder) StartForward(input StartCompletionInput) ([]LLMMessage, error) {

@@ -14,15 +14,15 @@ type AnthropicLLMForwarder struct {
 	anthropic AnthropicClient
 }
 
-func NewAnthropicLLMForwarder(l logger.Logger) LLMForwarder {
+func NewAnthropicLLMForwarder(l logger.Logger) (LLMForwarder, error) {
 	token, ok := os.LookupEnv("ANTHROPIC_API_KEY")
 	if !ok {
-		panic("ANTHROPIC_API_KEY is not set")
+		return nil, fmt.Errorf("ANTHROPIC_API_KEY is not set")
 	}
 
 	return AnthropicLLMForwarder{
 		anthropic: NewAnthropic(l, token),
-	}
+	}, nil
 }
 
 func (a AnthropicLLMForwarder) StartForward(input StartCompletionInput) ([]LLMMessage, error) {

@@ -10,14 +10,14 @@ import (
 
 func SelectForwarder(lo logger.Logger, model string) (LLMForwarder, error) {
 	if util.IsAWSBedrockModel(model) {
-		return NewBedrockLLMForwarder(lo), nil
+		return NewBedrockLLMForwarder(lo)
 	}
 	if strings.HasPrefix(model, "gpt") {
-		return NewOpenAILLMForwarder(lo), nil
+		return NewOpenAILLMForwarder(lo)
 	}
 
 	if strings.HasPrefix(model, "claude") {
-		return NewAnthropicLLMForwarder(lo), nil
+		return NewAnthropicLLMForwarder(lo)
 	}
 
 	if model == "" {
