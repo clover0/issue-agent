@@ -196,7 +196,7 @@ func TestParseGitHubArg(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			got, err := ParseGitHubArg(tt.input)
+			got, err := ParseCreatePRGitHubArg(tt.input)
 
 			if tt.wantErr {
 				assert.HasError(t, err)

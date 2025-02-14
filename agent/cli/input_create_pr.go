@@ -89,9 +89,9 @@ type ArgGitHubCreatePR struct {
 	IssueNumber string
 }
 
-// ParseGitHubArg binds the input to the GitHub input
+// ParseCreatePRGitHubArg binds the input to the GitHub input
 // expected format: OWNER/REPOSITORY/issues/NUMBER
-func ParseGitHubArg(arg string) (ArgGitHubCreatePR, error) {
+func ParseCreatePRGitHubArg(arg string) (ArgGitHubCreatePR, error) {
 	splits := strings.Split(arg, "/")
 	if len(splits) != 4 {
 		return ArgGitHubCreatePR{}, fmt.Errorf("invalid input format: `%s`. valid format is `OWNER/REPOSITORY/issues/NUMBER`", arg)
@@ -107,7 +107,7 @@ func ParseGitHubArg(arg string) (ArgGitHubCreatePR, error) {
 
 func ParseCreatePRInput(argAndFlags []string) (CreatePRInput, error) {
 	arg, flags := ParseArgFlags(argAndFlags)
-	ghIn, err := ParseGitHubArg(arg)
+	ghIn, err := ParseCreatePRGitHubArg(arg)
 	if err != nil {
 		return CreatePRInput{}, fmt.Errorf("failed to parse arg: %w", err)
 	}
