@@ -139,6 +139,10 @@ func (a *Agent) History() []models.LLMMessage {
 	return a.history
 }
 
+func (a *Agent) LastHistory() models.LLMMessage {
+	return a.history[len(a.history)-1]
+}
+
 func (a *Agent) ChangedFiles() []store.File {
 	return a.store.ChangedFiles()
 }

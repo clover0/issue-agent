@@ -95,7 +95,7 @@ func OrchestrateAgents(
 		return err
 	}
 
-	instruction := requirementAgent.History()[len(requirementAgent.History())-1].RawContent
+	instruction := requirementAgent.LastHistory().RawContent
 	prompt, err = libprompt.BuildDeveloperPrompt(promptTemplate, conf.Language, loaderr, issue.Path, instruction)
 	if err != nil {
 		lo.Error("failed build developer prompt: %s\n", err)
@@ -134,7 +134,7 @@ func OrchestrateAgents(
 		lo.Error("reviewManagerAgent failed: %s\n", err)
 		return err
 	}
-	output := reviewManager.History()[len(reviewManager.History())-1].RawContent
+	output := reviewManager.LastHistory().RawContent
 	lo.Info("ReviewManagerAgent output: %s\n", output)
 	type agentPrompt struct {
 		AgentName string `json:"agent_name"`
@@ -176,7 +176,7 @@ func OrchestrateAgents(
 			lo.Error("%s failed: %s\n", p.AgentName, err)
 			return err
 		}
-		output := reviewer.History()[len(reviewer.History())-1].RawContent
+		output := reviewer.LastHistory().RawContent
 
 		// parse JSON output
 		// TODO: validate
