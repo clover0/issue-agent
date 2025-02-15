@@ -29,7 +29,7 @@ image/dev:
 	docker build -t $(DEV_IMAGE):$(DEV_IMAGE_TAG) -f dev.Dockerfile .
 
 # for testing release image on development
-image/release: $(DIST) image/dev
+image/dev-release: $(DIST) image/dev
 	$(eval CONTAINER_NAME = issu-agent-dev-built-container)
 	docker rm -f $(CONTAINER_NAME) || true
 	docker run -it --name $(CONTAINER_NAME) $(DEV_IMAGE):$(DEV_IMAGE_TAG) version

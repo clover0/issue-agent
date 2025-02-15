@@ -89,7 +89,7 @@ func OrchestrateAgents(
 		lo.Error("failed build requirement prompt: %s\n", err)
 		return err
 	}
-	requirementAgent, err := RunRequirementAgent(prompt, submitServiceCaller, parameter, lo, &dataStore, llmForwarder)
+	requirementAgent, err := RunAgent("requirementAgent", prompt, submitServiceCaller, parameter, lo, &dataStore, llmForwarder)
 	if err != nil {
 		lo.Error("requirement agent failed: %s\n", err)
 		return err
@@ -101,7 +101,7 @@ func OrchestrateAgents(
 		lo.Error("failed build developer prompt: %s\n", err)
 		return err
 	}
-	developerAgent, err := RunDeveloperAgent(prompt, submitServiceCaller, parameter, lo, &dataStore, llmForwarder)
+	developerAgent, err := RunAgent("developerAgent", prompt, submitServiceCaller, parameter, lo, &dataStore, llmForwarder)
 	if err != nil {
 		lo.Error("developer agent failed: %s\n", err)
 		return err
@@ -124,11 +124,11 @@ func OrchestrateAgents(
 		lo.Error("failed to build review manager prompt: %s\n", err)
 		return err
 	}
-	reviewManager, err := ReviewManagerAgent(
+	reviewManager, err := RunAgent(
+		"reviewManagerAgent",
 		prompt,
-		parameter,
-		developerAgent.ChangedFiles(),
 		submitServiceCaller,
+		parameter,
 		lo, &dataStore, llmForwarder)
 	if err != nil {
 		lo.Error("reviewManagerAgent failed: %s\n", err)
@@ -166,10 +166,12 @@ func OrchestrateAgents(
 			return err
 		}
 
-		reviewer, err := RunReviewAgent(
+		reviewer, err := RunAgent(
 			p.AgentName,
 			prpt,
-			parameter, submitServiceCaller, lo, &dataStore, llmForwarder)
+			submitServiceCaller,
+			parameter,
+			lo, &dataStore, llmForwarder)
 		if err != nil {
 			lo.Error("%s failed: %s\n", p.AgentName, err)
 			return err
@@ -238,90 +240,11 @@ func OrchestrateAgents(
 	return nil
 }
 
-func RunRequirementAgent(
-	prompt libprompt.Prompt,
-	submitServiceCaller functions.SubmitFilesCallerType,
-	parameter Parameter,
-	lo logger.Logger,
-	dataStore *store.Store,
-	llmForwarder models.LLMForwarder,
-) (Agent, error) {
-	ag := NewAgent(
-		parameter,
-		"requirementAgent",
-		lo,
-		submitServiceCaller,
-		prompt,
-		llmForwarder,
-		dataStore,
-	)
-
-	if _, err := ag.Work(); err != nil {
-		lo.Error("requirement agent failed: %s\n", err)
-		return Agent{}, err
-	}
-
-	return ag, nil
-}
-
-func RunDeveloperAgent(
-	prompt libprompt.Prompt,
-	submitServiceCaller functions.SubmitFilesCallerType,
-	parameter Parameter,
-	lo logger.Logger,
-	dataStore *store.Store,
-	llmForwarder models.LLMForwarder,
-) (Agent, error) {
-	ag := NewAgent(
-		parameter,
-		"developerAgent",
-		lo,
-		submitServiceCaller,
-		prompt,
-		llmForwarder,
-		dataStore,
-	)
-
-	if _, err := ag.Work(); err != nil {
-		lo.Error("agent failed: %s\n", err)
-		return Agent{}, err
-	}
-
-	return ag, nil
-}
-
-func ReviewManagerAgent(
-	prompt libprompt.Prompt,
-	parameter Parameter,
-	changedFiles []store.File,
-	submitServiceCaller functions.SubmitFilesCallerType,
-	lo logger.Logger,
-	dataStore *store.Store,
-	llmForwarder models.LLMForwarder,
-) (Agent, error) {
-	ag := NewAgent(
-		parameter,
-		"reviewManagerAgent",
-		lo,
-		submitServiceCaller,
-		prompt,
-		llmForwarder,
-		dataStore,
-	)
-
-	if _, err := ag.Work(); err != nil {
-		lo.Error("reviewManagerAgent failed: %s\n", err)
-		return Agent{}, err
-	}
-
-	return ag, nil
-}
-
-func RunReviewAgent(
+func RunAgent(
 	name string,
 	prompt libprompt.Prompt,
+	submitServiceCaller functions.SubmitFilesCallerType,
 	parameter Parameter,
-	submitServiceCaller functions.SubmitFilesCallerType, // TODO
 	lo logger.Logger,
 	dataStore *store.Store,
 	llmForwarder models.LLMForwarder,
@@ -337,7 +260,7 @@ func RunReviewAgent(
 	)
 
 	if _, err := ag.Work(); err != nil {
-		lo.Error("%s failed: %s\n", name, err)
+		lo.Error("requirement agent failed: %s\n", err)
 		return Agent{}, err
 	}
 
