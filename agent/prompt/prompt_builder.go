@@ -16,7 +16,7 @@ type Prompt struct {
 }
 
 func BuildRequirementPrompt(promptTpl PromptTemplate, language string, issue loader.Issue) (Prompt, error) {
-	return BuildPrompt(promptTpl, "requirement", map[string]any{
+	return BuildPrompt(promptTpl, "planner", map[string]any{
 		"Language":    language,
 		"issue":       issue.Content,
 		"issueNumber": issue.Path,
