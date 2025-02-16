@@ -58,6 +58,7 @@ agents:
       * If a function_calling does not work, try another tool or change the arguments before running it again. A command that fails once will not work again without modification!
       * Always keep track of the current file you are editing and the current working directory. The file you are editing might be in a different directory from the working directory!
       * Consider how changes will affect other source code! If there are impacts, also modify the affected areas!
+      * Finally You must create Pull Request with submission-template in {{.Language}}
       </important>
 
       <submission-template>
