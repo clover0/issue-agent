@@ -19,7 +19,7 @@ RUN cd /agent/src/cmd/agent && \
       -o /agent/bin/agent
 
 
-FROM gcr.io/distroless/static-debian12
+FROM gcr.io/distroless/static-debian12@sha256:3f2b64ef97bd285e36132c684e6b2ae8f2723293d09aae046196cca64251acac
 
 ENV PATH="/agent/bin:$PATH"
 
