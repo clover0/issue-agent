@@ -16,11 +16,11 @@ clean:
 	rm -rf $(TEMPDIR)
 
 build: $(TEMPDIR)
-	cd cmd/runner && go build -o ../../$(TEMPDIR)/build/agent
+	cd cmd/runner && CGO_ENABLED=0 go build -o ../../$(TEMPDIR)/build/agent
 
 build/agent:
 	mkdir -p $(dir $(DIST))
-	go build -o $(DIST) ./cmd/agent/
+	CGO_ENABLED=0 go build -o $(DIST) ./cmd/agent/
 
 run/test:
 	go test ./... -v -race
