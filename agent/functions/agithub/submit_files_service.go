@@ -3,11 +3,15 @@ package agithub
 import (
 	"context"
 	"fmt"
+	"os"
+	"time"
 
+	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/google/go-github/v68/github"
 
 	"github.com/clover0/issue-agent/functions"
-	"github.com/clover0/issue-agent/functions/agit"
 	"github.com/clover0/issue-agent/logger"
 )
 
@@ -33,6 +37,12 @@ func NewSubmitFileGitHubService(
 	}
 }
 
+const branchPrefix = "agent-"
+
+func MakeBranchName() string {
+	return fmt.Sprintf("%s%d", branchPrefix, time.Now().UnixNano())
+}
+
 // TODO: move to GitHub service
 func (s SubmitFileGitHubService) Caller(
 	ctx context.Context,
@@ -43,7 +53,6 @@ func (s SubmitFileGitHubService) Caller(
 	}
 
 	return func(input functions.SubmitFilesInput) (submitFileOut functions.SubmitFilesOutput, _ error) {
-		var out string
 		var err error
 
 		// TODO: validation before this caller
@@ -54,47 +63,76 @@ func (s SubmitFileGitHubService) Caller(
 			return submitFileOut, errorf("git  name is not set")
 		}
 
-		output, err := agit.GitConfigLocal(s.logger, "user.email", callerInput.GitEmail)
+		repo, err := git.PlainOpen(".")
 		if err != nil {
-			s.logger.Error(output)
-			return submitFileOut, errorf("git config email error: %w", err)
+			return submitFileOut, errorf("failed to open repository: %w", err)
 		}
 
-		output, err = agit.GitConfigLocal(s.logger, "user.name", callerInput.GitName)
+		cfg, err := repo.Config()
 		if err != nil {
-			s.logger.Error(output)
-			return submitFileOut, errorf("git config email error: %w", err)
+			return submitFileOut, err
 		}
 
-		_, err = agit.GitStatus(s.logger)
-		if err != nil {
-			return submitFileOut, errorf("git status error: %w", err)
+		cfg.User.Email = callerInput.GitEmail
+		cfg.User.Name = callerInput.GitName
+
+		if err := repo.SetConfig(cfg); err != nil {
+			return submitFileOut, err
 		}
 
-		newBranch := agit.MakeBranchName()
-
-		out, err = agit.GitSwitchCreate(s.logger, newBranch)
+		wt, err := repo.Worktree()
 		if err != nil {
-			return submitFileOut, errorf("git switch error: %w", err)
+			return submitFileOut, errorf("failed to get worktree: %w", err)
 		}
-		s.logger.Debug(fmt.Sprintf("git swicth create: %s\n", out))
 
-		out, err = agit.GitAddAll(s.logger)
-		if err != nil {
-			return submitFileOut, errorf("git add error: %w", err)
+		newBranch := MakeBranchName()
+
+		if err := wt.Checkout(&git.CheckoutOptions{
+			Branch: plumbing.NewBranchReferenceName(newBranch),
+			Keep:   true,
+			Create: true,
+		}); err != nil {
+			return submitFileOut, errorf("failed to checkout branch: %w", err)
 		}
-		s.logger.Debug(fmt.Sprintf("git add all: %s\n", out))
 
-		out, err = agit.GitCommit(s.logger, input.CommitMessageShort, input.CommitMessageDetail)
-		if err != nil {
-			return submitFileOut, errorf("git commit error: %w", err)
+		if _, err := wt.Add("./"); err != nil {
+			return submitFileOut, errorf("failed to add files: %w", err)
 		}
-		s.logger.Debug(fmt.Sprintf("git commit: %s\n", out))
 
-		out, err = agit.GitPushBranch(s.logger, newBranch)
+		status, err := wt.Status()
 		if err != nil {
-			s.logger.Error(out)
-			return submitFileOut, errorf("git push branch error: %w", err)
+			return submitFileOut, errorf("failed to get worktree status: %w", err)
+		}
+
+		// reset symlink becauseb go-git's file system behavior causes symlinks to be relative paths, resulting in extra diffs.
+		for path := range status {
+			f, err := os.Lstat(path)
+			if err != nil {
+				return submitFileOut, fmt.Errorf("failed to open file %s: %w", path, err)
+			}
+			if f.Mode()&os.ModeSymlink != 0 {
+				s.logger.Debug(fmt.Sprintf("reset symlink: %s\n", path))
+				if err := wt.Reset(&git.ResetOptions{Files: []string{path}}); err != nil {
+					return submitFileOut, errorf("failed to reset symlink: %w", err)
+				}
+			}
+		}
+		s.logger.Info(status.String())
+
+		if _, err := wt.Commit(
+			fmt.Sprintf("%s\n\n%s", input.CommitMessageShort, input.CommitMessageDetail),
+			&git.CommitOptions{
+				Author: &object.Signature{
+					Name:  callerInput.GitName,
+					Email: callerInput.GitEmail,
+					When:  time.Now(),
+				},
+			}); err != nil {
+			return submitFileOut, errorf("failed to commit: %w", err)
+		}
+
+		if repo.Push(&git.PushOptions{RemoteName: "origin"}) != nil {
+			return submitFileOut, errorf("failed to push: %w", err)
 		}
 
 		s.logger.Debug(fmt.Sprintf("created PR parameter: name=%s, email=%s, base-branch=%s\n",

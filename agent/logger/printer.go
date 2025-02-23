@@ -20,6 +20,7 @@ func (l Printer) Debug(msg string, args ...any) {
 		fmt.Printf(msg, args...)
 	}
 }
+
 func (l Printer) Info(msg string, args ...any) {
 	if l.level <= slog.LevelInfo {
 		fmt.Printf(msg, args...)

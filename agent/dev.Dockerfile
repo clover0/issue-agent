@@ -14,10 +14,15 @@ COPY . .
 
 # TODO: SLSA
 RUN cd /agent/src/cmd/agent && \
-    go build \
+    CGO_ENABLED=0 go build \
       -ldflags "-X github.com/clover0/issue-agent/cli.version=dev-$(date -u +'%Y-%m-%dT%H%M%SZ')" \
       -o /agent/bin/agent
 
+
+FROM gcr.io/distroless/static-debian12
+
 ENV PATH="/agent/bin:$PATH"
 
-ENTRYPOINT ["/agent/bin/agent"]
+COPY --from=development /agent/bin/agent /agent/bin/
+
+ENTRYPOINT ["agent"]

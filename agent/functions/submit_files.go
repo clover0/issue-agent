@@ -5,7 +5,7 @@ const FuncSubmitFiles = "submit_files"
 func InitSubmitFilesGitHubFunction() Function {
 	f := Function{
 		Name:        FuncSubmitFiles,
-		Description: "Submit the modified files by GitHub Pull Request",
+		Description: "Submit the modified files by Creation GitHub Pull Request",
 		Func:        SubmitFiles,
 		Parameters: map[string]interface{}{
 			"type": "object",
