@@ -1,5 +1,6 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  schedule: ["before 7am every saturday"],
   extends: [
     "config:best-practices"
   ],
