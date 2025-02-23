@@ -6,10 +6,11 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.36.1
 	github.com/aws/aws-sdk-go-v2/config v1.29.6
 	github.com/aws/aws-sdk-go-v2/service/bedrockruntime v1.24.4
+	github.com/go-git/go-git/v5 v5.13.2
 	github.com/go-playground/validator/v10 v10.24.0
 	github.com/google/go-github/v68 v68.0.0
 	github.com/google/go-github/v69 v69.2.0
-	github.com/openai/openai-go v0.1.0-alpha.56
+	github.com/openai/openai-go v0.1.0-alpha.59
 	golang.org/x/net v0.35.0
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -36,7 +37,6 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-git/go-billy/v5 v5.6.2 // indirect
-	github.com/go-git/go-git/v5 v5.13.2 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
