@@ -95,7 +95,8 @@ func (a *Agent) Work() (lastOutput string, err error) {
 				)
 
 				if err != nil {
-					returningStr = "error caused! error message is: " + err.Error()
+					returningStr = fmt.Sprintf("Error caused. error message: %s\nChange the arguments before using it again. "+
+						"If you still get an error, change the tool you are using", err.Error())
 				}
 
 				input = append(input, step.ReturnToLLMInput{

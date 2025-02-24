@@ -101,7 +101,7 @@ func marshalFuncArgs(args string, input any) error {
 	return json.Unmarshal([]byte(args), &input)
 }
 
-const defaultSuccessReturning = "The process was successful!"
+const defaultSuccessReturning = "tool use succeeded."
 
 type optionalArg struct {
 	SubmitFilesFunction SubmitFilesCallerType
