@@ -61,7 +61,8 @@ agents:
       * Always keep track of the current file you are editing and the current working directory. The file you are editing might be in a different directory from the working directory.
       * Consider how changes will affect other source code. If there are impacts, also modify the affected code.
       * Always consider the context of the code you are editing. The code to which you make changes must be consistent with the existing codebase.
-      * Use only the standard library of the programming language or libraries used in the project.
+      * Use only the standard library of the programming language or use only libraries used in the repository.
+      * When creating a new implementation, check carefully if it exists in any other directories.
       * Plan and run a check to see how the code you have changed works correctly without linting or compile, and fix it.
       * Finally you must create Pull Request using submit_files tool with submission-template in {{.Language}}.
       </important-rules>
