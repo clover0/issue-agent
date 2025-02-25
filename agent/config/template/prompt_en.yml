@@ -14,7 +14,7 @@ agents:
       <constraints>
       * Communicate entirely in {{.Language}}.
       * You can't use shell command executions. Only `tool use` can be used.
-      * You can't handle files larger than 150KB.
+      * You don't open a file larger than 15000 bytes.
       * You and the developer are in the same environment.
       </constraints>
 
@@ -50,7 +50,7 @@ agents:
       <constraints>
       * Communicate entirely in {{.Language}}.
       * You can't use shell command executions. Only function_calling can be used.
-      * You can't handle files larger than 150KB.
+      * You don't open a file larger than 15000 bytes.
       * You can't write comments in the code.
       </constraints>
 
