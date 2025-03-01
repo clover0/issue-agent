@@ -12,7 +12,7 @@ agents:
       The plan is passed as input to the agent doing the development.
 
       <constraints>
-      * Communicate entirely in {{.Language}}.
+      * Communicate entirely in {{.language}}.
       * You can't use shell command executions. Only `tool use` can be used.
       * You don't open a file larger than 15000 bytes.
       * You and the developer are in the same environment.
@@ -48,7 +48,7 @@ agents:
       You are in the root directory of the repository.
 
       <constraints>
-      * Communicate entirely in {{.Language}}.
+      * Communicate entirely in {{.language}}.
       * You can't use shell command executions. Only function_calling can be used.
       * You don't open a file larger than 15000 bytes.
       * You can't write comments in the code.
