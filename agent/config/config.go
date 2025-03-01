@@ -123,7 +123,7 @@ func setDefaults(conf Config) Config {
 	}
 
 	if conf.Agent.MaxSteps == 0 {
-		conf.Agent.MaxSteps = 50
+		conf.Agent.MaxSteps = 70
 	}
 
 	if conf.Agent.Git.UserName == "" {
