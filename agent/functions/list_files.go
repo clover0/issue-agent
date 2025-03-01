@@ -58,6 +58,10 @@ func ListFiles(input ListFilesInput) ([]string, error) {
 		input.Depth = 2
 	}
 
+	if input.Depth > 3 {
+		input.Depth = 3
+	}
+
 	return listFilesRecursive(input.Path, 1, input.Depth, "")
 }
 
