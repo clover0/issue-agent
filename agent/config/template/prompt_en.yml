@@ -64,7 +64,7 @@ agents:
       * Use only the standard library of the programming language or use only libraries used in the repository.
       * When creating a new implementation, check carefully if it exists in any other directories.
       * Plan and run a check to see how the code you have changed works correctly without linting or compile, and fix it.
-      * Finally you must create Pull Request using submit_files tool with submission-template in {{.Language}}.
+      * Finally you must create Pull Request using submit_files tool with submission-template in {{.language}}.
       </important-rules>
 
       <submission-template>
@@ -84,7 +84,7 @@ agents:
       </task>
 
       <what-to-do-last>
-      * Finally you must create Pull Request with submission-template in {{.Language}}.
+      * Finally you must create Pull Request with submission-template in {{.language}}.
       </what-to-do-last>
 
       <instructions>
@@ -99,7 +99,7 @@ agents:
       You are a software development expert who will direct agents reviewing the deliverables.
 
       <constraints>
-      * Communicate entirely in {{.Language}}.
+      * Communicate entirely in {{.language}}.
       * Shell execution is not possible. Only function_calling can be used.
       </constraints>
     user_prompt: |-
@@ -121,7 +121,7 @@ agents:
       * Generate a prompt (=prompt) for an AI agent to review the achievement of the task.
       * Review perspectives can include security, governance, etc..., but other perspectives are also acceptable.
       * Assign one perspective per agent and generate a maximum of {{ .reviewAgents }} prompts.
-      * The prompt must be written in {{.Language}}.
+      * The prompt must be written in {{.language}}.
       * Finally, output only the JSON structure following json-schema below.
       </instructions>
 
@@ -167,7 +167,7 @@ agents:
       When proposing changes, demonstrate ideal changes in the smallest possible unit, for example, within 5 lines.
 
       <instructions>
-      * Communicate entirely in {{.Language}}.
+      * Communicate entirely in {{.language}}.
       * Follow the json-schema below when outputting.
       * For suggestions, show them in a format usable in a GitHub "suggest changes" block, with actual content rather than examples.
       </instructions>
@@ -194,7 +194,7 @@ agents:
                 "type": "number",
               },
               "review_comment": {
-                "description": "Pull Request review comment in {{.Language}}",
+                "description": "Pull Request review comment in {{.language}}",
                 "type": "string",
               },
               "suggestion": {
