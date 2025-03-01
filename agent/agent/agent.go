@@ -26,6 +26,7 @@ type Agent struct {
 	prompt              prompt.Prompt
 	history             []models.LLMMessage
 	store               *store.Store
+	tools               []functions.Function
 }
 
 func NewAgent(
@@ -36,6 +37,7 @@ func NewAgent(
 	prompt prompt.Prompt,
 	forwarder models.LLMForwarder,
 	store *store.Store,
+	tools []functions.Function,
 ) Agent {
 	return Agent{
 		name:                name,
@@ -46,6 +48,7 @@ func NewAgent(
 		prompt:              prompt,
 		llmForwarder:        forwarder,
 		store:               store,
+		tools:               tools,
 	}
 }
 
@@ -57,7 +60,7 @@ func (a *Agent) Work() (lastOutput string, err error) {
 		Model:           a.parameter.Model,
 		SystemPrompt:    a.prompt.SystemPrompt,
 		StartUserPrompt: a.prompt.StartUserPrompt,
-		Functions:       functions.AllFunctions(),
+		Functions:       a.tools,
 	}
 
 	a.logg.Info(logger.Green("[STEP]start commnuication with LLM\n"))
