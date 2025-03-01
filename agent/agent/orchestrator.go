@@ -89,7 +89,8 @@ func OrchestrateAgents(
 		lo.Error("failed build requirement prompt: %s\n", err)
 		return err
 	}
-	requirementAgent, err := RunAgent("requirementAgent", prompt, submitServiceCaller, parameter, lo, &dataStore, llmForwarder)
+	requirementAgent, err := RunAgent("requirementAgent",
+		prompt, submitServiceCaller, parameter, lo, &dataStore, llmForwarder, PlanTools())
 	if err != nil {
 		lo.Error("requirement agent failed: %s\n", err)
 		return err
@@ -101,7 +102,8 @@ func OrchestrateAgents(
 		lo.Error("failed build developer prompt: %s\n", err)
 		return err
 	}
-	developerAgent, err := RunAgent("developerAgent", prompt, submitServiceCaller, parameter, lo, &dataStore, llmForwarder)
+	developerAgent, err := RunAgent("developerAgent",
+		prompt, submitServiceCaller, parameter, lo, &dataStore, llmForwarder, functions.AllFunctions())
 	if err != nil {
 		lo.Error("developer agent failed: %s\n", err)
 		return err
@@ -129,7 +131,7 @@ func OrchestrateAgents(
 		prompt,
 		submitServiceCaller,
 		parameter,
-		lo, &dataStore, llmForwarder)
+		lo, &dataStore, llmForwarder, functions.AllFunctions())
 	if err != nil {
 		lo.Error("reviewManagerAgent failed: %s\n", err)
 		return err
@@ -171,7 +173,7 @@ func OrchestrateAgents(
 			prpt,
 			submitServiceCaller,
 			parameter,
-			lo, &dataStore, llmForwarder)
+			lo, &dataStore, llmForwarder, functions.AllFunctions())
 		if err != nil {
 			lo.Error("%s failed: %s\n", p.AgentName, err)
 			return err
@@ -248,6 +250,7 @@ func RunAgent(
 	lo logger.Logger,
 	dataStore *store.Store,
 	llmForwarder models.LLMForwarder,
+	tools []functions.Function,
 ) (Agent, error) {
 	ag := NewAgent(
 		parameter,
@@ -257,6 +260,7 @@ func RunAgent(
 		prompt,
 		llmForwarder,
 		dataStore,
+		tools,
 	)
 
 	if _, err := ag.Work(); err != nil {

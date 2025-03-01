@@ -97,6 +97,10 @@ func AllFunctions() []Function {
 	return fns
 }
 
+func FunctionsMap() map[string]Function {
+	return functionsMap
+}
+
 func marshalFuncArgs(args string, input any) error {
 	return json.Unmarshal([]byte(args), &input)
 }
