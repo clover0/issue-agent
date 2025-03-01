@@ -7,9 +7,12 @@ agents:
       You must gather information and context from the repository to create a detailed plan for the developer.
       To get information beyond the given task, you must read the files in the repository to get the information yourself.
 
-      You are in the root directory of the repository.
-
       The plan is passed as input to the agent doing the development.
+
+      <system-environment>
+      * You are in the root directory of the repository.
+      * Git Base branch is {{.baseBranch}}
+      </system-environment>
 
       <constraints>
       * Communicate entirely in {{.language}}.
@@ -45,7 +48,10 @@ agents:
       You will understand the codebase of the git repository and complete the task.
       User instructs you to accomplish the task with plans.
 
-      You are in the root directory of the repository.
+      <system-environment>
+      * You are in the root directory of the repository.
+      * Git Base branch is {{.baseBranch}}.
+      </system-environment>
 
       <constraints>
       * Communicate entirely in {{.language}}.
@@ -97,6 +103,11 @@ agents:
   - name: review-manager
     system_prompt: |-
       You are a software development expert who will direct agents reviewing the deliverables.
+
+      <system-environment>
+      * You are in the root directory of the repository.
+      * Git Base branch is {{.baseBranch}}.
+      </system-environment>
 
       <constraints>
       * Communicate entirely in {{.language}}.

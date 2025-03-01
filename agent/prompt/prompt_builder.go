@@ -15,15 +15,16 @@ type Prompt struct {
 	StartUserPrompt string
 }
 
-func BuildRequirementPrompt(promptTpl PromptTemplate, language string, issue loader.Issue) (Prompt, error) {
+func BuildRequirementPrompt(promptTpl PromptTemplate, language string, baseBranch string, issue loader.Issue) (Prompt, error) {
 	return BuildPrompt(promptTpl, "planner", map[string]any{
 		"language":    language,
 		"issue":       issue.Content,
 		"issueNumber": issue.Path,
+		"baseBranch":  baseBranch,
 	})
 }
 
-func BuildDeveloperPrompt(promptTpl PromptTemplate, language string, issueLoader loader.Loader, issueNumber string, instruction string) (Prompt, error) {
+func BuildDeveloperPrompt(promptTpl PromptTemplate, language string, baseBranch string, issueLoader loader.Loader, issueNumber string, instruction string) (Prompt, error) {
 	// TODO: separate issueLoader and issue from this
 	iss, err := issueLoader.LoadIssue(context.TODO(), issueNumber)
 	if err != nil {
@@ -35,16 +36,18 @@ func BuildDeveloperPrompt(promptTpl PromptTemplate, language string, issueLoader
 		"issue":       iss.Content,
 		"issueNumber": issueNumber,
 		"instruction": instruction,
+		"baseBranch":  baseBranch,
 	})
 }
 
-func BuildReviewManagerPrompt(promptTpl PromptTemplate, cnf config.Config, issue loader.Issue, changedFilesPath []string) (Prompt, error) {
+func BuildReviewManagerPrompt(promptTpl PromptTemplate, cnf config.Config, issue loader.Issue, changedFilesPath []string, baseBranch string) (Prompt, error) {
 	m := make(map[string]any)
 
 	m["language"] = cnf.Language
 	m["filePaths"] = changedFilesPath
 	m["issue"] = issue.Content
 	m["reviewAgents"] = cnf.Agent.ReviewAgents
+	m["baseBranch"] = baseBranch
 
 	m["noFiles"] = ""
 	if len(changedFilesPath) == 0 {

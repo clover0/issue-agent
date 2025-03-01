@@ -37,12 +37,6 @@ func NewSubmitFileGitHubService(
 	}
 }
 
-const branchPrefix = "agent-"
-
-func MakeBranchName() string {
-	return fmt.Sprintf("%s%d", branchPrefix, time.Now().UnixNano())
-}
-
 // TODO: move to GitHub service
 func (s SubmitFileGitHubService) Caller(
 	ctx context.Context,
@@ -68,6 +62,14 @@ func (s SubmitFileGitHubService) Caller(
 			return submitFileOut, errorf("failed to open repository: %w", err)
 		}
 
+		head, err := repo.Head()
+		if err != nil {
+			return submitFileOut, errorf("failed to get HEAD: %w", err)
+		}
+		if head.Name().Short() == callerInput.BaseBranch {
+			return submitFileOut, errorf("cannot submit in the base branch. create and switch to a new branch")
+		}
+
 		cfg, err := repo.Config()
 		if err != nil {
 			return submitFileOut, err
@@ -83,16 +85,6 @@ func (s SubmitFileGitHubService) Caller(
 		wt, err := repo.Worktree()
 		if err != nil {
 			return submitFileOut, errorf("failed to get worktree: %w", err)
-		}
-
-		newBranch := MakeBranchName()
-
-		if err := wt.Checkout(&git.CheckoutOptions{
-			Branch: plumbing.NewBranchReferenceName(newBranch),
-			Keep:   true,
-			Create: true,
-		}); err != nil {
-			return submitFileOut, errorf("failed to checkout branch: %w", err)
 		}
 
 		if _, err := wt.Add("./"); err != nil {
@@ -135,11 +127,18 @@ func (s SubmitFileGitHubService) Caller(
 			return submitFileOut, errorf("failed to push: %w", err)
 		}
 
-		s.logger.Debug(fmt.Sprintf("created PR parameter: name=%s, email=%s, base-branch=%s\n",
-			callerInput.GitName, callerInput.GitEmail, callerInput.BaseBranch))
+		ref, err := repo.Head()
+		if err != nil {
+			return submitFileOut, errorf("failed to get HEAD: %w", err)
+		}
+		currentBranch := ref.Name().Short()
+		prBranch := currentBranch
+
+		s.logger.Debug(fmt.Sprintf("created PR parameter: name=%s, email=%s, base-branch=%s branch=%s\n",
+			callerInput.GitName, callerInput.GitEmail, callerInput.BaseBranch, currentBranch))
 		pr, _, err := s.client.PullRequests.Create(ctx, s.owner, s.repository, &github.NewPullRequest{
 			Title: &input.CommitMessageShort,
-			Head:  &newBranch,
+			Head:  &prBranch,
 			Base:  &callerInput.BaseBranch,
 			Body:  &input.PullRequestContent,
 		})
@@ -158,10 +157,20 @@ func (s SubmitFileGitHubService) Caller(
 			}
 		}
 
-		s.logger.Debug(fmt.Sprintf("created PR: %v\n", pr.URL))
+		// checkout to the base branch
+		if err := wt.Checkout(&git.CheckoutOptions{
+			Branch: plumbing.NewBranchReferenceName(callerInput.BaseBranch),
+			Keep:   false,
+			Force:  true,
+			Create: false,
+		}); err != nil {
+			return submitFileOut, fmt.Errorf("failed to checkout branch %s: %w", callerInput.BaseBranch, err)
+		}
 
 		return functions.SubmitFilesOutput{
-			Branch:            newBranch,
+			Message: fmt.Sprintf("success creating pull request.\ncreated pull request number: %d\nbranch: %s.\n switched %s branch.",
+				*pr.Number, prBranch, callerInput.BaseBranch),
+			PushedBranch:      prBranch,
 			PullRequestNumber: *pr.Number,
 		}, nil
 	}

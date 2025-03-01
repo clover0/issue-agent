@@ -49,6 +49,9 @@ func InitializeFunctions(
 	if allowFunction(allowFunctions, FuncRemoveFile) {
 		InitRemoveFileFunction()
 	}
+	if allowFunction(allowFunctions, FuncSwitchBranch) {
+		InitSwitchBranchFunction()
+	}
 }
 
 func allowFunction(allowFunctions []string, name string) bool {
@@ -191,7 +194,8 @@ func ExecFunction(l logger.Logger, store *libstore.Store, funcName FuncName, arg
 		// NOTE: we would like to use any key, but for ease of implementation, we keep this as a simple implementation.
 		SubmitFilesAfter(store, libstore.LastSubmissionKey, out)
 
-		return defaultSuccessReturning, nil
+		return fmt.Sprintf("%s\n%s\n",
+			defaultSuccessReturning, out.Message), nil
 
 	case FuncGetWebSearchResult:
 		l.Info("functions: do %s\n", FuncGetWebSearchResult)
@@ -258,6 +262,18 @@ func ExecFunction(l logger.Logger, store *libstore.Store, funcName FuncName, arg
 			return "", err
 		}
 		return defaultSuccessReturning, nil
+
+	case FuncSwitchBranch:
+		l.Info("functions: do %s\n", FuncSwitchBranch)
+		input := SwitchBranchInput{}
+		if err := marshalFuncArgs(argsJson, &input); err != nil {
+			return "", fmt.Errorf("failed to unmarshal args: %w", err)
+		}
+		r, err := SwitchBranch(input)
+		if err != nil {
+			return "", err
+		}
+		return fmt.Sprintf("%s\n%s\n", defaultSuccessReturning, r), nil
 	}
 
 	return "", errors.New("function not found")

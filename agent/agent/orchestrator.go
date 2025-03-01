@@ -84,7 +84,7 @@ func OrchestrateAgents(
 		Model:    conf.Agent.Model,
 	}
 
-	prompt, err := libprompt.BuildRequirementPrompt(promptTemplate, conf.Language, issue)
+	prompt, err := libprompt.BuildRequirementPrompt(promptTemplate, conf.Language, baseBranch, issue)
 	if err != nil {
 		lo.Error("failed build requirement prompt: %s\n", err)
 		return err
@@ -97,7 +97,7 @@ func OrchestrateAgents(
 	}
 
 	instruction := requirementAgent.LastHistory().RawContent
-	prompt, err = libprompt.BuildDeveloperPrompt(promptTemplate, conf.Language, loaderr, issue.Path, instruction)
+	prompt, err = libprompt.BuildDeveloperPrompt(promptTemplate, conf.Language, baseBranch, loaderr, issue.Path, instruction)
 	if err != nil {
 		lo.Error("failed build developer prompt: %s\n", err)
 		return err
@@ -121,7 +121,8 @@ func OrchestrateAgents(
 	}
 	submittedPRNumber := dataStore.GetSubmission(store.LastSubmissionKey).PullRequestNumber
 
-	prompt, err = libprompt.BuildReviewManagerPrompt(promptTemplate, conf, issue, util.Map(developerAgent.ChangedFiles(), func(f store.File) string { return f.Path }))
+	prompt, err = libprompt.BuildReviewManagerPrompt(
+		promptTemplate, conf, issue, util.Map(developerAgent.ChangedFiles(), func(f store.File) string { return f.Path }), baseBranch)
 	if err != nil {
 		lo.Error("failed to build review manager prompt: %s\n", err)
 		return err
