@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/clover0/issue-agent/agent"
 	"github.com/clover0/issue-agent/test/assert"
 	"github.com/clover0/issue-agent/test/loggertest"
 )
@@ -21,7 +22,7 @@ func TestSelectForwarder(t *testing.T) {
 	tests := map[string]struct {
 		model    string
 		wantErr  bool
-		wantType LLMForwarder
+		wantType agent.LLMForwarder
 	}{
 		"AWS Bedrock model": {
 			model:    "anthropic.claude-3-5-sonnet-v1",

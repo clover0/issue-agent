@@ -6,9 +6,7 @@ import (
 
 	"github.com/clover0/issue-agent/functions"
 	"github.com/clover0/issue-agent/logger"
-	"github.com/clover0/issue-agent/models"
 	"github.com/clover0/issue-agent/prompt"
-	"github.com/clover0/issue-agent/step"
 	"github.com/clover0/issue-agent/store"
 )
 
@@ -19,12 +17,12 @@ type AgentLike interface {
 type Agent struct {
 	name                string
 	parameter           Parameter
-	currentStep         step.Step
+	currentStep         Step
 	logg                logger.Logger
 	submitServiceCaller functions.SubmitFilesCallerType
-	llmForwarder        models.LLMForwarder
+	llmForwarder        LLMForwarder
 	prompt              prompt.Prompt
-	history             []models.LLMMessage
+	history             []LLMMessage
 	store               *store.Store
 	tools               []functions.Function
 }
@@ -35,14 +33,14 @@ func NewAgent(
 	logg logger.Logger,
 	submitServiceCaller functions.SubmitFilesCallerType,
 	prompt prompt.Prompt,
-	forwarder models.LLMForwarder,
+	forwarder LLMForwarder,
 	store *store.Store,
 	tools []functions.Function,
 ) Agent {
 	return Agent{
 		name:                name,
 		parameter:           parameter,
-		currentStep:         step.Step{},
+		currentStep:         Step{},
 		logg:                logg,
 		submitServiceCaller: submitServiceCaller,
 		prompt:              prompt,
@@ -56,7 +54,7 @@ func (a *Agent) Work() (lastOutput string, err error) {
 	ctx := context.Background()
 	a.logg.Info("[%s]agent starts work\n", a.name)
 
-	completionInput := models.StartCompletionInput{
+	completionInput := StartCompletionInput{
 		Model:           a.parameter.Model,
 		SystemPrompt:    a.prompt.SystemPrompt,
 		StartUserPrompt: a.prompt.StartUserPrompt,
@@ -82,9 +80,9 @@ func (a *Agent) Work() (lastOutput string, err error) {
 		}
 
 		switch a.currentStep.Do {
-		case step.Exec:
+		case Exec:
 			a.logg.Info(logger.Blue("[STEP]execution functions:\n"))
-			var input []step.ReturnToLLMInput
+			var input []ReturnToLLMInput
 			for _, fnCtx := range a.currentStep.FunctionContexts {
 				var returningStr string
 				returningStr, err = functions.ExecFunction(
@@ -102,14 +100,14 @@ func (a *Agent) Work() (lastOutput string, err error) {
 						"If you still get an error, change the tool you are using", err.Error())
 				}
 
-				input = append(input, step.ReturnToLLMInput{
+				input = append(input, ReturnToLLMInput{
 					ToolCallerID: fnCtx.ToolCallerID,
 					Content:      returningStr,
 				})
 			}
-			a.currentStep = step.NewReturnToLLMStep(input)
+			a.currentStep = NewReturnToLLMStep(input)
 
-		case step.ReturnToLLM:
+		case ReturnToLLM:
 			a.logg.Info(logger.Green("[STEP]forwarding message to LLM and waiting for response\n"))
 			history, err = a.llmForwarder.ForwardLLM(ctx, completionInput, a.currentStep.ReturnToLLMContexts, history)
 			if err != nil {
@@ -119,12 +117,12 @@ func (a *Agent) Work() (lastOutput string, err error) {
 			a.updateHistory(history)
 			a.currentStep = a.llmForwarder.ForwardStep(ctx, history)
 
-		case step.WaitingInstruction:
+		case WaitingInstruction:
 			a.logg.Info("[STEP]finish instructions\n")
 			lastOutput = a.currentStep.LastOutput
 			loop = false
 
-		case step.Unrecoverable, step.Unknown:
+		case Unrecoverable, Unknown:
 			a.logg.Error("unrecoverable error: %s\n", a.currentStep.UnrecoverableErr)
 			return lastOutput, fmt.Errorf("unrecoverable error: %s", a.currentStep.UnrecoverableErr)
 		default:
@@ -135,15 +133,15 @@ func (a *Agent) Work() (lastOutput string, err error) {
 	return lastOutput, nil
 }
 
-func (a *Agent) updateHistory(history []models.LLMMessage) {
+func (a *Agent) updateHistory(history []LLMMessage) {
 	a.history = history
 }
 
-func (a *Agent) History() []models.LLMMessage {
+func (a *Agent) History() []LLMMessage {
 	return a.history
 }
 
-func (a *Agent) LastHistory() models.LLMMessage {
+func (a *Agent) LastHistory() LLMMessage {
 	return a.history[len(a.history)-1]
 }
 

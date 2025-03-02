@@ -12,6 +12,7 @@ import (
 	"github.com/clover0/issue-agent/functions/agithub"
 	"github.com/clover0/issue-agent/loader"
 	"github.com/clover0/issue-agent/logger"
+	"github.com/clover0/issue-agent/models"
 )
 
 const CreatePrCommand = "create-pr"
@@ -72,7 +73,7 @@ func CreatePR(flags []string) error {
 		}
 	}
 
-	return agent.OrchestrateAgents(ctx, lo, conf, issLoader, cliIn.BaseBranch, issue, cliIn.WorkRepository, gh)
+	return agent.OrchestrateAgents(ctx, lo, conf, issLoader, cliIn.BaseBranch, issue, cliIn.WorkRepository, gh, models.SelectForwarder)
 }
 
 func isPassedConfig(configPath string) bool {

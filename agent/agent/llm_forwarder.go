@@ -1,4 +1,4 @@
-package models
+package agent
 
 import (
 	"context"
@@ -6,7 +6,6 @@ import (
 
 	"github.com/clover0/issue-agent/functions"
 	"github.com/clover0/issue-agent/logger"
-	"github.com/clover0/issue-agent/step"
 )
 
 // TODO: make no OpenAI dependency
@@ -23,11 +22,13 @@ type LLMForwarder interface {
 	ForwardLLM(
 		ctx context.Context,
 		input StartCompletionInput,
-		llmContexts []step.ReturnToLLMContext,
+		llmContexts []ReturnToLLMContext,
 		history []LLMMessage,
 	) ([]LLMMessage, error)
-	ForwardStep(ctx context.Context, history []LLMMessage) step.Step
+	ForwardStep(ctx context.Context, history []LLMMessage) Step
 }
+
+type SelectForwarder = func(lo logger.Logger, model string) (LLMForwarder, error)
 
 type LLMMessage struct {
 	Role         MessageRole

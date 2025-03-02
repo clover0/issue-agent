@@ -14,7 +14,6 @@ import (
 	"github.com/clover0/issue-agent/functions/agithub"
 	"github.com/clover0/issue-agent/loader"
 	"github.com/clover0/issue-agent/logger"
-	"github.com/clover0/issue-agent/models"
 	libprompt "github.com/clover0/issue-agent/prompt"
 	"github.com/clover0/issue-agent/store"
 	"github.com/clover0/issue-agent/util"
@@ -34,8 +33,9 @@ func OrchestrateAgents(
 	issue loader.Issue,
 	workRepository string,
 	gh *github.Client,
+	selectForward SelectForwarder,
 ) error {
-	llmForwarder, err := models.SelectForwarder(lo, conf.Agent.Model)
+	llmForwarder, err := selectForward(lo, conf.Agent.Model)
 	if err != nil {
 		lo.Error("failed to select forwarder: %s\n", err)
 		return err
@@ -250,7 +250,7 @@ func RunAgent(
 	parameter Parameter,
 	lo logger.Logger,
 	dataStore *store.Store,
-	llmForwarder models.LLMForwarder,
+	llmForwarder LLMForwarder,
 	tools []functions.Function,
 ) (Agent, error) {
 	ag := NewAgent(
