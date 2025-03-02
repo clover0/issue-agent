@@ -22,7 +22,7 @@ Issue Agent has a very limited scope because it is designed to be secure and pra
 
 What we mean by secure here are the following:
 
-* Do not execute the response returned from the LLM as-is. For example, avoid directly executing shell commands. Only predefined functions are allowed to run._
+* Do not execute the response returned from the LLM as-is. For example, avoid directly executing shell commands. Only predefined functions are allowed to run.
 * Control the credentials given to the Agent. Control the use of credentials.
 
 

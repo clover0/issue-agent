@@ -32,7 +32,7 @@ agent:
   # The following are defined as 1 step
   # - user to LLM and returned to user from LLM
   # - execution function
-  max_steps: 50
+  max_steps: 70
 
   # The number of agents to review.
   # If a value greater than 0 is specified, 
@@ -72,4 +72,5 @@ agent:
     - submit_files
     - search_files
     - remove_file
+    - switch_branch
 ```
