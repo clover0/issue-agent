@@ -1,4 +1,4 @@
-package agent
+package core
 
 type Parameter struct {
 	MaxSteps int
