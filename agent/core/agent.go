@@ -61,7 +61,7 @@ func (a *Agent) Work() (lastOutput string, err error) {
 		Functions:       a.tools,
 	}
 
-	a.logg.Info(logger.Green("[STEP]start commnuication with LLM\n"))
+	a.logg.Info(logger.Green("[STEP:1]start communication with LLM\n"))
 	history, err := a.llmForwarder.StartForward(completionInput)
 	if err != nil {
 		return lastOutput, fmt.Errorf("start llm forward error: %w", err)
@@ -75,13 +75,14 @@ func (a *Agent) Work() (lastOutput string, err error) {
 	for loop {
 		steps++
 		if steps > a.parameter.MaxSteps {
-			a.logg.Info("Reached to the max steps\n")
+			a.logg.Info(fmt.Sprintf("Reached to the max steps %d\n", a.parameter.MaxSteps))
 			break
 		}
+		stepLabel := fmt.Sprintf("[STEP:%d]", steps)
 
 		switch a.currentStep.Do {
 		case Exec:
-			a.logg.Info(logger.Blue("[STEP]execution functions:\n"))
+			a.logg.Info(logger.Blue(stepLabel + "execution functions:\n"))
 			var input []ReturnToLLMInput
 			for _, fnCtx := range a.currentStep.FunctionContexts {
 				var returningStr string
@@ -108,7 +109,7 @@ func (a *Agent) Work() (lastOutput string, err error) {
 			a.currentStep = NewReturnToLLMStep(input)
 
 		case ReturnToLLM:
-			a.logg.Info(logger.Green("[STEP]forwarding message to LLM and waiting for response\n"))
+			a.logg.Info(logger.Green(stepLabel + "forwarding message to LLM and waiting for response\n"))
 			history, err = a.llmForwarder.ForwardLLM(ctx, completionInput, a.currentStep.ReturnToLLMContexts, history)
 			if err != nil {
 				a.logg.Error("unrecoverable ContinueCompletion: %s\n", err)
@@ -118,13 +119,14 @@ func (a *Agent) Work() (lastOutput string, err error) {
 			a.currentStep = a.llmForwarder.ForwardStep(ctx, history)
 
 		case WaitingInstruction:
-			a.logg.Info("[STEP]finish instructions\n")
+			a.logg.Info(stepLabel + "finish instructions\n")
 			lastOutput = a.currentStep.LastOutput
 			loop = false
 
 		case Unrecoverable, Unknown:
 			a.logg.Error("unrecoverable error: %s\n", a.currentStep.UnrecoverableErr)
 			return lastOutput, fmt.Errorf("unrecoverable error: %s", a.currentStep.UnrecoverableErr)
+
 		default:
 			a.logg.Error("does not exist step type\n")
 			return lastOutput, fmt.Errorf("does not exist step type")
