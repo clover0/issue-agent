@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/clover0/issue-agent/agent"
+	"github.com/clover0/issue-agent/core"
 	"github.com/clover0/issue-agent/logger"
 )
 
@@ -14,7 +14,7 @@ type AnthropicLLMForwarder struct {
 	anthropic AnthropicClient
 }
 
-func NewAnthropicLLMForwarder(l logger.Logger) (agent.LLMForwarder, error) {
+func NewAnthropicLLMForwarder(l logger.Logger) (core.LLMForwarder, error) {
 	token, ok := os.LookupEnv("ANTHROPIC_API_KEY")
 	if !ok {
 		return nil, fmt.Errorf("ANTHROPIC_API_KEY is not set")
@@ -25,8 +25,8 @@ func NewAnthropicLLMForwarder(l logger.Logger) (agent.LLMForwarder, error) {
 	}, nil
 }
 
-func (a AnthropicLLMForwarder) StartForward(input agent.StartCompletionInput) ([]agent.LLMMessage, error) {
-	var history []agent.LLMMessage
+func (a AnthropicLLMForwarder) StartForward(input core.StartCompletionInput) ([]core.LLMMessage, error) {
+	var history []core.LLMMessage
 	params, initialHistory := a.createParams(input)
 	history = append(history, initialHistory...)
 
@@ -38,7 +38,7 @@ func (a AnthropicLLMForwarder) StartForward(input agent.StartCompletionInput) ([
 		return nil, err
 	}
 
-	var toolCalls []agent.ToolCall
+	var toolCalls []core.ToolCall
 	var text string
 	for _, cont := range resp.Content {
 		// discard text
@@ -51,19 +51,19 @@ func (a AnthropicLLMForwarder) StartForward(input agent.StartCompletionInput) ([
 			if err != nil {
 				return nil, err
 			}
-			toolCalls = append(toolCalls, agent.ToolCall{
+			toolCalls = append(toolCalls, core.ToolCall{
 				ToolCallerID: cont.ID,
 				ToolName:     cont.Name,
 				Argument:     string(j),
 			})
 		}
 	}
-	lastMsg := agent.LLMMessage{
-		Role:              agent.LLMAssistant,
+	lastMsg := core.LLMMessage{
+		Role:              core.LLMAssistant,
 		FinishReason:      convertAnthropicStopReasonToReason(resp.StopReason),
 		RawContent:        text,
 		ReturnedToolCalls: toolCalls,
-		Usage: agent.LLMUsage{
+		Usage: core.LLMUsage{
 			InputToken:  int32(resp.Usage.InputTokens),
 			OutputToken: int32(resp.Usage.OutputTokens),
 			TotalToken:  int32(resp.Usage.InputTokens + resp.Usage.OutputTokens),
@@ -79,10 +79,10 @@ func (a AnthropicLLMForwarder) StartForward(input agent.StartCompletionInput) ([
 
 func (a AnthropicLLMForwarder) ForwardLLM(
 	_ context.Context,
-	input agent.StartCompletionInput,
-	llmContexts []agent.ReturnToLLMContext,
-	history []agent.LLMMessage,
-) ([]agent.LLMMessage, error) {
+	input core.StartCompletionInput,
+	llmContexts []core.ReturnToLLMContext,
+	history []core.LLMMessage,
+) ([]core.LLMMessage, error) {
 	params, _ := a.createParams(input)
 
 	// reset message
@@ -91,7 +91,7 @@ func (a AnthropicLLMForwarder) ForwardLLM(
 	// build message from history
 	for _, h := range history {
 		switch h.Role {
-		case agent.LLMAssistant:
+		case core.LLMAssistant:
 			if len(h.ReturnedToolCalls) > 0 {
 				content := make([]J, 0)
 				for _, v := range h.ReturnedToolCalls {
@@ -117,14 +117,14 @@ func (a AnthropicLLMForwarder) ForwardLLM(
 					"content": h.RawContent,
 				})
 			}
-		case agent.LLMUser:
+		case core.LLMUser:
 			params["messages"] = append(params["messages"].([]J), J{
 				"role":    "user",
 				"content": h.RawContent,
 			})
 
 		// multiple contents in 1 message
-		case agent.LLMTool:
+		case core.LLMTool:
 			// 本来は複数のLLM Messageを1つのmessageにまとめる必要がある
 			params["messages"] = append(params["messages"].([]J), J{
 				"role": "user",
@@ -142,7 +142,7 @@ func (a AnthropicLLMForwarder) ForwardLLM(
 	}
 
 	// new message
-	var newMsg agent.LLMMessage
+	var newMsg core.LLMMessage
 	content := make([]J, len(llmContexts))
 	for i, v := range llmContexts {
 		if v.ToolCallerID != "" {
@@ -152,10 +152,10 @@ func (a AnthropicLLMForwarder) ForwardLLM(
 				"content":     v.Content,
 			}
 
-			newMsg = agent.LLMMessage{
-				Role:       agent.LLMTool,
+			newMsg = core.LLMMessage{
+				Role:       core.LLMTool,
 				RawContent: v.Content,
-				RespondToolCall: agent.ToolCall{
+				RespondToolCall: core.ToolCall{
 					ToolCallerID: v.ToolCallerID,
 					ToolName:     v.ToolName,
 				},
@@ -165,8 +165,8 @@ func (a AnthropicLLMForwarder) ForwardLLM(
 				"role":    "user",
 				"content": v.Content,
 			})
-			newMsg = agent.LLMMessage{
-				Role:       agent.LLMUser,
+			newMsg = core.LLMMessage{
+				Role:       core.LLMUser,
 				RawContent: v.Content,
 			}
 		}
@@ -186,7 +186,7 @@ func (a AnthropicLLMForwarder) ForwardLLM(
 	}
 
 	// TODO: refactor with StartForward
-	var toolCalls []agent.ToolCall
+	var toolCalls []core.ToolCall
 	var text string
 	for _, cont := range resp.Content {
 		// assumption of only 1 text per content
@@ -199,7 +199,7 @@ func (a AnthropicLLMForwarder) ForwardLLM(
 			if err != nil {
 				return nil, err
 			}
-			toolCalls = append(toolCalls, agent.ToolCall{
+			toolCalls = append(toolCalls, core.ToolCall{
 				ToolCallerID: cont.ID,
 				ToolName:     cont.Name,
 				Argument:     string(j),
@@ -207,12 +207,12 @@ func (a AnthropicLLMForwarder) ForwardLLM(
 		}
 	}
 
-	lastMsg := agent.LLMMessage{
-		Role:              agent.LLMAssistant,
+	lastMsg := core.LLMMessage{
+		Role:              core.LLMAssistant,
 		FinishReason:      convertAnthropicStopReasonToReason(resp.StopReason),
 		RawContent:        text,
 		ReturnedToolCalls: toolCalls,
-		Usage: agent.LLMUsage{
+		Usage: core.LLMUsage{
 			InputToken:  int32(resp.Usage.InputTokens),
 			OutputToken: int32(resp.Usage.OutputTokens),
 			TotalToken:  int32(resp.Usage.InputTokens + resp.Usage.OutputTokens),
@@ -227,30 +227,30 @@ func (a AnthropicLLMForwarder) ForwardLLM(
 }
 
 // TODO: refactor with openai forwarder
-func (a AnthropicLLMForwarder) ForwardStep(_ context.Context, history []agent.LLMMessage) agent.Step {
+func (a AnthropicLLMForwarder) ForwardStep(_ context.Context, history []core.LLMMessage) core.Step {
 	lastMsg := history[len(history)-1]
 
 	switch lastMsg.FinishReason {
-	case agent.FinishStop:
-		return agent.NewWaitingInstructionStep(lastMsg.RawContent)
-	case agent.FinishToolCalls:
-		var input []agent.FunctionsInput
+	case core.FinishStop:
+		return core.NewWaitingInstructionStep(lastMsg.RawContent)
+	case core.FinishToolCalls:
+		var input []core.FunctionsInput
 		for _, v := range lastMsg.ReturnedToolCalls {
-			input = append(input, agent.FunctionsInput{
+			input = append(input, core.FunctionsInput{
 				FuncName:     v.ToolName,
 				FunctionArgs: v.Argument,
 				ToolCallerID: v.ToolCallerID,
 			})
 		}
-		return agent.NewExecStep(input)
-	case agent.FinishLengthOver:
-		return agent.NewUnrecoverableStep(fmt.Errorf("chat completion length error"))
+		return core.NewExecStep(input)
+	case core.FinishLengthOver:
+		return core.NewUnrecoverableStep(fmt.Errorf("chat completion length error"))
 	}
 
-	return agent.NewUnknownStep()
+	return core.NewUnknownStep()
 }
 
-func (a AnthropicLLMForwarder) createParams(input agent.StartCompletionInput) (J, []agent.LLMMessage) {
+func (a AnthropicLLMForwarder) createParams(input core.StartCompletionInput) (J, []core.LLMMessage) {
 	tools := make([]J, len(input.Functions))
 
 	for i, f := range input.Functions {
@@ -276,26 +276,26 @@ func (a AnthropicLLMForwarder) createParams(input agent.StartCompletionInput) (J
 		"max_tokens": 8192, // TODO: max_tokens
 	}
 
-	return body, []agent.LLMMessage{
+	return body, []core.LLMMessage{
 		{
-			Role:       agent.LLMUser,
+			Role:       core.LLMUser,
 			RawContent: input.StartUserPrompt,
 		},
 	}
 }
 
 // TODO: refactor to shared multi models
-func convertAnthropicStopReasonToReason(reason string) agent.MessageFinishReason {
+func convertAnthropicStopReasonToReason(reason string) core.MessageFinishReason {
 	switch reason {
 	case "end_turn":
-		return agent.FinishStop
+		return core.FinishStop
 	case "max_tokens":
-		return agent.FinishLengthOver
+		return core.FinishLengthOver
 	case "stop_sequence":
-		return agent.FinishStop
+		return core.FinishStop
 	case "too_use":
-		return agent.FinishToolCalls
+		return core.FinishToolCalls
 	default:
-		return agent.FinishToolCalls
+		return core.FinishToolCalls
 	}
 }

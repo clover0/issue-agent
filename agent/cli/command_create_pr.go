@@ -7,8 +7,8 @@ import (
 
 	"github.com/google/go-github/v68/github"
 
-	"github.com/clover0/issue-agent/agent"
 	"github.com/clover0/issue-agent/config"
+	"github.com/clover0/issue-agent/core"
 	"github.com/clover0/issue-agent/functions/agithub"
 	"github.com/clover0/issue-agent/loader"
 	"github.com/clover0/issue-agent/logger"
@@ -73,7 +73,7 @@ func CreatePR(flags []string) error {
 		}
 	}
 
-	return agent.OrchestrateAgents(ctx, lo, conf, issLoader, cliIn.BaseBranch, issue, cliIn.WorkRepository, gh, models.SelectForwarder)
+	return core.OrchestrateAgents(ctx, lo, conf, issLoader, cliIn.BaseBranch, issue, cliIn.WorkRepository, gh, models.SelectForwarder)
 }
 
 func isPassedConfig(configPath string) bool {
