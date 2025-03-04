@@ -1,9 +1,7 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
-  schedule: ["before 7am every saturday"],
-  extends: [
-    "config:best-practices"
-  ],
+  schedule: ["before 7am on saturday"],
+  extends: ["config:best-practices"],
   automerge: false,
   addLabels: ["dependencies", "renovate"],
   branchPrefix: "renovate/",
@@ -13,7 +11,7 @@
       // https://github.com/slsa-framework/slsa-github-generator/blob/v2.0.0/internal/builders/container/README.md#referencing-the-slsa-generator
       matchDepNames: ["slsa-framework/slsa-github-generator"],
       matchUpdateTypes: ["pinDigest"],
-      enabled: false
-    }
-  ]
+      enabled: false,
+    },
+  ],
 }
