@@ -9,7 +9,6 @@ require (
 	github.com/go-git/go-git/v5 v5.13.2
 	github.com/go-playground/validator/v10 v10.25.0
 	github.com/google/go-github/v69 v69.2.0
-	github.com/google/go-github/v69 v69.2.0
 	github.com/openai/openai-go v0.1.0-alpha.59
 	golang.org/x/net v0.35.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -43,7 +42,6 @@ require (
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
-	github.com/kr/pretty v0.3.1 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/pjbgf/sha1cd v0.3.2 // indirect
 	github.com/rogpeppe/go-internal v1.13.1 // indirect
@@ -60,6 +58,5 @@ require (
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
 	golang.org/x/tools v0.22.0 // indirect
-	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )
