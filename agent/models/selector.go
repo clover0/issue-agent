@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/clover0/issue-agent/core"
 	"github.com/clover0/issue-agent/logger"
 	"github.com/clover0/issue-agent/util"
 )
 
-func SelectForwarder(lo logger.Logger, model string) (LLMForwarder, error) {
+func SelectForwarder(lo logger.Logger, model string) (core.LLMForwarder, error) {
 	if util.IsAWSBedrockModel(model) {
 		return NewBedrockLLMForwarder(lo)
 	}

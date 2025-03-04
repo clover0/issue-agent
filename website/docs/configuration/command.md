@@ -1,6 +1,6 @@
 # Command
 
-```shell
+```
 $ issue-agent help
 
 Usage

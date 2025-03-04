@@ -97,9 +97,13 @@ func (s *AnthropicMessageService) Create(ctx context.Context, body J) (*Response
 		}
 
 		if resp.StatusCode >= 400 {
-			s := string(b)
-			if resp.StatusCode == http.StatusServiceUnavailable || strings.Contains(s, "overloaded") {
+			respStr := string(b)
+			if resp.StatusCode == http.StatusServiceUnavailable || strings.Contains(respStr, "overloaded") {
 				return util.RetryableError
+			}
+			if resp.StatusCode == http.StatusTooManyRequests {
+				s.client.logger.Info(fmt.Sprintf("%s\nRate limited, retrying after 60 seconds...\n", respStr))
+				return util.RetryAfter60SecondError
 			}
 			return fmt.Errorf("invalid request or server error %s", b)
 		}

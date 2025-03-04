@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/bedrockruntime"
 	"github.com/aws/aws-sdk-go-v2/service/bedrockruntime/types"
 
+	"github.com/clover0/issue-agent/core"
 	"github.com/clover0/issue-agent/logger"
 	"github.com/clover0/issue-agent/util/pointer"
 )
@@ -48,7 +49,7 @@ type BedrockMessageService struct {
 
 type BedrockConverseMessageResponse struct {
 	Value string
-	Role  MessageRole
+	Role  core.MessageRole
 }
 
 func (s *BedrockMessageService) Create(

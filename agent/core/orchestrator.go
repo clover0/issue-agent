@@ -1,4 +1,4 @@
-package agent
+package core
 
 import (
 	"bytes"
@@ -14,7 +14,6 @@ import (
 	"github.com/clover0/issue-agent/functions/agithub"
 	"github.com/clover0/issue-agent/loader"
 	"github.com/clover0/issue-agent/logger"
-	"github.com/clover0/issue-agent/models"
 	libprompt "github.com/clover0/issue-agent/prompt"
 	"github.com/clover0/issue-agent/store"
 	"github.com/clover0/issue-agent/util"
@@ -34,8 +33,9 @@ func OrchestrateAgents(
 	issue loader.Issue,
 	workRepository string,
 	gh *github.Client,
+	selectForward SelectForwarder,
 ) error {
-	llmForwarder, err := models.SelectForwarder(lo, conf.Agent.Model)
+	llmForwarder, err := selectForward(lo, conf.Agent.Model)
 	if err != nil {
 		lo.Error("failed to select forwarder: %s\n", err)
 		return err
@@ -84,24 +84,26 @@ func OrchestrateAgents(
 		Model:    conf.Agent.Model,
 	}
 
-	prompt, err := libprompt.BuildRequirementPrompt(promptTemplate, conf.Language, issue)
+	prompt, err := libprompt.BuildRequirementPrompt(promptTemplate, conf.Language, baseBranch, issue)
 	if err != nil {
 		lo.Error("failed build requirement prompt: %s\n", err)
 		return err
 	}
-	requirementAgent, err := RunAgent("requirementAgent", prompt, submitServiceCaller, parameter, lo, &dataStore, llmForwarder)
+	requirementAgent, err := RunAgent("requirementAgent",
+		prompt, submitServiceCaller, parameter, lo, &dataStore, llmForwarder, PlanTools())
 	if err != nil {
 		lo.Error("requirement agent failed: %s\n", err)
 		return err
 	}
 
 	instruction := requirementAgent.LastHistory().RawContent
-	prompt, err = libprompt.BuildDeveloperPrompt(promptTemplate, conf.Language, loaderr, issue.Path, instruction)
+	prompt, err = libprompt.BuildDeveloperPrompt(promptTemplate, conf.Language, baseBranch, loaderr, issue.Path, instruction)
 	if err != nil {
 		lo.Error("failed build developer prompt: %s\n", err)
 		return err
 	}
-	developerAgent, err := RunAgent("developerAgent", prompt, submitServiceCaller, parameter, lo, &dataStore, llmForwarder)
+	developerAgent, err := RunAgent("developerAgent",
+		prompt, submitServiceCaller, parameter, lo, &dataStore, llmForwarder, functions.AllFunctions())
 	if err != nil {
 		lo.Error("developer agent failed: %s\n", err)
 		return err
@@ -119,7 +121,8 @@ func OrchestrateAgents(
 	}
 	submittedPRNumber := dataStore.GetSubmission(store.LastSubmissionKey).PullRequestNumber
 
-	prompt, err = libprompt.BuildReviewManagerPrompt(promptTemplate, conf, issue, util.Map(developerAgent.ChangedFiles(), func(f store.File) string { return f.Path }))
+	prompt, err = libprompt.BuildReviewManagerPrompt(
+		promptTemplate, conf, issue, util.Map(developerAgent.ChangedFiles(), func(f store.File) string { return f.Path }), baseBranch)
 	if err != nil {
 		lo.Error("failed to build review manager prompt: %s\n", err)
 		return err
@@ -129,7 +132,7 @@ func OrchestrateAgents(
 		prompt,
 		submitServiceCaller,
 		parameter,
-		lo, &dataStore, llmForwarder)
+		lo, &dataStore, llmForwarder, functions.AllFunctions())
 	if err != nil {
 		lo.Error("reviewManagerAgent failed: %s\n", err)
 		return err
@@ -171,7 +174,7 @@ func OrchestrateAgents(
 			prpt,
 			submitServiceCaller,
 			parameter,
-			lo, &dataStore, llmForwarder)
+			lo, &dataStore, llmForwarder, functions.AllFunctions())
 		if err != nil {
 			lo.Error("%s failed: %s\n", p.AgentName, err)
 			return err
@@ -247,7 +250,8 @@ func RunAgent(
 	parameter Parameter,
 	lo logger.Logger,
 	dataStore *store.Store,
-	llmForwarder models.LLMForwarder,
+	llmForwarder LLMForwarder,
+	tools []functions.Function,
 ) (Agent, error) {
 	ag := NewAgent(
 		parameter,
@@ -257,6 +261,7 @@ func RunAgent(
 		prompt,
 		llmForwarder,
 		dataStore,
+		tools,
 	)
 
 	if _, err := ag.Work(); err != nil {

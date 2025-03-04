@@ -9,8 +9,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/bedrockruntime/document"
 	"github.com/aws/aws-sdk-go-v2/service/bedrockruntime/types"
 
+	"github.com/clover0/issue-agent/core"
 	"github.com/clover0/issue-agent/logger"
-	"github.com/clover0/issue-agent/step"
 	"github.com/clover0/issue-agent/util/pointer"
 )
 
@@ -20,7 +20,7 @@ type BedrockLLMForwarder struct {
 	Bedrock BedrockClient
 }
 
-func NewBedrockLLMForwarder(l logger.Logger) (LLMForwarder, error) {
+func NewBedrockLLMForwarder(l logger.Logger) (core.LLMForwarder, error) {
 	bed, err := NewBedrock(l)
 	if err != nil {
 		return nil, err
@@ -30,8 +30,8 @@ func NewBedrockLLMForwarder(l logger.Logger) (LLMForwarder, error) {
 	}, nil
 }
 
-func (a BedrockLLMForwarder) StartForward(input StartCompletionInput) ([]LLMMessage, error) {
-	var history []LLMMessage
+func (a BedrockLLMForwarder) StartForward(input core.StartCompletionInput) ([]core.LLMMessage, error) {
+	var history []core.LLMMessage
 	initMsg, toolSpecs, initialHistory := a.buildStartParams(input)
 
 	history = append(history, initialHistory...)
@@ -64,10 +64,10 @@ func (a BedrockLLMForwarder) StartForward(input StartCompletionInput) ([]LLMMess
 
 func (a BedrockLLMForwarder) ForwardLLM(
 	_ context.Context,
-	input StartCompletionInput,
-	llmContexts []step.ReturnToLLMContext,
-	history []LLMMessage,
-) ([]LLMMessage, error) {
+	input core.StartCompletionInput,
+	llmContexts []core.ReturnToLLMContext,
+	history []core.LLMMessage,
+) ([]core.LLMMessage, error) {
 	_, toolSpecs, _ := a.buildStartParams(input)
 
 	// reset message
@@ -78,7 +78,7 @@ func (a BedrockLLMForwarder) ForwardLLM(
 		var msg types.Message
 
 		switch h.Role {
-		case LLMAssistant:
+		case core.LLMAssistant:
 			msg.Role = types.ConversationRoleAssistant
 			if len(h.ReturnedToolCalls) > 0 {
 				for _, v := range h.ReturnedToolCalls {
@@ -100,13 +100,13 @@ func (a BedrockLLMForwarder) ForwardLLM(
 				})
 			}
 
-		case LLMUser:
+		case core.LLMUser:
 			msg.Role = types.ConversationRoleUser
 			msg.Content = append(msg.Content, &types.ContentBlockMemberText{
 				Value: h.RawContent,
 			})
 
-		case LLMTool:
+		case core.LLMTool:
 			msg.Role = types.ConversationRoleUser
 			toolResult := types.ToolResultBlock{
 				ToolUseId: &h.RespondToolCall.ToolCallerID,
@@ -122,7 +122,7 @@ func (a BedrockLLMForwarder) ForwardLLM(
 	}
 
 	// new message
-	var newMsg LLMMessage
+	var newMsg core.LLMMessage
 	content := make([]types.ContentBlock, len(llmContexts))
 	for i, v := range llmContexts {
 		// only one content ?
@@ -137,10 +137,10 @@ func (a BedrockLLMForwarder) ForwardLLM(
 					},
 				},
 			}
-			newMsg = LLMMessage{
-				Role:       LLMTool,
+			newMsg = core.LLMMessage{
+				Role:       core.LLMTool,
 				RawContent: v.Content,
-				RespondToolCall: ToolCall{
+				RespondToolCall: core.ToolCall{
 					ToolCallerID: v.ToolCallerID,
 					ToolName:     v.ToolName,
 				},
@@ -149,8 +149,8 @@ func (a BedrockLLMForwarder) ForwardLLM(
 			content[i] = &types.ContentBlockMemberText{
 				Value: v.Content,
 			}
-			newMsg = LLMMessage{
-				Role:       LLMUser,
+			newMsg = core.LLMMessage{
+				Role:       core.LLMUser,
 				RawContent: v.Content,
 			}
 		}
@@ -189,35 +189,35 @@ func (a BedrockLLMForwarder) ForwardLLM(
 }
 
 // TODO: refactor with openai forwarder
-func (a BedrockLLMForwarder) ForwardStep(_ context.Context, history []LLMMessage) step.Step {
+func (a BedrockLLMForwarder) ForwardStep(_ context.Context, history []core.LLMMessage) core.Step {
 	lastMsg := history[len(history)-1]
 
 	switch lastMsg.FinishReason {
-	case FinishStop:
-		return step.NewWaitingInstructionStep(lastMsg.RawContent)
-	case FinishToolCalls:
-		var input []step.FunctionsInput
+	case core.FinishStop:
+		return core.NewWaitingInstructionStep(lastMsg.RawContent)
+	case core.FinishToolCalls:
+		var input []core.FunctionsInput
 		for _, v := range lastMsg.ReturnedToolCalls {
-			input = append(input, step.FunctionsInput{
+			input = append(input, core.FunctionsInput{
 				FuncName:     v.ToolName,
 				FunctionArgs: v.Argument,
 				ToolCallerID: v.ToolCallerID,
 			})
 		}
-		return step.NewExecStep(input)
-	case FinishLengthOver:
-		return step.NewUnrecoverableStep(fmt.Errorf("chat completion length error"))
+		return core.NewExecStep(input)
+	case core.FinishLengthOver:
+		return core.NewUnrecoverableStep(fmt.Errorf("chat completion length error"))
 	}
 
-	return step.NewUnknownStep()
+	return core.NewUnknownStep()
 }
 
-func (a BedrockLLMForwarder) buildAssistantHistory(bedrockResp bedrockruntime.ConverseOutput) (LLMMessage, error) {
+func (a BedrockLLMForwarder) buildAssistantHistory(bedrockResp bedrockruntime.ConverseOutput) (core.LLMMessage, error) {
 	respMessage, ok := bedrockResp.Output.(*types.ConverseOutputMemberMessage)
 	if !ok {
-		return LLMMessage{}, fmt.Errorf("failed to convert output to message")
+		return core.LLMMessage{}, fmt.Errorf("failed to convert output to message")
 	}
-	var toolCalls []ToolCall
+	var toolCalls []core.ToolCall
 	var text string
 	for _, cont := range respMessage.Value.Content {
 		switch c := cont.(type) {
@@ -226,24 +226,24 @@ func (a BedrockLLMForwarder) buildAssistantHistory(bedrockResp bedrockruntime.Co
 		case *types.ContentBlockMemberToolUse:
 			doc, err := c.Value.Input.MarshalSmithyDocument()
 			if err != nil {
-				return LLMMessage{}, fmt.Errorf("failed to unmarshal tool argument: %w", err)
+				return core.LLMMessage{}, fmt.Errorf("failed to unmarshal tool argument: %w", err)
 			}
-			toolCalls = append(toolCalls, ToolCall{
+			toolCalls = append(toolCalls, core.ToolCall{
 				ToolCallerID: *c.Value.ToolUseId,
 				ToolName:     *c.Value.Name,
 				Argument:     string(doc),
 			})
 		default:
-			return LLMMessage{}, fmt.Errorf("unknown content type: %T", c)
+			return core.LLMMessage{}, fmt.Errorf("unknown content type: %T", c)
 		}
 	}
 
-	return LLMMessage{
-		Role:              LLMAssistant,
+	return core.LLMMessage{
+		Role:              core.LLMAssistant,
 		FinishReason:      convertBedrockStopReasonToReason(bedrockResp.StopReason),
 		RawContent:        text,
 		ReturnedToolCalls: toolCalls,
-		Usage: LLMUsage{
+		Usage: core.LLMUsage{
 			InputToken:  *bedrockResp.Usage.InputTokens,
 			OutputToken: *bedrockResp.Usage.OutputTokens,
 			TotalToken:  *bedrockResp.Usage.TotalTokens,
@@ -252,7 +252,7 @@ func (a BedrockLLMForwarder) buildAssistantHistory(bedrockResp bedrockruntime.Co
 }
 
 // TODO: refactor rename
-func (a BedrockLLMForwarder) buildStartParams(input StartCompletionInput) ([]types.Message, []*types.ToolMemberToolSpec, []LLMMessage) {
+func (a BedrockLLMForwarder) buildStartParams(input core.StartCompletionInput) ([]types.Message, []*types.ToolMemberToolSpec, []core.LLMMessage) {
 	var messages []types.Message
 	tools := make([]*types.ToolMemberToolSpec, len(input.Functions))
 
@@ -277,22 +277,22 @@ func (a BedrockLLMForwarder) buildStartParams(input StartCompletionInput) ([]typ
 		},
 	})
 
-	return messages, tools, []LLMMessage{
+	return messages, tools, []core.LLMMessage{
 		{
-			Role:       LLMUser,
+			Role:       core.LLMUser,
 			RawContent: input.StartUserPrompt,
 		},
 	}
 }
 
-func convertBedrockStopReasonToReason(reason types.StopReason) MessageFinishReason {
+func convertBedrockStopReasonToReason(reason types.StopReason) core.MessageFinishReason {
 	switch reason {
 	case types.StopReasonEndTurn:
-		return FinishStop
+		return core.FinishStop
 	case types.StopReasonToolUse:
-		return FinishToolCalls
+		return core.FinishToolCalls
 	case types.StopReasonMaxTokens:
-		return FinishLengthOver
+		return core.FinishLengthOver
 	default:
 		panic(fmt.Sprintf("unknown finish reason: %s", reason))
 	}
