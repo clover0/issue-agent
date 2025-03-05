@@ -46,6 +46,11 @@ type GetPullRequestOutput struct {
 	Content string
 }
 
+type GetIssueOutput struct {
+	Path    string
+	Content string
+}
+
 func (g GetPullRequestOutput) ToLLMString() string {
 	errMsg := "failed to convert pull-request to string for LLM"
 

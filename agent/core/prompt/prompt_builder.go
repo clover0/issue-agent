@@ -2,12 +2,11 @@ package prompt
 
 import (
 	"bytes"
-	"context"
 	"fmt"
 	"text/template"
 
 	"github.com/clover0/issue-agent/config"
-	"github.com/clover0/issue-agent/loader"
+	"github.com/clover0/issue-agent/functions"
 )
 
 type Prompt struct {
@@ -15,7 +14,7 @@ type Prompt struct {
 	StartUserPrompt string
 }
 
-func BuildRequirementPrompt(promptTpl PromptTemplate, language string, baseBranch string, issue loader.Issue) (Prompt, error) {
+func BuildRequirementPrompt(promptTpl PromptTemplate, language string, baseBranch string, issue functions.GetIssueOutput) (Prompt, error) {
 	return BuildPrompt(promptTpl, "planner", map[string]any{
 		"language":    language,
 		"issue":       issue.Content,
@@ -24,23 +23,17 @@ func BuildRequirementPrompt(promptTpl PromptTemplate, language string, baseBranc
 	})
 }
 
-func BuildDeveloperPrompt(promptTpl PromptTemplate, language string, baseBranch string, issueLoader loader.Loader, issueNumber string, instruction string) (Prompt, error) {
-	// TODO: separate issueLoader and issue from this
-	iss, err := issueLoader.LoadIssue(context.TODO(), issueNumber)
-	if err != nil {
-		return Prompt{}, fmt.Errorf("failed to load issue: %w", err)
-	}
-
+func BuildDeveloperPrompt(promptTpl PromptTemplate, language string, baseBranch string, issue functions.GetIssueOutput, instruction string) (Prompt, error) {
 	return BuildPrompt(promptTpl, "developer", map[string]any{
 		"language":    language,
-		"issue":       iss.Content,
-		"issueNumber": issueNumber,
+		"issue":       issue.Content,
+		"issueNumber": issue.Path,
 		"instruction": instruction,
 		"baseBranch":  baseBranch,
 	})
 }
 
-func BuildReviewManagerPrompt(promptTpl PromptTemplate, cnf config.Config, issue loader.Issue, changedFilesPath []string, baseBranch string) (Prompt, error) {
+func BuildReviewManagerPrompt(promptTpl PromptTemplate, cnf config.Config, issue functions.GetIssueOutput, changedFilesPath []string, baseBranch string) (Prompt, error) {
 	m := make(map[string]any)
 
 	m["language"] = cnf.Language

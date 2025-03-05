@@ -16,7 +16,6 @@ type CreatePRInput struct {
 	GithubIssueNumber string
 	WorkRepository    string `validate:"required"`
 	BaseBranch        string `validate:"required"`
-	FromFile          string
 }
 
 func (c *CreatePRInput) MergeGitHubArg(pr ArgGitHubCreatePR) *CreatePRInput {
@@ -59,8 +58,8 @@ func (c *CreatePRInput) Validate() error {
 		return fmt.Errorf("validation failed: %w", errs)
 	}
 
-	if c.GithubIssueNumber == "" && c.FromFile == "" {
-		return fmt.Errorf("github_issue_number or from_file is required")
+	if c.GithubIssueNumber == "" {
+		return fmt.Errorf("github_issue_number is required")
 	}
 
 	return nil
@@ -76,9 +75,6 @@ func CreatePRFlags() (*flag.FlagSet, *CreatePRInput) {
 	addCommonFlags(cmd, flagMapper.Common)
 
 	cmd.StringVar(&flagMapper.BaseBranch, "base_branch", "", "Base Branch for pull request")
-
-	// NOTE: from_file is not implemented yet.
-	// cmd.StringVar(&flagMapper.FromFile, "from_file", "", "Issue content from file path.")
 
 	return cmd, flagMapper
 }
