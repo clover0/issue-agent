@@ -27,11 +27,13 @@ Refer to the [documentation](https://clover0.github.io/issue-agent) for more det
 ## Supported Models
 The following models are supported.
 
+⭐️We strongly recommend using Claude 3.5 and 3.7 models.
+
 - OpenAI Models
   - gpt-4o
   - gpt-4o-mini
 - Anthropic Models
-  - claude-3-5-sonnet-latest (⭐️Strongly Recommended!)
+  - claude-3-5-sonnet-latest
   - claude-3-7-sonnet-20250219
 - AWS Bedrock Models
   - claude-3-5-sonnet v2 (ModelID = anthropic.claude-3-5-sonnet-20241022-v2:0)
