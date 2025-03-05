@@ -112,11 +112,11 @@ func OrchestrateAgents(
 		return nil
 	}
 
-	if s := dataStore.GetSubmission(corestore.LastSubmissionKey); s == nil {
+	if s := dataStore.GetSubmittedWork(corestore.LastSubmissionKey); s == nil {
 		lo.Error("submission is not found\n")
 		return err
 	}
-	submittedPRNumber := dataStore.GetSubmission(corestore.LastSubmissionKey).PullRequestNumber
+	submittedPRNumber := dataStore.GetSubmittedWork(corestore.LastSubmissionKey).PullRequestNumber
 
 	prompt, err = coreprompt.BuildReviewManagerPrompt(
 		promptTemplate, conf, issue, util.Map(developerAgent.ChangedFiles(), func(f corestore.File) string { return f.Path }), baseBranch)
