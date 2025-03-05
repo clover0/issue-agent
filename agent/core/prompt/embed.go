@@ -1,4 +1,4 @@
-package template
+package prompt
 
 import _ "embed"
 

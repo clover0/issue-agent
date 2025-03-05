@@ -2,8 +2,6 @@ package prompt
 
 import (
 	"gopkg.in/yaml.v3"
-
-	"github.com/clover0/issue-agent/config/template"
 )
 
 type PromptTemplate struct {
@@ -17,7 +15,7 @@ type PromptTemplate struct {
 func LoadPrompt() (PromptTemplate, error) {
 	var pt PromptTemplate
 
-	data := template.DefaultTemplate()
+	data := DefaultTemplate()
 	err := yaml.Unmarshal(data, &pt)
 	if err != nil {
 		return pt, err
