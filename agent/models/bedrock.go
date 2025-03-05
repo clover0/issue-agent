@@ -2,10 +2,14 @@ package models
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"net/http"
 	"strings"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/aws/retry"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/bedrockruntime"
 	"github.com/aws/aws-sdk-go-v2/service/bedrockruntime/types"
@@ -23,16 +27,54 @@ type BedrockClient struct {
 	Messages *BedrockMessageService
 }
 
+type awsCustomRetryer struct {
+	*retry.Standard
+	logger logger.Logger
+}
+
+func (r *awsCustomRetryer) IsErrorRetryable(err error) bool {
+	var v interface{ HTTPStatusCode() int }
+
+	// custom error handling
+	if errors.As(err, &v) {
+		if v.HTTPStatusCode() == http.StatusTooManyRequests {
+			r.logger.Info(fmt.Sprintf("%s\nRate limited, retrying after 60 seconds...\n", err))
+			time.Sleep(60 * time.Second)
+			return true
+		}
+	}
+
+	return r.Standard.IsErrorRetryable(err)
+}
+
+func (r *awsCustomRetryer) MaxAttempts() int {
+	return r.Standard.MaxAttempts()
+}
+
+func (r *awsCustomRetryer) RetryDelay(attempt int, opErr error) (time.Duration, error) {
+	return r.Standard.RetryDelay(attempt, opErr)
+}
+
+func (r *awsCustomRetryer) GetRetryToken(ctx context.Context, opErr error) (releaseToken func(error) error, err error) {
+	return r.Standard.GetRetryToken(ctx, opErr)
+}
+
+func (r *awsCustomRetryer) GetAttemptToken(ctx context.Context) (func(error) error, error) {
+	return r.Standard.GetAttemptToken(ctx)
+}
+
 func NewBedrock(logger logger.Logger) (BedrockClient, error) {
 	ctx := context.Background()
-	var opts []func(*config.LoadOptions) error
-	sdkConfig, err := config.LoadDefaultConfig(ctx, opts...)
+	stdRetryer := retry.NewStandard()
+	sdkConfig, err := config.LoadDefaultConfig(ctx,
+		config.WithRetryer(func() aws.Retryer {
+			return &awsCustomRetryer{Standard: stdRetryer, logger: logger}
+		}))
 	if err != nil {
 		return BedrockClient{}, fmt.Errorf("failed to load AWS SDK config: %w", err)
 	}
 
 	client := bedrockruntime.NewFromConfig(sdkConfig)
-
 	c := BedrockClient{
 		logger: logger,
 		client: client,
@@ -57,7 +99,8 @@ func (s *BedrockMessageService) Create(
 	modelID string,
 	systemMessage string,
 	messages []types.Message,
-	toolSpecs []*types.ToolMemberToolSpec) (response *bedrockruntime.ConverseOutput, _ error) {
+	toolSpecs []*types.ToolMemberToolSpec,
+) (response *bedrockruntime.ConverseOutput, _ error) {
 	input := &bedrockruntime.ConverseInput{
 		// todo: changeable models
 		ModelId: aws.String(modelID),
