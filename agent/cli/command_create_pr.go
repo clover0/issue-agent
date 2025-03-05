@@ -7,9 +7,9 @@ import (
 
 	"github.com/google/go-github/v69/github"
 
+	"github.com/clover0/issue-agent/agithub"
 	"github.com/clover0/issue-agent/config"
 	"github.com/clover0/issue-agent/core"
-	"github.com/clover0/issue-agent/functions/agithub"
 	"github.com/clover0/issue-agent/logger"
 	"github.com/clover0/issue-agent/models"
 )

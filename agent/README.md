@@ -7,6 +7,7 @@ After changing code, build container image
 make image/dev
 ```
 
+
 ### Run
 ```sh
 GITHUB_TOKEN=$(gh auth token) \
@@ -18,6 +19,7 @@ OPENAI_API_KEY="key" \
      --language Japanese \
      --log_level debug
 ```
+
 
 ## Run using release image
 ```sh

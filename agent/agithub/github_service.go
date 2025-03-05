@@ -82,5 +82,6 @@ func (s GitHubService) GetBranch(branchName string) (string, error) {
 		}
 		return "", fmt.Errorf("failed to get branch: %w", err)
 	}
+
 	return branch.GetName(), nil
 }

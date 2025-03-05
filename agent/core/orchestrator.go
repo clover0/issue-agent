@@ -9,11 +9,11 @@ import (
 
 	"github.com/google/go-github/v69/github"
 
+	agithub2 "github.com/clover0/issue-agent/agithub"
 	"github.com/clover0/issue-agent/config"
 	coreprompt "github.com/clover0/issue-agent/core/prompt"
 	corestore "github.com/clover0/issue-agent/core/store"
 	"github.com/clover0/issue-agent/functions"
-	"github.com/clover0/issue-agent/functions/agithub"
 	"github.com/clover0/issue-agent/logger"
 	"github.com/clover0/issue-agent/util"
 	"github.com/clover0/issue-agent/util/pointer"
@@ -45,7 +45,7 @@ func OrchestrateAgents(
 	}
 
 	// check if the base branch exists
-	ghservice := agithub.NewGitHubService(conf.Agent.GitHub.Owner, workRepository, gh, lo)
+	ghservice := agithub2.NewGitHubService(conf.Agent.GitHub.Owner, workRepository, gh, lo)
 	if _, err = ghservice.GetBranch(baseBranch); err != nil {
 		return err
 	}
@@ -61,7 +61,7 @@ func OrchestrateAgents(
 	), ","))
 	lo.Info("agents make a pull request to %s/%s\n", conf.Agent.GitHub.Owner, workRepository)
 
-	submitServiceCaller := agithub.NewSubmitFileGitHubService(conf.Agent.GitHub.Owner, workRepository, gh, lo).
+	submitServiceCaller := agithub2.NewSubmitFileGitHubService(conf.Agent.GitHub.Owner, workRepository, gh, lo).
 		Caller(ctx, functions.SubmitFilesServiceInput{
 			BaseBranch: baseBranch,
 			GitEmail:   conf.Agent.Git.UserEmail,
