@@ -7,7 +7,7 @@ import (
 
 	"github.com/clover0/issue-agent/agithub"
 	"github.com/clover0/issue-agent/config"
-	"github.com/clover0/issue-agent/functions"
+	"github.com/clover0/issue-agent/core/functions"
 	"github.com/clover0/issue-agent/logger"
 )
 

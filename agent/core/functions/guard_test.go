@@ -3,7 +3,7 @@ package functions_test
 import (
 	"testing"
 
-	"github.com/clover0/issue-agent/functions"
+	"github.com/clover0/issue-agent/core/functions"
 	"github.com/clover0/issue-agent/test/assert"
 )
 
