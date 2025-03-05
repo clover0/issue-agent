@@ -32,6 +32,24 @@ func NewGitHubService(
 	}
 }
 
+func (s GitHubService) GetIssue(issueNumber string) (functions.GetIssueOutput, error) {
+	number, err := strconv.Atoi(issueNumber)
+	if err != nil {
+		return functions.GetIssueOutput{}, fmt.Errorf("failed to convert issue number to int: %w", err)
+	}
+
+	c := context.Background()
+	issue, _, err := s.client.Issues.Get(c, s.owner, s.repository, number)
+	if err != nil {
+		return functions.GetIssueOutput{}, fmt.Errorf("failed to get issue: %w", err)
+	}
+
+	return functions.GetIssueOutput{
+		Path:    strconv.Itoa(issue.GetNumber()),
+		Content: issue.GetBody(),
+	}, nil
+}
+
 func (s GitHubService) GetPullRequest(prNumber string) (functions.GetPullRequestOutput, error) {
 	number, err := strconv.Atoi(prNumber)
 	if err != nil {

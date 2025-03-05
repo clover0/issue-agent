@@ -91,10 +91,10 @@ func TestValidate(t *testing.T) {
 	}{
 		"valid input": {
 			input: CreatePRInput{
-				GitHubOwner:    "owner",
-				WorkRepository: "repo",
-				BaseBranch:     "main",
-				FromFile:       "file.txt",
+				GitHubOwner:       "owner",
+				WorkRepository:    "repo",
+				BaseBranch:        "main",
+				GithubIssueNumber: "123",
 			},
 			wantErr: false,
 		},
@@ -104,32 +104,6 @@ func TestValidate(t *testing.T) {
 				BaseBranch:  "main",
 			},
 			wantErr: true,
-		},
-		"missing both github_issue_number and from_file": {
-			input: CreatePRInput{
-				GitHubOwner:    "owner",
-				WorkRepository: "repo",
-				BaseBranch:     "main",
-			},
-			wantErr: true,
-		},
-		"only github_issue_number exists": {
-			input: CreatePRInput{
-				GitHubOwner:       "owner",
-				WorkRepository:    "repo",
-				BaseBranch:        "main",
-				GithubIssueNumber: "123",
-			},
-			wantErr: false,
-		},
-		"only from_file exists": {
-			input: CreatePRInput{
-				GitHubOwner:    "owner",
-				WorkRepository: "repo",
-				BaseBranch:     "main",
-				FromFile:       "file.txt",
-			},
-			wantErr: false,
 		},
 	}
 

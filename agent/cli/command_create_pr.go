@@ -10,7 +10,6 @@ import (
 	"github.com/clover0/issue-agent/config"
 	"github.com/clover0/issue-agent/core"
 	"github.com/clover0/issue-agent/functions/agithub"
-	"github.com/clover0/issue-agent/loader"
 	"github.com/clover0/issue-agent/logger"
 	"github.com/clover0/issue-agent/models"
 )
@@ -55,25 +54,8 @@ func CreatePR(flags []string) error {
 	}
 
 	ctx := context.Background()
-	var issLoader loader.Loader
-	var issue loader.Issue
-	if len(cliIn.FromFile) > 0 {
-		lo.Info("load issue from file\n")
-		issLoader = loader.NewFileLoader()
-		if issue, err = issLoader.LoadIssue(ctx, cliIn.FromFile); err != nil {
-			lo.Error("failed to load issue from file: %s\n", err)
-			return err
-		}
-	} else {
-		lo.Info("load issue from GitHub\n")
-		issLoader = loader.NewGitHubLoader(gh, conf.Agent.GitHub.Owner, cliIn.WorkRepository)
-		if issue, err = issLoader.LoadIssue(ctx, cliIn.GithubIssueNumber); err != nil {
-			lo.Error("failed to load issue from GitHub: %s\n", err)
-			return err
-		}
-	}
 
-	return core.OrchestrateAgents(ctx, lo, conf, issLoader, cliIn.BaseBranch, issue, cliIn.WorkRepository, gh, models.SelectForwarder)
+	return core.OrchestrateAgents(ctx, lo, conf, cliIn.BaseBranch, cliIn.WorkRepository, gh, cliIn.GithubIssueNumber, models.SelectForwarder)
 }
 
 func isPassedConfig(configPath string) bool {

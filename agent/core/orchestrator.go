@@ -14,7 +14,6 @@ import (
 	corestore "github.com/clover0/issue-agent/core/store"
 	"github.com/clover0/issue-agent/functions"
 	"github.com/clover0/issue-agent/functions/agithub"
-	"github.com/clover0/issue-agent/loader"
 	"github.com/clover0/issue-agent/logger"
 	"github.com/clover0/issue-agent/util"
 	"github.com/clover0/issue-agent/util/pointer"
@@ -28,11 +27,10 @@ func OrchestrateAgents(
 	ctx context.Context,
 	lo logger.Logger,
 	conf config.Config,
-	loaderr loader.Loader,
 	baseBranch string,
-	issue loader.Issue,
 	workRepository string,
 	gh *github.Client,
+	issueNumber string,
 	selectForward SelectForwarder,
 ) error {
 	llmForwarder, err := selectForward(lo, conf.Agent.Model)
@@ -84,6 +82,12 @@ func OrchestrateAgents(
 		Model:    conf.Agent.Model,
 	}
 
+	issue, err := ghservice.GetIssue(issueNumber)
+	if err != nil {
+		return fmt.Errorf("failed to get issue: %w", err)
+
+	}
+
 	prompt, err := coreprompt.BuildRequirementPrompt(promptTemplate, conf.Language, baseBranch, issue)
 	if err != nil {
 		lo.Error("failed build requirement prompt: %s\n", err)
@@ -97,7 +101,7 @@ func OrchestrateAgents(
 	}
 
 	instruction := requirementAgent.LastHistory().RawContent
-	prompt, err = coreprompt.BuildDeveloperPrompt(promptTemplate, conf.Language, baseBranch, loaderr, issue.Path, instruction)
+	prompt, err = coreprompt.BuildDeveloperPrompt(promptTemplate, conf.Language, baseBranch, issue, instruction)
 	if err != nil {
 		lo.Error("failed build developer prompt: %s\n", err)
 		return err
