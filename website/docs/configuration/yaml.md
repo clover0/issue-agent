@@ -16,11 +16,6 @@ workdir: "/tmp/repositories"
 log_level: "info"
 
 agent:
-  # Default prompt template is embed config.
-  # prompt_path is a relative path from the execution directory.
-  # e.g) config/prompt_template_en.yml
-  prompt_path: ""
-
   # Required
   # LLM name
   # The recommend model is Claude 3.5 Sonnet

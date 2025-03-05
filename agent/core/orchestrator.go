@@ -39,15 +39,9 @@ func OrchestrateAgents(
 		return err
 	}
 
-	promptPath := conf.Agent.PromptPath
-	if len(promptPath) > 0 {
-		// In container, the prompt file is mounted to `config.PromptFilePath`
-		promptPath = config.PromptFilePath
-	}
-	promptTemplate, err := coreprompt.LoadPrompt(promptPath)
+	promptTemplate, err := coreprompt.LoadPrompt()
 	if err != nil {
-		lo.Error("failed to load prompt template: %s\n", err)
-		return err
+		return fmt.Errorf("failed to load prompt template: %w\n", err)
 	}
 
 	// check if the base branch exists
@@ -85,7 +79,6 @@ func OrchestrateAgents(
 	issue, err := ghservice.GetIssue(issueNumber)
 	if err != nil {
 		return fmt.Errorf("failed to get issue: %w", err)
-
 	}
 
 	prompt, err := coreprompt.BuildRequirementPrompt(promptTemplate, conf.Language, baseBranch, issue)

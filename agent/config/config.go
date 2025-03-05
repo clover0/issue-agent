@@ -15,7 +15,6 @@ var defaultConfig []byte
 
 const (
 	ConfigFilePath = "/agent/config/config.yml"
-	PromptFilePath = "/agent/config/prompt.yml"
 	DefaultWorkDir = "/agent/repositories"
 
 	LogDebug = "debug"
@@ -28,7 +27,6 @@ type Config struct {
 	WorkDir  string `yaml:"workdir"`
 	LogLevel string `yaml:"log_level" validate:"log_level"`
 	Agent    struct {
-		PromptPath   string `yaml:"prompt_path"`
 		Model        string `yaml:"model" validate:"required"`
 		MaxSteps     int    `yaml:"max_steps" validate:"gte=0"`
 		ReviewAgents int    `yaml:"review_agents"`
