@@ -11,7 +11,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/google/go-github/v69/github"
 
-	"github.com/clover0/issue-agent/functions"
+	"github.com/clover0/issue-agent/core/functions"
 	"github.com/clover0/issue-agent/logger"
 )
 

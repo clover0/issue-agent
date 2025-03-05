@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/clover0/issue-agent/functions"
+	"github.com/clover0/issue-agent/core/functions"
 )
 
 func PlanTools() []functions.Function {

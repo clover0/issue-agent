@@ -11,9 +11,9 @@ import (
 
 	agithub2 "github.com/clover0/issue-agent/agithub"
 	"github.com/clover0/issue-agent/config"
+	"github.com/clover0/issue-agent/core/functions"
 	coreprompt "github.com/clover0/issue-agent/core/prompt"
 	corestore "github.com/clover0/issue-agent/core/store"
-	"github.com/clover0/issue-agent/functions"
 	"github.com/clover0/issue-agent/logger"
 	"github.com/clover0/issue-agent/util"
 	"github.com/clover0/issue-agent/util/pointer"
