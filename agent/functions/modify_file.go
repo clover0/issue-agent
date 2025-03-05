@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/clover0/issue-agent/store"
+	"github.com/clover0/issue-agent/core/store"
 )
 
 const FuncModifyFile = "modify_file"

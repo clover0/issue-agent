@@ -10,12 +10,12 @@ import (
 	"github.com/google/go-github/v69/github"
 
 	"github.com/clover0/issue-agent/config"
+	coreprompt "github.com/clover0/issue-agent/core/prompt"
+	corestore "github.com/clover0/issue-agent/core/store"
 	"github.com/clover0/issue-agent/functions"
 	"github.com/clover0/issue-agent/functions/agithub"
 	"github.com/clover0/issue-agent/loader"
 	"github.com/clover0/issue-agent/logger"
-	libprompt "github.com/clover0/issue-agent/prompt"
-	"github.com/clover0/issue-agent/store"
 	"github.com/clover0/issue-agent/util"
 	"github.com/clover0/issue-agent/util/pointer"
 )
@@ -46,7 +46,7 @@ func OrchestrateAgents(
 		// In container, the prompt file is mounted to `config.PromptFilePath`
 		promptPath = config.PromptFilePath
 	}
-	promptTemplate, err := libprompt.LoadPrompt(promptPath)
+	promptTemplate, err := coreprompt.LoadPrompt(promptPath)
 	if err != nil {
 		lo.Error("failed to load prompt template: %s\n", err)
 		return err
@@ -77,14 +77,14 @@ func OrchestrateAgents(
 			PRLabels:   conf.Agent.GitHub.PRLabels,
 		})
 
-	dataStore := store.NewStore()
+	dataStore := corestore.NewStore()
 
 	parameter := Parameter{
 		MaxSteps: conf.Agent.MaxSteps,
 		Model:    conf.Agent.Model,
 	}
 
-	prompt, err := libprompt.BuildRequirementPrompt(promptTemplate, conf.Language, baseBranch, issue)
+	prompt, err := coreprompt.BuildRequirementPrompt(promptTemplate, conf.Language, baseBranch, issue)
 	if err != nil {
 		lo.Error("failed build requirement prompt: %s\n", err)
 		return err
@@ -97,7 +97,7 @@ func OrchestrateAgents(
 	}
 
 	instruction := requirementAgent.LastHistory().RawContent
-	prompt, err = libprompt.BuildDeveloperPrompt(promptTemplate, conf.Language, baseBranch, loaderr, issue.Path, instruction)
+	prompt, err = coreprompt.BuildDeveloperPrompt(promptTemplate, conf.Language, baseBranch, loaderr, issue.Path, instruction)
 	if err != nil {
 		lo.Error("failed build developer prompt: %s\n", err)
 		return err
@@ -115,14 +115,14 @@ func OrchestrateAgents(
 		return nil
 	}
 
-	if s := dataStore.GetSubmission(store.LastSubmissionKey); s == nil {
+	if s := dataStore.GetSubmission(corestore.LastSubmissionKey); s == nil {
 		lo.Error("submission is not found\n")
 		return err
 	}
-	submittedPRNumber := dataStore.GetSubmission(store.LastSubmissionKey).PullRequestNumber
+	submittedPRNumber := dataStore.GetSubmission(corestore.LastSubmissionKey).PullRequestNumber
 
-	prompt, err = libprompt.BuildReviewManagerPrompt(
-		promptTemplate, conf, issue, util.Map(developerAgent.ChangedFiles(), func(f store.File) string { return f.Path }), baseBranch)
+	prompt, err = coreprompt.BuildReviewManagerPrompt(
+		promptTemplate, conf, issue, util.Map(developerAgent.ChangedFiles(), func(f corestore.File) string { return f.Path }), baseBranch)
 	if err != nil {
 		lo.Error("failed to build review manager prompt: %s\n", err)
 		return err
@@ -163,7 +163,7 @@ func OrchestrateAgents(
 
 	for _, p := range prompts {
 		lo.Info("Run %s\n", p.AgentName)
-		prpt, err := libprompt.BuildReviewerPrompt(promptTemplate, conf.Language, submittedPRNumber, p.Prompt)
+		prpt, err := coreprompt.BuildReviewerPrompt(promptTemplate, conf.Language, submittedPRNumber, p.Prompt)
 		if err != nil {
 			lo.Error("failed to build reviewer prompt: %s\n", err)
 			return err
@@ -245,11 +245,11 @@ func OrchestrateAgents(
 
 func RunAgent(
 	name string,
-	prompt libprompt.Prompt,
+	prompt coreprompt.Prompt,
 	submitServiceCaller functions.SubmitFilesCallerType,
 	parameter Parameter,
 	lo logger.Logger,
-	dataStore *store.Store,
+	dataStore *corestore.Store,
 	llmForwarder LLMForwarder,
 	tools []functions.Function,
 ) (Agent, error) {
