@@ -9,8 +9,8 @@ import (
 
 	"github.com/openai/openai-go"
 
+	corestore "github.com/clover0/issue-agent/core/store"
 	"github.com/clover0/issue-agent/logger"
-	libstore "github.com/clover0/issue-agent/store"
 )
 
 func InitializeFunctions(
@@ -122,7 +122,7 @@ func SetSubmitFiles(fn SubmitFilesCallerType) FunctionOption {
 	}
 }
 
-func ExecFunction(l logger.Logger, store *libstore.Store, funcName FuncName, argsJson string, optArg ...FunctionOption) (string, error) {
+func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, argsJson string, optArg ...FunctionOption) (string, error) {
 	option := &optionalArg{}
 	for _, o := range optArg {
 		o(option)
@@ -192,7 +192,7 @@ func ExecFunction(l logger.Logger, store *libstore.Store, funcName FuncName, arg
 		}
 
 		// NOTE: we would like to use any key, but for ease of implementation, we keep this as a simple implementation.
-		SubmitFilesAfter(store, libstore.LastSubmissionKey, out)
+		SubmitFilesAfter(store, corestore.LastSubmissionKey, out)
 
 		return fmt.Sprintf("%s\n%s\n",
 			defaultSuccessReturning, out.Message), nil

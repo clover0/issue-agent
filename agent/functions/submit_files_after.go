@@ -1,6 +1,8 @@
 package functions
 
-import "github.com/clover0/issue-agent/store"
+import (
+	"github.com/clover0/issue-agent/core/store"
+)
 
 func SubmitFilesAfter(s *store.Store, storeKey string, storeValue SubmitFilesOutput) {
 	s.AddSubmission(storeKey, store.Submission{

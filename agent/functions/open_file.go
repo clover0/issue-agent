@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/clover0/issue-agent/store"
+	"github.com/clover0/issue-agent/core/store"
 )
 
 const FuncOpenFile = "open_file"

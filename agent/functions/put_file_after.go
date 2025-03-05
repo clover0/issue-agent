@@ -1,7 +1,7 @@
 package functions
 
 import (
-	"github.com/clover0/issue-agent/store"
+	"github.com/clover0/issue-agent/core/store"
 )
 
 // TODO: implement hook?
