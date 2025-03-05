@@ -1,15 +1,15 @@
 # Models
 List of available LLM models.
 
-Claude is strongly recommended!
+We strongly recommend using Claude 3.5 and 3.7 models.
 
 - OpenAI models
     - gpt-4o
     - gpt-4o-mini
 
 - Anthropic models
-    - claude-3-5-sonnet-latest (⭐️Strongly Recommended!)
-    - claude-3-7-sonnet-20250219 (⭐️Strongly Recommended!)
+    - claude-3-5-sonnet-latest
+    - claude-3-7-sonnet-20250219
 
 - AWS Bedrock Claude models
     - claude-3-5-sonnet v2 (ModelID = anthropic.claude-3-5-sonnet-20241022-v2:0)
