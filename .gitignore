@@ -3,6 +3,7 @@
 /*.iml
 
 # Project
+.env*
 .tmp
 issue_agent.yml
 

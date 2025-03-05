@@ -49,11 +49,6 @@ func run(lo logger.Logger) error {
 		return err
 	}
 
-	promptPath, err := getPromptPath(conf)
-	if err != nil {
-		return err
-	}
-
 	flags, err := parseArgs(lo)
 	if err != nil {
 		return err
@@ -85,13 +80,6 @@ func run(lo logger.Logger) error {
 	// Mount files to the container
 	if len(configPath) > 0 {
 		args = append(args, "-v", configPath+":"+config.ConfigFilePath)
-	}
-	if len(promptPath) > 0 {
-		path, err := filepath.Abs(conf.Agent.PromptPath)
-		if err != nil {
-			return err
-		}
-		args = append(args, "-v", path+":"+config.PromptFilePath)
 	}
 	args = append(args, dockerEnvs...)
 	args = append(args, awsDockerEnvs...)
@@ -208,13 +196,6 @@ func getConfigPathOrDefault() (string, error) {
 	}
 
 	return path, nil
-}
-
-func getPromptPath(conf config.Config) (string, error) {
-	if len(conf.Agent.PromptPath) == 0 {
-		return "", nil
-	}
-	return filepath.Abs(conf.Agent.PromptPath)
 }
 
 // Pass only the environment variables that are required by the agent.
