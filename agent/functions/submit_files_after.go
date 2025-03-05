@@ -5,7 +5,7 @@ import (
 )
 
 func SubmitFilesAfter(s *store.Store, storeKey string, storeValue SubmitFilesOutput) {
-	s.AddSubmission(storeKey, store.Submission{
+	s.AddSubmittedWork(storeKey, store.SubmittedWork{
 		BaseBranch:        storeValue.PushedBranch,
 		PullRequestNumber: storeValue.PullRequestNumber,
 	})

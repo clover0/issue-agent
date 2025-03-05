@@ -1,6 +1,6 @@
 package store
 
-type Submission struct {
+type SubmittedWork struct {
 	BaseBranch        string
 	PullRequestNumber int
 }

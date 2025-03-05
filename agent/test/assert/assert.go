@@ -33,8 +33,13 @@ expected: %v
 func Nil(t *testing.T, value any) {
 	t.Helper()
 
-	if value != nil {
-		t.Errorf(`execpted nil, got %v`, value)
+	if value == nil {
+		return
+	}
+
+	v := reflect.ValueOf(value)
+	if !v.IsNil() {
+		t.Errorf(`expected nil, got %v`, value)
 	}
 }
 
