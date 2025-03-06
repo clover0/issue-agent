@@ -13,5 +13,11 @@
       matchUpdateTypes: ["pinDigest"],
       enabled: false,
     },
+    {
+      groupName: "go",
+      matchManagers: ["dockerfile", "gomod"],
+      matchDepTypes: ["golang"],
+      groupSlug: "go-version",
+    },
   ],
 }
