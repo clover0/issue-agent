@@ -6,16 +6,16 @@ This section describe common use cases for Issue Agent.
 ## Simple but difficult to automate tasks
 
 - Tasks that do not require immediate developer attention but are simple and expected to be accomplished asynchronously.
-- Migrate deprecated statements that cannot be handled by tools
-- Update forgotten documentation
-- Delete files that are no longer needed
+- Migrate deprecated statements that cannot be handled by tools.
+- Update forgotten documentation.
+- Delete files that are no longer needed.
 
 
-### Let's take a closer look.
+### Let's take a closer look
 
-Addition or modification of wording accompanying feature additions or changes.
+Additions or modifications of wording accompanying feature additions or changes.
 
-GitHub Issue #1
+**GitHub Issue #1**
 
 ```markdown
 Change "wording" to "new wording" in the `dir1/` directory.
@@ -45,7 +45,8 @@ Issue Agent creates a Pull Request with the following changes:
  Here is the end of the example.
 ```
 
-GitHub Issue #2
+
+**GitHub Issue #2**
 
 ```markdown
 Fix all typos present in the comments under the `dir1/` directory.
