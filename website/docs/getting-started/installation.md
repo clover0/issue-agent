@@ -21,7 +21,7 @@ brew install clover0/issue-agent/issue-agent
 
 ### GitHub Action
 
-Refer to the [setup-issue-agent guide](https://github.com/clover0/setup-issue-agent) for instructions on how to use Issue Agent as a GitHub Action.
+Refer to the [setup-issue-agent](https://github.com/clover0/setup-issue-agent) for instructions.
 
 
 ### GitHub Releases

@@ -30,8 +30,8 @@ $ GITHUB_TOKEN=$(gh auth token) \
 ```
 
 
-## Run AWS Bedrock with SSO session
-You can also execute the `issue-agent` command using AWS Bedrock with an SSO session.
+## Run AWS Bedrock with profile
+You can also execute the `issue-agent` command using AWS Bedrock with profile.
 
 ```sh
 $ GITHUB_TOKEN=$(gh auth token) \
