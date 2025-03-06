@@ -3,7 +3,7 @@ package core
 import (
 	"fmt"
 
-	"github.com/clover0/issue-agent/functions"
+	"github.com/clover0/issue-agent/core/functions"
 )
 
 // TODO: Step owned Agent
