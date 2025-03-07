@@ -9,7 +9,7 @@ import (
 
 	"github.com/google/go-github/v69/github"
 
-	agithub2 "github.com/clover0/issue-agent/agithub"
+	"github.com/clover0/issue-agent/agithub"
 	"github.com/clover0/issue-agent/config"
 	"github.com/clover0/issue-agent/core/functions"
 	coreprompt "github.com/clover0/issue-agent/core/prompt"
@@ -19,11 +19,11 @@ import (
 	"github.com/clover0/issue-agent/util/pointer"
 )
 
-// OrchestrateAgents orchestrates agents
+// OrchestrateAgentsByIssue orchestrates agents
 // Currently, the processing is based on the issue command
 // TODO: refactor many arguments
 // TODO: no dependent on issue command
-func OrchestrateAgents(
+func OrchestrateAgentsByIssue(
 	ctx context.Context,
 	lo logger.Logger,
 	conf config.Config,
@@ -45,14 +45,14 @@ func OrchestrateAgents(
 	}
 
 	// check if the base branch exists
-	ghservice := agithub2.NewGitHubService(conf.Agent.GitHub.Owner, workRepository, gh, lo)
-	if _, err = ghservice.GetBranch(baseBranch); err != nil {
+	ghService := agithub.NewGitHubService(conf.Agent.GitHub.Owner, workRepository, gh, lo)
+	if _, err = ghService.GetBranch(baseBranch); err != nil {
 		return err
 	}
 
 	functions.InitializeFunctions(
 		*conf.Agent.GitHub.NoSubmit,
-		ghservice,
+		ghService,
 		conf.Agent.AllowFunctions,
 	)
 	lo.Info("allowed functions: %s\n", strings.Join(util.Map(
@@ -61,7 +61,7 @@ func OrchestrateAgents(
 	), ","))
 	lo.Info("agents make a pull request to %s/%s\n", conf.Agent.GitHub.Owner, workRepository)
 
-	submitServiceCaller := agithub2.NewSubmitFileGitHubService(conf.Agent.GitHub.Owner, workRepository, gh, lo).
+	submitServiceCaller := agithub.NewSubmitFileGitHubService(conf.Agent.GitHub.Owner, workRepository, gh, lo).
 		Caller(ctx, functions.SubmitFilesServiceInput{
 			BaseBranch: baseBranch,
 			GitEmail:   conf.Agent.Git.UserEmail,
@@ -76,7 +76,7 @@ func OrchestrateAgents(
 		Model:    conf.Agent.Model,
 	}
 
-	issue, err := ghservice.GetIssue(issueNumber)
+	issue, err := ghService.GetIssue(issueNumber)
 	if err != nil {
 		return fmt.Errorf("failed to get issue: %w", err)
 	}
