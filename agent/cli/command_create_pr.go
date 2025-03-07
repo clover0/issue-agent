@@ -55,7 +55,7 @@ func CreatePR(flags []string) error {
 
 	ctx := context.Background()
 
-	return core.OrchestrateAgents(ctx, lo, conf, cliIn.BaseBranch, cliIn.WorkRepository, gh, cliIn.GithubIssueNumber, models.SelectForwarder)
+	return core.OrchestrateAgentsByIssue(ctx, lo, conf, cliIn.BaseBranch, cliIn.WorkRepository, gh, cliIn.GithubIssueNumber, models.SelectForwarder)
 }
 
 func isPassedConfig(configPath string) bool {
