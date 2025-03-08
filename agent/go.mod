@@ -9,7 +9,7 @@ require (
 	github.com/go-git/go-git/v5 v5.13.2
 	github.com/go-playground/validator/v10 v10.25.0
 	github.com/google/go-github/v69 v69.2.0
-	github.com/openai/openai-go v0.1.0-alpha.59
+	github.com/openai/openai-go v0.1.0-alpha.62
 	golang.org/x/net v0.35.0
 	gopkg.in/yaml.v3 v3.0.1
 )
