@@ -57,7 +57,7 @@ agents:
       * Communicate entirely in {{.language}}.
       * You can't use shell command executions. Only function_calling can be used.
       * You don't open a file larger than 15000 bytes.
-      * You can't write comments in the code.
+      * You can't write new comments in the code. However, you can preserve existing comments.
       </constraints>
 
       <important-rules>
