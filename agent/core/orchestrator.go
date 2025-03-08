@@ -50,9 +50,21 @@ func OrchestrateAgentsByIssue(
 		return err
 	}
 
+	submitService := agithub.NewSubmitFileGitHubService(
+		lo, gh,
+		functions.SubmitFilesServiceInput{
+			GitHubOwner: conf.Agent.GitHub.Owner,
+			Repository:  workRepository,
+			BaseBranch:  baseBranch,
+			GitEmail:    conf.Agent.Git.UserEmail,
+			GitName:     conf.Agent.Git.UserName,
+			PRLabels:    conf.Agent.GitHub.PRLabels,
+		})
+
 	functions.InitializeFunctions(
 		*conf.Agent.GitHub.NoSubmit,
 		ghService,
+		submitService,
 		conf.Agent.AllowFunctions,
 	)
 	lo.Info("allowed functions: %s\n", strings.Join(util.Map(
@@ -60,14 +72,6 @@ func OrchestrateAgentsByIssue(
 		func(e functions.Function) string { return e.Name.String() },
 	), ","))
 	lo.Info("agents make a pull request to %s/%s\n", conf.Agent.GitHub.Owner, workRepository)
-
-	submitServiceCaller := agithub.NewSubmitFileGitHubService(conf.Agent.GitHub.Owner, workRepository, gh, lo).
-		Caller(ctx, functions.SubmitFilesServiceInput{
-			BaseBranch: baseBranch,
-			GitEmail:   conf.Agent.Git.UserEmail,
-			GitName:    conf.Agent.Git.UserName,
-			PRLabels:   conf.Agent.GitHub.PRLabels,
-		})
 
 	dataStore := corestore.NewStore()
 
@@ -87,7 +91,7 @@ func OrchestrateAgentsByIssue(
 		return err
 	}
 	requirementAgent, err := RunAgent("requirementAgent",
-		prompt, submitServiceCaller, parameter, lo, &dataStore, llmForwarder, PlanTools())
+		prompt, parameter, lo, &dataStore, llmForwarder, PlanTools())
 	if err != nil {
 		lo.Error("requirement agent failed: %s\n", err)
 		return err
@@ -100,7 +104,7 @@ func OrchestrateAgentsByIssue(
 		return err
 	}
 	developerAgent, err := RunAgent("developerAgent",
-		prompt, submitServiceCaller, parameter, lo, &dataStore, llmForwarder, functions.AllFunctions())
+		prompt, parameter, lo, &dataStore, llmForwarder, functions.AllFunctions())
 	if err != nil {
 		lo.Error("developer agent failed: %s\n", err)
 		return err
@@ -127,7 +131,6 @@ func OrchestrateAgentsByIssue(
 	reviewManager, err := RunAgent(
 		"reviewManagerAgent",
 		prompt,
-		submitServiceCaller,
 		parameter,
 		lo, &dataStore, llmForwarder, functions.AllFunctions())
 	if err != nil {
@@ -169,7 +172,6 @@ func OrchestrateAgentsByIssue(
 		reviewer, err := RunAgent(
 			p.AgentName,
 			prpt,
-			submitServiceCaller,
 			parameter,
 			lo, &dataStore, llmForwarder, functions.AllFunctions())
 		if err != nil {
@@ -243,7 +245,6 @@ func OrchestrateAgentsByIssue(
 func RunAgent(
 	name string,
 	prompt coreprompt.Prompt,
-	submitServiceCaller functions.SubmitFilesCallerType,
 	parameter Parameter,
 	lo logger.Logger,
 	dataStore *corestore.Store,
@@ -254,7 +255,6 @@ func RunAgent(
 		parameter,
 		name,
 		lo,
-		submitServiceCaller,
 		prompt,
 		llmForwarder,
 		dataStore,

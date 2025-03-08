@@ -2,11 +2,11 @@ package functions
 
 const FuncSubmitFiles = "submit_files"
 
-func InitSubmitFilesGitHubFunction() Function {
+func InitSubmitFilesGitHubFunction(service SubmitFilesService) Function {
 	f := Function{
 		Name:        FuncSubmitFiles,
 		Description: "Submit the modified files by Creation GitHub Pull Request",
-		Func:        SubmitFiles,
+		Func:        SubmitFileCaller(service),
 		Parameters: map[string]interface{}{
 			"type": "object",
 			"properties": map[string]interface{}{
@@ -39,6 +39,8 @@ type SubmitFilesInput struct {
 	PullRequestContent  string `json:"pull_request_content"`
 }
 
-func SubmitFiles(submitting SubmitFilesCallerType, input SubmitFilesInput) (SubmitFilesOutput, error) {
-	return submitting(input)
+func SubmitFileCaller(service SubmitFilesService) SubmitFilesType {
+	return func(input SubmitFilesInput) (SubmitFilesOutput, error) {
+		return service.SubmitFiles(input)
+	}
 }
