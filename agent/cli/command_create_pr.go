@@ -36,7 +36,7 @@ func CreatePR(flags []string) error {
 	lo := logger.NewPrinter(conf.LogLevel)
 
 	if *conf.Agent.GitHub.CloneRepository {
-		if err := agithub.CloneRepository(lo, conf, cliIn.WorkRepository); err != nil {
+		if err := agithub.CloneRepository(lo, conf, cliIn.WorkRepository, cliIn.BaseBranch); err != nil {
 			lo.Error("failed to clone repository")
 			return err
 		}
