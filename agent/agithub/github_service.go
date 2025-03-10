@@ -3,7 +3,9 @@ package agithub
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"strconv"
+	"strings"
 
 	"github.com/google/go-github/v69/github"
 
@@ -67,6 +69,8 @@ func (s GitHubService) GetPullRequest(prNumber string) (functions.GetPullRequest
 	}
 
 	return functions.GetPullRequestOutput{
+		Head:    pr.GetHead().GetRef(),
+		Base:    pr.GetBase().GetRef(),
 		RawDiff: diff,
 		Title:   pr.GetTitle(),
 		Content: pr.GetBody(),
@@ -84,4 +88,30 @@ func (s GitHubService) GetBranch(branchName string) (string, error) {
 	}
 
 	return branch.GetName(), nil
+}
+
+func (s GitHubService) GetComment(commentNumber string) (functions.GetCommentOutput, error) {
+	c := context.Background()
+	number, err := strconv.ParseInt(commentNumber, 10, 64)
+	if err != nil {
+		return functions.GetCommentOutput{}, fmt.Errorf("failed to convert comment number to int %s", commentNumber)
+	}
+
+	comment, _, err := s.client.Issues.GetComment(c, s.owner, s.repository, number)
+	if err != nil {
+		return functions.GetCommentOutput{}, fmt.Errorf("failed to get comment: %w", err)
+	}
+
+	u, err := url.Parse(*comment.IssueURL)
+	if err != nil {
+		return functions.GetCommentOutput{}, fmt.Errorf("failed to parse issue url: %w", err)
+	}
+
+	parts := strings.Split(u.Path, "/")
+	issueNumber := parts[len(parts)-1]
+
+	return functions.GetCommentOutput{
+		IssueNumber: issueNumber,
+		Content:     comment.GetBody(),
+	}, nil
 }

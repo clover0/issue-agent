@@ -11,7 +11,7 @@ type CommonInput struct {
 	LogLevel     string
 	Language     string
 	Model        string
-	ReviewAgents int
+	ReviewAgents int // TODO: remove from common. move to create-pr command.
 }
 
 func addCommonFlags(fs *flag.FlagSet, cfg *CommonInput) {

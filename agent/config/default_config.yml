@@ -67,3 +67,4 @@ agent:
     - search_files
     - remove_file
     - switch_branch
+    - submit_revision
