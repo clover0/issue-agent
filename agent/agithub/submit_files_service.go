@@ -165,3 +165,15 @@ func (s SubmitFileGitHubService) SubmitFiles(input functions.SubmitFilesInput) (
 		PullRequestNumber: *pr.Number,
 	}, nil
 }
+
+// NopSubmitFileService implements functions.SubmitFilesService as a no-op service.
+type NopSubmitFileService struct{}
+
+// SubmitFiles is a no-op implementation of the SubmitFilesService interface.
+func (s NopSubmitFileService) SubmitFiles(input functions.SubmitFilesInput) (functions.SubmitFilesOutput, error) {
+	return functions.SubmitFilesOutput{
+		Message:           "NopSubmitFileService: operation skipped",
+		PushedBranch:      "",
+		PullRequestNumber: -1,
+	}, nil
+}
