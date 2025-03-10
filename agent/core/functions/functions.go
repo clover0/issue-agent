@@ -17,6 +17,7 @@ func InitializeFunctions(
 	noSubmit bool,
 	repoService RepositoryService,
 	submitFilesService SubmitFilesService,
+	submitRevisionService SubmitRevisionService,
 	allowFunctions []string,
 ) {
 	if allowFunction(allowFunctions, FuncOpenFile) {
@@ -52,6 +53,9 @@ func InitializeFunctions(
 	}
 	if allowFunction(allowFunctions, FuncSwitchBranch) {
 		InitSwitchBranchFunction()
+	}
+	if allowFunction(allowFunctions, FuncSubmitRevision) {
+		InitSubmitRevisionFunction(submitRevisionService)
 	}
 }
 
@@ -258,6 +262,18 @@ func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, ar
 			return "", err
 		}
 		return fmt.Sprintf("%s\n%s\n", defaultSuccessReturning, r), nil
+
+	case FuncSubmitRevision:
+		l.Info("functions: do %s\n", FuncSubmitRevision)
+		input := SubmitRevisionInput{}
+		if err := marshalFuncArgs(argsJson, &input); err != nil {
+			return "", fmt.Errorf("failed to unmarshal args: %w", err)
+		}
+		out, err := functionsMap[FuncSubmitRevision].Func.(SubmitRevisionType)(input)
+		if err != nil {
+			return "", err
+		}
+		return out.Message, nil
 	}
 
 	return "", errors.New("function not found")

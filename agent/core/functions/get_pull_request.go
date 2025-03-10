@@ -41,6 +41,8 @@ type GetPullRequestInput struct {
 }
 
 type GetPullRequestOutput struct {
+	Head    string
+	Base    string
 	RawDiff string
 	Title   string
 	Content string
@@ -48,6 +50,14 @@ type GetPullRequestOutput struct {
 
 type GetIssueOutput struct {
 	Path    string
+	Content string
+}
+
+type GetCommentOutput struct {
+	// IssueNumber is the issue number.
+	// When comment is on the pull request, IssueNumber is the pull request number.
+	IssueNumber string
+
 	Content string
 }
 

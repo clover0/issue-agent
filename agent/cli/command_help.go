@@ -18,6 +18,7 @@ Command and Flags
   version: Show version of issue-agent CLI
 `
 	createPRFlags, _ := CreatePRFlags()
+	reactFlags, _ := ReactFlags()
 
 	msg += fmt.Sprintf("  %s:\n", CreatePrCommand)
 	msg += "    Usage:\n"
@@ -29,6 +30,17 @@ Command and Flags
 		msg += IndentMultiLine(flg.Usage, "      ")
 		msg += "\n"
 	})
+
+	msg += fmt.Sprintf("  %s:\n", ReactCommand)
+	msg += "    Usage:\n"
+	msg += fmt.Sprintf("      %s OWNER/REPO/issues/comments/COMMENT_ID [flags]\n", ReactCommand)
+	msg += "    Flags:\n"
+	reactFlags.VisitAll(func(flg *flag.Flag) {
+		msg += fmt.Sprintf("    --%s\n", flg.Name)
+		msg += IndentMultiLine(flg.Usage, "      ")
+		msg += "\n"
+	})
+
 	lo.Info(msg)
 }
 

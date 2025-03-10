@@ -28,6 +28,8 @@ func Execute() error {
 		return Version()
 	case CreatePrCommand:
 		return CreatePR(others)
+	case ReactCommand:
+		return React(others)
 	case HelpCommand:
 		Help(lo)
 		return nil

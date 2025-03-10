@@ -33,6 +33,18 @@ func BuildDeveloperPrompt(promptTpl PromptTemplate, language string, baseBranch 
 	})
 }
 
+func BuildCommentReactorPrompt(promptTpl PromptTemplate, language string,
+	comment functions.GetCommentOutput,
+	pr functions.GetPullRequestOutput) (Prompt, error) {
+	return BuildPrompt(promptTpl, "comment-reactor", map[string]any{
+		"language":      language,
+		"workingBranch": pr.Head,
+		"issueNumber":   comment.IssueNumber,
+		"comment":       comment.Content,
+		"prLLMString":   pr.ToLLMString(),
+	})
+}
+
 func BuildReviewManagerPrompt(promptTpl PromptTemplate, cnf config.Config, issue functions.GetIssueOutput, changedFilesPath []string, baseBranch string) (Prompt, error) {
 	m := make(map[string]any)
 

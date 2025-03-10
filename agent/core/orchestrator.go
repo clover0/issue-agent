@@ -60,11 +60,13 @@ func OrchestrateAgentsByIssue(
 			GitName:     conf.Agent.Git.UserName,
 			PRLabels:    conf.Agent.GitHub.PRLabels,
 		})
+	submitRevisionService := agithub.NopSubmitRevisionService{}
 
 	functions.InitializeFunctions(
 		*conf.Agent.GitHub.NoSubmit,
 		ghService,
 		submitService,
+		submitRevisionService,
 		conf.Agent.AllowFunctions,
 	)
 	lo.Info("allowed functions: %s\n", strings.Join(util.Map(
@@ -237,6 +239,89 @@ func OrchestrateAgentsByIssue(
 		lo.Info("finish %s\n", p.AgentName)
 	}
 
+	lo.Info("agents finished work\n")
+
+	return nil
+}
+
+func OrchestrateAgentsByComment(
+	lo logger.Logger,
+	conf config.Config,
+	workRepository string,
+	gh *github.Client,
+	selectForward SelectForwarder,
+	comment functions.GetCommentOutput,
+	pr functions.GetPullRequestOutput,
+) error {
+	// TODO: move selection llm forwarder
+	llmForwarder, err := selectForward(lo, conf.Agent.Model)
+	if err != nil {
+		lo.Error("failed to select forwarder: %s\n", err)
+		return err
+	}
+
+	promptTemplate, err := coreprompt.LoadPrompt()
+	if err != nil {
+		return fmt.Errorf("failed to load prompt template: %w\n", err)
+	}
+
+	ghService := agithub.NewGitHubService(conf.Agent.GitHub.Owner, workRepository, gh, lo)
+
+	submitFilesService := agithub.NopSubmitFileService{}
+	submitRevisionService := agithub.NewSubmitRevisionGitHubService(lo, gh,
+		functions.SubmitRevisionServiceInput{
+			GitHubOwner: conf.Agent.GitHub.Owner,
+			Repository:  workRepository,
+			BaseBranch:  pr.Base,
+			WorkBranch:  pr.Head,
+			GitEmail:    conf.Agent.Git.UserEmail,
+			GitName:     conf.Agent.Git.UserName,
+		})
+
+	functions.InitializeFunctions(
+		*conf.Agent.GitHub.NoSubmit,
+		ghService,
+		submitFilesService,
+		submitRevisionService,
+		conf.Agent.AllowFunctions,
+	)
+	lo.Info("allowed functions: %s\n", strings.Join(util.Map(
+		functions.AllFunctions(), // TODO: commenting tools
+		func(e functions.Function) string { return e.Name.String() },
+	), ","))
+	lo.Info("agents will push to %s/%s branch %s\n", conf.Agent.GitHub.Owner, workRepository, pr.Head)
+
+	dataStore := corestore.NewStore()
+
+	parameter := Parameter{
+		MaxSteps: conf.Agent.MaxSteps,
+		Model:    conf.Agent.Model,
+	}
+
+	// switch to head branch
+	//_, err = functions.SwitchBranch(functions.SwitchBranchInput{
+	//	Branch:       pr.Head,
+	//	CreateBranch: false,
+	//})
+	//if err != nil {
+	//	return fmt.Errorf("failed to switch branch: %w", err)
+	//}
+	//lo.Info("switched branch to %s\n", pr.Head)
+
+	prompt, err := coreprompt.BuildCommentReactorPrompt(promptTemplate, conf.Language, comment, pr)
+	if err != nil {
+		lo.Error("failed build commentReactor prompt: %s\n", err)
+		return err
+	}
+
+	_, err = RunAgent("commentReactorAgent",
+		prompt, parameter, lo, &dataStore, llmForwarder,
+		CommentingTools(),
+	)
+	if err != nil {
+		lo.Error("developer agent failed: %s\n", err)
+		return err
+	}
 	lo.Info("agents finished work\n")
 
 	return nil
