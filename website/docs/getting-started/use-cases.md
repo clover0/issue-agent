@@ -6,7 +6,7 @@ This section describe common use cases for Issue Agent.
 ## Simple but difficult to automate tasks
 
 - Tasks that do not require immediate developer attention but are simple and expected to be accomplished asynchronously.
-- Migrate deprecated statements that cannot be handled by tools.
+- Migrate deprecated statements that tools cannot handle.
 - Update forgotten documentation.
 - Delete files that are no longer needed.
 
@@ -68,7 +68,7 @@ Issue Agent will create a Pull Request:
 ```
 
 
-## Horizontal deployment of tasks that are difficult to automate
+## Horizontal deployment of tasks that are challenging to automate
 
 For changes that require wide-ranging adjustments,
 create a Pull Request for some parts handled by a human developer.
