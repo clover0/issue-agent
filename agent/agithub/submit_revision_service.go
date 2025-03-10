@@ -79,13 +79,16 @@ func (s SubmitRevisionGitHubService) SubmitRevision(input functions.SubmitRevisi
 		return submitFileOut, errorf("failed to add files: %w", err)
 	}
 
-	status, err := wt.Status()
+	statuses, err := wt.Status()
 	if err != nil {
 		return submitFileOut, errorf("failed to get worktree status: %w", err)
 	}
 
 	// reset symlink because go-git's file system behavior causes symlinks to be relative paths, resulting in extra diffs.
-	for path := range status {
+	for path, status := range statuses {
+		if status.Staging != git.Modified {
+			continue
+		}
 		f, err := os.Lstat(path)
 		if err != nil {
 			return submitFileOut, fmt.Errorf("failed to open file %s: %w", path, err)
@@ -97,7 +100,7 @@ func (s SubmitRevisionGitHubService) SubmitRevision(input functions.SubmitRevisi
 			}
 		}
 	}
-	s.logger.Info(status.String())
+	s.logger.Info(statuses.String())
 
 	if _, err := wt.Commit(
 		fmt.Sprintf("%s\n\n%s", input.CommitMessageShort, input.CommitMessageDetail),
