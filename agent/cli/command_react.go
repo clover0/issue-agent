@@ -48,7 +48,7 @@ func React(flags []string) error {
 		return fmt.Errorf("failed to get pull request: %w", err)
 	}
 	if pr.Base == pr.Head {
-		lo.Info(fmt.Sprintf("base and head are the same. base=%s, head=%s\n"), pr.Base, pr.Head)
+		lo.Info(fmt.Sprintf("base and head are the same. base=%s, head=%s\n", pr.Base, pr.Head))
 		return nil
 	}
 
