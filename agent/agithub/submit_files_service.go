@@ -117,7 +117,7 @@ func (s SubmitFileGitHubService) SubmitFiles(input functions.SubmitFilesInput) (
 		return submitFileOut, errorf("failed to commit: %w", err)
 	}
 
-	if repo.Push(&git.PushOptions{RemoteName: "origin"}) != nil {
+	if err := repo.Push(&git.PushOptions{RemoteName: "origin"}); err != nil {
 		return submitFileOut, errorf("failed to push: %w", err)
 	}
 
