@@ -16,6 +16,7 @@ type CreatePRInput struct {
 	GithubIssueNumber string
 	WorkRepository    string `validate:"required"`
 	BaseBranch        string `validate:"required"`
+	ReviewAgents      int
 }
 
 func (c *CreatePRInput) MergeGitHubArg(pr ArgGitHubCreatePR) *CreatePRInput {
@@ -42,8 +43,8 @@ func (c *CreatePRInput) MergeConfig(conf config.Config) config.Config {
 		conf.Agent.GitHub.Owner = c.GitHubOwner
 	}
 
-	if c.Common.ReviewAgents > 0 {
-		conf.Agent.ReviewAgents = c.Common.ReviewAgents
+	if c.ReviewAgents > 0 {
+		conf.Agent.ReviewAgents = c.ReviewAgents
 	}
 
 	return conf
@@ -75,6 +76,8 @@ func CreatePRFlags() (*flag.FlagSet, *CreatePRInput) {
 	addCommonFlags(cmd, flagMapper.Common)
 
 	cmd.StringVar(&flagMapper.BaseBranch, "base_branch", "", "Base Branch for pull request")
+	cmd.IntVar(&flagMapper.ReviewAgents, "review_agents", 0, `The number of agents to review. A value greater than 0 will review to the created PR.
+Default: 0`)
 
 	return cmd, flagMapper
 }
