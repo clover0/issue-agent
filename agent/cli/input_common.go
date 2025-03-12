@@ -5,13 +5,12 @@ import (
 )
 
 type CommonInput struct {
-	Config       string
-	AWSProfile   string
-	AWSRegion    string
-	LogLevel     string
-	Language     string
-	Model        string
-	ReviewAgents int // TODO: remove from common. move to create-pr command.
+	Config     string
+	AWSProfile string
+	AWSRegion  string
+	LogLevel   string
+	Language   string
+	Model      string
 }
 
 func addCommonFlags(fs *flag.FlagSet, cfg *CommonInput) {
@@ -31,7 +30,4 @@ Default: English.`)
 
 	fs.StringVar(&cfg.Model, "model", "", "LLM name. For the model name, check the documentation of each LLM provider.")
 
-	fs.IntVar(&cfg.ReviewAgents, "review_agents", 0, `The number of agents to review.
-The number of agents to review. A value greater than 0 will review to the created PR.
-Default: 0`)
 }
