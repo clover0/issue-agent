@@ -15,7 +15,7 @@ COPY . .
 # TODO: SLSA
 RUN cd /agent/src/cmd/agent && \
     CGO_ENABLED=0 go build \
-      -ldflags "-X github.com/clover0/issue-agent/cli.version=dev-$(date -u +'%Y-%m-%dT%H%M%SZ')" \
+      -ldflags "-X github.com/clover0/issue-agent/cli/command/version.version=dev-$(date -u +'%Y-%m-%dT%H%M%SZ')" \
       -o /agent/bin/agent
 
 

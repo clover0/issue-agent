@@ -15,6 +15,7 @@ import (
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 
 	"github.com/clover0/issue-agent/cli"
+	"github.com/clover0/issue-agent/cli/command/createpr"
 	"github.com/clover0/issue-agent/config"
 	"github.com/clover0/issue-agent/logger"
 	"github.com/clover0/issue-agent/util"
@@ -125,8 +126,8 @@ func run(lo logger.Logger) error {
 	return nil
 }
 
-func parseArgs(lo logger.Logger) (*cli.CreatePRInput, error) {
-	flags, mapper := cli.CreatePRFlags()
+func parseArgs(lo logger.Logger) (*createpr.CreatePRInput, error) {
+	flags, mapper := createpr.CreatePRFlags()
 
 	start := 1
 	for i, arg := range os.Args {

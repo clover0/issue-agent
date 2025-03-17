@@ -1,9 +1,13 @@
-package cli
+package command
 
 import (
 	"fmt"
 	"os"
 
+	"github.com/clover0/issue-agent/cli/command/createpr"
+	"github.com/clover0/issue-agent/cli/command/help"
+	"github.com/clover0/issue-agent/cli/command/react"
+	"github.com/clover0/issue-agent/cli/command/version"
 	"github.com/clover0/issue-agent/logger"
 )
 
@@ -24,17 +28,17 @@ func Execute() error {
 
 	lo := logger.NewPrinter("info")
 	switch command {
-	case VersionCommand:
-		return Version()
-	case CreatePrCommand:
-		return CreatePR(others)
-	case ReactCommand:
-		return React(others)
-	case HelpCommand:
-		Help(lo)
+	case version.VersionCommand:
+		return version.Version()
+	case createpr.CreatePrCommand:
+		return createpr.CreatePR(others)
+	case react.ReactCommand:
+		return react.React(others)
+	case help.HelpCommand:
+		help.Help(lo)
 		return nil
 	default:
-		Help(lo)
+		help.Help(lo)
 		return fmt.Errorf("unknown command: %s", command)
 	}
 }

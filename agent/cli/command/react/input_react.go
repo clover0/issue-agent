@@ -1,4 +1,4 @@
-package cli
+package react
 
 import (
 	"flag"
@@ -7,6 +7,8 @@ import (
 
 	"github.com/go-playground/validator/v10"
 
+	"github.com/clover0/issue-agent/cli/command/common"
+	"github.com/clover0/issue-agent/cli/util"
 	"github.com/clover0/issue-agent/config"
 )
 
@@ -18,7 +20,7 @@ type ArgGitHubReact struct {
 }
 
 type ReactInput struct {
-	Common         *CommonInput
+	Common         *common.CommonInput
 	GitHubOwner    string `validate:"required"`
 	GithubPRNumber string
 	WorkRepository string `validate:"required"`
@@ -91,19 +93,19 @@ func BindReactGitHubArg(arg string) (ArgGitHubReact, error) {
 
 func ReactFlags() (*flag.FlagSet, *ReactInput) {
 	flagMapper := &ReactInput{
-		Common: &CommonInput{},
+		Common: &common.CommonInput{},
 	}
 
 	cmd := flag.NewFlagSet("react", flag.ExitOnError)
 
-	addCommonFlags(cmd, flagMapper.Common)
+	common.AddCommonFlags(cmd, flagMapper.Common)
 
 	return cmd, flagMapper
 }
 
 // ParseReactInput
 func ParseReactInput(argAndFlags []string) (ReactInput, error) {
-	arg, flags := ParseArgFlags(argAndFlags)
+	arg, flags := util.ParseArgFlags(argAndFlags)
 	ghIn, err := BindReactGitHubArg(arg)
 	if err != nil {
 		return ReactInput{}, fmt.Errorf("failed to parse arg: %w", err)

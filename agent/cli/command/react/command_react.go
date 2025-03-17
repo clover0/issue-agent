@@ -1,10 +1,11 @@
-package cli
+package react
 
 import (
 	"fmt"
 	"os"
 
 	"github.com/clover0/issue-agent/agithub"
+	"github.com/clover0/issue-agent/cli/util"
 	"github.com/clover0/issue-agent/config"
 	"github.com/clover0/issue-agent/core"
 	"github.com/clover0/issue-agent/logger"
@@ -19,7 +20,7 @@ func React(flags []string) error {
 		return fmt.Errorf("failed to parse input: %w", err)
 	}
 
-	conf, err := config.LoadDefault(isPassedConfig(cliIn.Common.Config))
+	conf, err := config.LoadDefault(util.IsPassedConfig(cliIn.Common.Config))
 	if err != nil {
 		return fmt.Errorf("failed to load config: %w", err)
 	}
@@ -32,7 +33,7 @@ func React(flags []string) error {
 
 	lo := logger.NewPrinter(conf.LogLevel)
 
-	gh, err := newGitHub()
+	gh, err := agithub.NewGitHub()
 	if err != nil {
 		return fmt.Errorf("failed to create GitHub client: %w", err)
 	}
