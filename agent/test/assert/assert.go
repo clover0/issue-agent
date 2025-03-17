@@ -7,26 +7,14 @@ import (
 
 func Equal[V comparable](t *testing.T, got, expected V) {
 	t.Helper()
-
-	gotIsPtr := reflect.TypeOf(got).Kind() == reflect.Pointer
-	expectedIsPtr := reflect.TypeOf(expected).Kind() == reflect.Pointer
-
-	// compare pointers
-	if gotIsPtr && expectedIsPtr {
-		if !reflect.ValueOf(got).Elem().Equal(reflect.ValueOf(expected).Elem()) {
-			t.Errorf(`assert.Equal(
-got: %v
-expected: %v
-)`, got, expected)
-		}
+	if reflect.DeepEqual(got, expected) {
 		return
-	}
-
-	if expected != got {
+	} else {
 		t.Errorf(`assert.Equal(
 got: %v
 expected: %v
 )`, got, expected)
+		return
 	}
 }
 

@@ -17,12 +17,26 @@ type CreatePRInput struct {
 	WorkRepository    string `validate:"required"`
 	BaseBranch        string `validate:"required"`
 	ReviewAgents      int
+	Reviewers         reviewers
+	TeamReviewers     reviewers
+}
+
+type reviewers []string
+
+func (s *reviewers) String() string {
+	return fmt.Sprintf("%v", *s)
+}
+
+func (s *reviewers) Set(value string) error {
+	*s = append(*s, value)
+	return nil
 }
 
 func (c *CreatePRInput) MergeGitHubArg(pr ArgGitHubCreatePR) *CreatePRInput {
 	c.GitHubOwner = pr.Owner
 	c.WorkRepository = pr.Repository
 	c.GithubIssueNumber = pr.IssueNumber
+
 	return c
 }
 
@@ -47,10 +61,13 @@ func (c *CreatePRInput) MergeConfig(conf config.Config) config.Config {
 		conf.Agent.ReviewAgents = c.ReviewAgents
 	}
 
+	if len(c.TeamReviewers) > 0 {
+		conf.Agent.GitHub.TeamReviewers = c.TeamReviewers
+	}
+
 	return conf
 }
 
-// Validate
 func (c *CreatePRInput) Validate() error {
 	validate := validator.New()
 	if err := validate.Struct(c); err != nil {
@@ -78,6 +95,8 @@ func CreatePRFlags() (*flag.FlagSet, *CreatePRInput) {
 	cmd.StringVar(&flagMapper.BaseBranch, "base_branch", "", "Base Branch for pull request")
 	cmd.IntVar(&flagMapper.ReviewAgents, "review_agents", 0, `The number of agents to review. A value greater than 0 will review to the created PR.
 Default: 0`)
+	cmd.Var(&flagMapper.Reviewers, "reviewers", "The list of GitHub user `login` as reviewers. If you want to add multiple reviewers, separate them with a comma.")
+	cmd.Var(&flagMapper.TeamReviewers, "team_reviewers", "The list of GitHub Team `slug` as team_reviewers. If you want to add multiple team reviewers, separate them with a comma.")
 
 	return cmd, flagMapper
 }
@@ -101,7 +120,6 @@ func ParseCreatePRGitHubArg(arg string) (ArgGitHubCreatePR, error) {
 		Repository:  splits[1],
 		IssueNumber: splits[3],
 	}, nil
-
 }
 
 func ParseCreatePRInput(argAndFlags []string) (CreatePRInput, error) {

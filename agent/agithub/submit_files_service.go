@@ -3,6 +3,7 @@ package agithub
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"time"
 
@@ -151,6 +152,12 @@ func (s SubmitFileGitHubService) SubmitFiles(input functions.SubmitFilesInput) (
 		}
 	}
 
+	if len(s.callerInput.Reviewers) > 0 || len(s.callerInput.TeamReviewers) > 0 {
+		if err := s.reviewRequest(ctx, pr, s.callerInput.Reviewers, s.callerInput.TeamReviewers); err != nil {
+			return submitFileOut, errorf("failed to request reviewers: %w", err)
+		}
+	}
+
 	// checkout to the base branch
 	if err := wt.Checkout(&git.CheckoutOptions{
 		Branch: plumbing.NewBranchReferenceName(s.callerInput.BaseBranch),
@@ -167,6 +174,35 @@ func (s SubmitFileGitHubService) SubmitFiles(input functions.SubmitFilesInput) (
 		PushedBranch:      prBranch,
 		PullRequestNumber: *pr.Number,
 	}, nil
+}
+
+func (s SubmitFileGitHubService) reviewRequest(ctx context.Context, pr *github.PullRequest, reviewers []string, teamReviewers []string) error {
+	if _, resp, err := s.client.PullRequests.RequestReviewers(
+		ctx,
+		s.callerInput.GitHubOwner,
+		s.callerInput.Repository,
+		*pr.Number,
+		github.ReviewersRequest{
+			Reviewers:     reviewers,
+			TeamReviewers: teamReviewers,
+		}); err != nil {
+		if resp == nil {
+			return fmt.Errorf("failed to request reviewers=%s, team_reviewers=%s to PR: %w", s.callerInput.Reviewers, s.callerInput.TeamReviewers, err)
+		}
+
+		// if the client error caused, print the response body and continue
+		if resp.StatusCode >= 400 && resp.StatusCode < 500 {
+			body, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return fmt.Errorf("failed to read response body: %w", err)
+			}
+			defer resp.Body.Close()
+
+			s.logger.Error("client error: %s\n", body)
+		}
+	}
+
+	return nil
 }
 
 // NopSubmitFileService implements functions.SubmitFilesService as a no-op service.
