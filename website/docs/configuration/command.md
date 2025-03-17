@@ -34,6 +34,11 @@ Command and Flags
       The number of agents to review.
       If a value greater than 0 is specified, then that number of reviews will be performed by agents with different roles.
       Default: 0
+    --reviewers
+      The list of GitHub user `login` as reviewers. If you want to add multiple reviewers, separate them with a comma.
+    --team_reviewers
+      The list of GitHub Team `slug` as team_reviewers. If you want to add multiple team reviewers, separate them with a comma.
+
   react:
     Usage:
       react OWNER/REPO/issues/comments/COMMENT_ID [flags]

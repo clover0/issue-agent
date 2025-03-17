@@ -53,12 +53,14 @@ func OrchestrateAgentsByIssue(
 	submitService := agithub.NewSubmitFileGitHubService(
 		lo, gh,
 		functions.SubmitFilesServiceInput{
-			GitHubOwner: conf.Agent.GitHub.Owner,
-			Repository:  workRepository,
-			BaseBranch:  baseBranch,
-			GitEmail:    conf.Agent.Git.UserEmail,
-			GitName:     conf.Agent.Git.UserName,
-			PRLabels:    conf.Agent.GitHub.PRLabels,
+			GitHubOwner:   conf.Agent.GitHub.Owner,
+			Repository:    workRepository,
+			BaseBranch:    baseBranch,
+			GitEmail:      conf.Agent.Git.UserEmail,
+			GitName:       conf.Agent.Git.UserName,
+			PRLabels:      conf.Agent.GitHub.PRLabels,
+			Reviewers:     conf.Agent.GitHub.Reviewers,
+			TeamReviewers: conf.Agent.GitHub.TeamReviewers,
 		})
 	submitRevisionService := agithub.NopSubmitRevisionService{}
 
