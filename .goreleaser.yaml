@@ -33,7 +33,7 @@ builds:
       - amd64
       - arm64
     ldflags:
-      - "-X github.com/clover0/issue-agent/cli.version={{ .Tag }}"
+      - "-X github.com/clover0/issue-agent/cli/command/version.version={{ .Tag }}"
 
 dockers:
   - id: issue-agent-amd64

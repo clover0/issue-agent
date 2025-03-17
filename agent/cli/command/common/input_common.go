@@ -1,4 +1,4 @@
-package cli
+package common
 
 import (
 	"flag"
@@ -13,7 +13,7 @@ type CommonInput struct {
 	Model      string
 }
 
-func addCommonFlags(fs *flag.FlagSet, cfg *CommonInput) {
+func AddCommonFlags(fs *flag.FlagSet, cfg *CommonInput) {
 	fs.StringVar(&cfg.Config, "config", "", `Path to the configuration file. 
 Default: agent/config/default_config.yml in this project.`)
 

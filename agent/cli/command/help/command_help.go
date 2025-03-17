@@ -1,10 +1,12 @@
-package cli
+package help
 
 import (
 	"flag"
 	"fmt"
 	"strings"
 
+	"github.com/clover0/issue-agent/cli/command/createpr"
+	"github.com/clover0/issue-agent/cli/command/react"
 	"github.com/clover0/issue-agent/logger"
 )
 
@@ -17,12 +19,12 @@ Command and Flags
   help: Show usage of commands and flags
   version: Show version of issue-agent CLI
 `
-	createPRFlags, _ := CreatePRFlags()
-	reactFlags, _ := ReactFlags()
+	createPRFlags, _ := createpr.CreatePRFlags()
+	reactFlags, _ := react.ReactFlags()
 
-	msg += fmt.Sprintf("  %s:\n", CreatePrCommand)
+	msg += fmt.Sprintf("  %s:\n", createpr.CreatePrCommand)
 	msg += "    Usage:\n"
-	msg += fmt.Sprintf("      %s GITHUB_OWNER/REPOSITORY/issues/NUMBER [flags]\n", CreatePrCommand)
+	msg += fmt.Sprintf("      %s GITHUB_OWNER/REPOSITORY/issues/NUMBER [flags]\n", createpr.CreatePrCommand)
 	msg += "    Flags:\n"
 
 	createPRFlags.VisitAll(func(flg *flag.Flag) {
@@ -31,9 +33,9 @@ Command and Flags
 		msg += "\n"
 	})
 
-	msg += fmt.Sprintf("  %s:\n", ReactCommand)
+	msg += fmt.Sprintf("  %s:\n", react.ReactCommand)
 	msg += "    Usage:\n"
-	msg += fmt.Sprintf("      %s OWNER/REPO/issues/comments/COMMENT_ID [flags]\n", ReactCommand)
+	msg += fmt.Sprintf("      %s OWNER/REPO/issues/comments/COMMENT_ID [flags]\n", react.ReactCommand)
 	msg += "    Flags:\n"
 	reactFlags.VisitAll(func(flg *flag.Flag) {
 		msg += fmt.Sprintf("    --%s\n", flg.Name)

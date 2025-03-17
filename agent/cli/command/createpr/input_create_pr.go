@@ -1,4 +1,4 @@
-package cli
+package createpr
 
 import (
 	"flag"
@@ -7,11 +7,13 @@ import (
 
 	"github.com/go-playground/validator/v10"
 
+	"github.com/clover0/issue-agent/cli/command/common"
+	"github.com/clover0/issue-agent/cli/util"
 	"github.com/clover0/issue-agent/config"
 )
 
 type CreatePRInput struct {
-	Common            *CommonInput
+	Common            *common.CommonInput
 	GitHubOwner       string `validate:"required"`
 	GithubIssueNumber string
 	WorkRepository    string `validate:"required"`
@@ -85,12 +87,12 @@ func (c *CreatePRInput) Validate() error {
 
 func CreatePRFlags() (*flag.FlagSet, *CreatePRInput) {
 	flagMapper := &CreatePRInput{
-		Common: &CommonInput{},
+		Common: &common.CommonInput{},
 	}
 
 	cmd := flag.NewFlagSet("issue", flag.ExitOnError)
 
-	addCommonFlags(cmd, flagMapper.Common)
+	common.AddCommonFlags(cmd, flagMapper.Common)
 
 	cmd.StringVar(&flagMapper.BaseBranch, "base_branch", "", "Base Branch for pull request")
 	cmd.IntVar(&flagMapper.ReviewAgents, "review_agents", 0, `The number of agents to review. A value greater than 0 will review to the created PR.
@@ -123,7 +125,7 @@ func ParseCreatePRGitHubArg(arg string) (ArgGitHubCreatePR, error) {
 }
 
 func ParseCreatePRInput(argAndFlags []string) (CreatePRInput, error) {
-	arg, flags := ParseArgFlags(argAndFlags)
+	arg, flags := util.ParseArgFlags(argAndFlags)
 	ghIn, err := ParseCreatePRGitHubArg(arg)
 	if err != nil {
 		return CreatePRInput{}, fmt.Errorf("failed to parse arg: %w", err)
