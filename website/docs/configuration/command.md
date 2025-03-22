@@ -41,7 +41,12 @@ Command and Flags
 
   react:
     Usage:
-      react OWNER/REPO/issues/comments/COMMENT_ID [flags]
+      react RESOURCE_FORMAT [flags]
+    RESOURCE_FORMAT:
+        issue_comment(pull request comment): OWNER/REPO/issues/comments/COMMENT_ID
+        pull_request_review_comment: OWNER/REPO/pulls/comments/COMMENT_ID
+    Example:
+       react owner/example/issues/comments/123456 [flags]
     Flags:
     --aws_profile
       AWS profile to use a specific profile from credentials.

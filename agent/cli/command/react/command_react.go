@@ -8,6 +8,7 @@ import (
 	"github.com/clover0/issue-agent/cli/util"
 	"github.com/clover0/issue-agent/config"
 	"github.com/clover0/issue-agent/core"
+	"github.com/clover0/issue-agent/core/functions"
 	"github.com/clover0/issue-agent/logger"
 	"github.com/clover0/issue-agent/models"
 )
@@ -40,9 +41,9 @@ func React(flags []string) error {
 
 	ghService := agithub.NewGitHubService(conf.Agent.GitHub.Owner, cliIn.WorkRepository, gh, lo)
 
-	comment, err := ghService.GetComment(cliIn.CommentID)
+	comment, err := getComment(ghService, cliIn)
 	if err != nil {
-		return fmt.Errorf("failed to get issue: %w", err)
+		return fmt.Errorf("failed to get comment: %w", err)
 	}
 	pr, err := ghService.GetPullRequest(comment.IssueNumber)
 	if err != nil {
@@ -68,5 +69,27 @@ func React(flags []string) error {
 
 	return core.OrchestrateAgentsByComment(
 		lo, conf, cliIn.WorkRepository, gh, models.SelectForwarder, comment, pr)
+}
 
+func getComment(ghService agithub.GitHubService, in ReactInput) (functions.GetCommentOutput, error) {
+	switch in.ReactType {
+	case Comment:
+		comment, err := ghService.GetComment(in.CommentID)
+		if err != nil {
+			return functions.GetCommentOutput{}, fmt.Errorf("failed to get issue: %w", err)
+		}
+		return comment, nil
+
+	case ReviewComment:
+		comment, err := ghService.GetReviewComment(in.ReviewID)
+		if err != nil {
+			return functions.GetCommentOutput{}, fmt.Errorf("failed to get review: %w", err)
+		}
+		return functions.GetCommentOutput{
+			IssueNumber: comment.IssuesNumber,
+			Content:     comment.ToLLMString(),
+		}, nil
+	}
+
+	return functions.GetCommentOutput{}, fmt.Errorf("invalid react type: %v", in.ReactType)
 }
