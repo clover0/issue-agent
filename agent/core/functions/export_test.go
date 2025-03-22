@@ -1,3 +1,3 @@
 package functions
 
-var GuardPath = guardPath
+var GuardPathInner = guardPathInner

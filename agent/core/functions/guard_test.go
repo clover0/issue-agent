@@ -7,7 +7,7 @@ import (
 	"github.com/clover0/issue-agent/test/assert"
 )
 
-func TestGuardPath(t *testing.T) {
+func TestGuardPathInner(t *testing.T) {
 	t.Parallel()
 
 	tests := map[string]struct {
@@ -60,7 +60,7 @@ func TestGuardPath(t *testing.T) {
 
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			err := functions.GuardPath(tt.path)
+			err := functions.GuardPathInner(tt.path)
 
 			if !tt.wantErr {
 				assert.Nil(t, err)
