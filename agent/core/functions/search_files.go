@@ -64,8 +64,8 @@ func SearchFiles(input SearchFilesInput) ([]string, error) {
 			return nil
 		}
 
-		fileInfo, err := os.Lstat(path)
-		if err != nil {
+		fileInfo, statErr := os.Lstat(path)
+		if statErr != nil {
 			return fmt.Errorf("failed to get file info: %w", err)
 		}
 
