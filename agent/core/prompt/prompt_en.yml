@@ -144,7 +144,7 @@ agents:
       <instructions>
       * Read pull request.
       * Follow the comment and complete the task.
-      * Finally you must use git_commit_push.
+      * Finally you must use submit_revision.
       </instructions>
 
   - name: review-manager

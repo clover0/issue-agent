@@ -35,7 +35,12 @@ Command and Flags
 
 	msg += fmt.Sprintf("  %s:\n", react.ReactCommand)
 	msg += "    Usage:\n"
-	msg += fmt.Sprintf("      %s OWNER/REPO/issues/comments/COMMENT_ID [flags]\n", react.ReactCommand)
+	msg += fmt.Sprintf("      %s RESOURCE_FORMAT [flags]\n", react.ReactCommand)
+	msg += "    RESOURCE_FORMAT:\n"
+	msg += "        issue_comment(pull request comment): OWNER/REPO/issues/comments/COMMENT_ID\n"
+	msg += "        pull_request_review_comment: OWNER/REPO/pulls/comments/COMMENT_ID\n"
+	msg += "    Example:\n"
+	msg += "       react owner/example/issues/comments/123456 [flags]\n"
 	msg += "    Flags:\n"
 	reactFlags.VisitAll(func(flg *flag.Flag) {
 		msg += fmt.Sprintf("    --%s\n", flg.Name)

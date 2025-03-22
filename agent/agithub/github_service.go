@@ -115,3 +115,34 @@ func (s GitHubService) GetComment(commentNumber string) (functions.GetCommentOut
 		Content:     comment.GetBody(),
 	}, nil
 }
+
+func (s GitHubService) GetReviewComment(reviewID string) (functions.GetReviewOutput, error) {
+	c := context.Background()
+	id, err := strconv.ParseInt(reviewID, 10, 64)
+	if err != nil {
+		return functions.GetReviewOutput{}, fmt.Errorf("failed to convert review id to int %s", reviewID)
+	}
+
+	review, _, err := s.client.PullRequests.GetComment(c, s.owner, s.repository, id)
+	if err != nil {
+		return functions.GetReviewOutput{}, fmt.Errorf("failed to get review: %w", err)
+	}
+
+	u, err := url.Parse(review.GetPullRequestURL())
+	if err != nil {
+		return functions.GetReviewOutput{}, fmt.Errorf("failed to parse pull request url: %w", err)
+	}
+
+	parts := strings.Split(u.Path, "/")
+	issueNumber := parts[len(parts)-1]
+
+	return functions.GetReviewOutput{
+		IssuesNumber: issueNumber,
+		Path:         review.GetPath(),
+		StartLine:    review.GetStartLine(),
+		EndLine:      review.GetLine(),
+		Content:      review.GetBody(),
+		DiffHunk:     review.GetDiffHunk(),
+	}, nil
+
+}
