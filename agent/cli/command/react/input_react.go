@@ -12,15 +12,15 @@ import (
 	"github.com/clover0/issue-agent/config"
 )
 
-type RecatType string
+type ReactType string
 
 const (
-	Comment       RecatType = RecatType("comment")
-	ReviewComment RecatType = RecatType("review_comment")
+	Comment       ReactType = ReactType("comment")
+	ReviewComment ReactType = ReactType("review_comment")
 )
 
 type ArgGitHubReact struct {
-	ReactType RecatType
+	ReactType ReactType
 
 	Owner      string
 	Repository string
@@ -30,7 +30,7 @@ type ArgGitHubReact struct {
 }
 
 type ReactInput struct {
-	ReactType RecatType
+	ReactType ReactType
 
 	Common         *common.CommonInput
 	GitHubOwner    string `validate:"required"`
