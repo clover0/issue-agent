@@ -53,14 +53,23 @@ func SearchFiles(input SearchFilesInput) ([]string, error) {
 		return nil, fmt.Errorf("%s does not exist: %w", input.Path, err)
 	}
 
-	var currentDirs = []string{".", "./"}
-	var fileNames []string
+	currentDirs := []string{".", "./"}
+	fileNames := make([]string, 0)
 	err := filepath.WalkDir(input.Path, func(path string, d os.DirEntry, err error) error {
 		if d.IsDir() {
 			// Skip hidden directories
 			if !slices.Contains(currentDirs, d.Name()) && strings.HasPrefix(d.Name(), ".") {
 				return filepath.SkipDir
 			}
+			return nil
+		}
+
+		fileInfo, err := os.Lstat(path)
+		if err != nil {
+			return fmt.Errorf("failed to get file info: %w", err)
+		}
+
+		if !fileInfo.Mode().IsRegular() {
 			return nil
 		}
 
