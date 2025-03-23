@@ -68,7 +68,6 @@ type GetReviewOutput struct {
 	StartLine    int
 	EndLine      int
 	Content      string
-	DiffHunk     string
 }
 
 func (g GetReviewOutput) ToLLMString() string {
@@ -82,9 +81,6 @@ The following file information received a code review.
 
 # Review content
 {{ .Content }}
-
-# Review diff hunk
-{{ .DiffHunk }}
 `
 	t, err := template.New("reviewComments").Parse(tmpl)
 	if err != nil {

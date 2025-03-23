@@ -136,13 +136,16 @@ func (s GitHubService) GetReviewComment(reviewID string) (functions.GetReviewOut
 	parts := strings.Split(u.Path, "/")
 	issueNumber := parts[len(parts)-1]
 
+	startLine := review.GetOriginalStartLine()
+	if startLine == 0 {
+		startLine = review.GetOriginalLine()
+	}
 	return functions.GetReviewOutput{
 		IssuesNumber: issueNumber,
 		Path:         review.GetPath(),
-		StartLine:    review.GetStartLine(),
-		EndLine:      review.GetLine(),
+		StartLine:    startLine,
+		EndLine:      review.GetOriginalLine(),
 		Content:      review.GetBody(),
-		DiffHunk:     review.GetDiffHunk(),
 	}, nil
 
 }
