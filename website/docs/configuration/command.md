@@ -66,3 +66,33 @@ Command and Flags
       LLM name. For the model name, check the documentation of each LLM provider.
 
 ```
+
+
+## `create-pr` command
+
+Using functions:
+
+- get_pull_request
+- list_files
+- modify_file
+- open_file
+- put_file
+- submit_files
+- search_files
+- remove_file
+- switch_branch
+- submit_revision
+
+
+## `react` command
+
+Using functions:
+
+- get_pull_request
+- list_files
+- modify_file
+- open_file
+- put_file
+- search_files
+- remove_file
+- submit_revision
