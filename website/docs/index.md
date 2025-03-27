@@ -7,6 +7,21 @@ Issue Agent is a lightweight tool powered by a Large Language Model (LLM).
 When given an issue, the Agent autonomously attempts to solve the issue and submit the results as a Pull Request on GitHub.
 
 
+## Suitable scenarios for "Issue Agent"
+
+### Handle simple tasks but difficult to automate tasks
+- Migration code
+- Routine tasks of adding or modifying using a standardized approach**
+- Code review
+- Writing documentation
+
+
+### Repetitive tasks
+- Scale out the same tasks
+- Converting code
+- Fixing typos
+
+
 ## Why Issue Agent?
 
 ### Ready to use immediately
