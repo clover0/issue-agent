@@ -16,6 +16,8 @@ import (
 func InitializeFunctions(
 	noSubmit bool,
 	repoService RepositoryService,
+	submitFilesService SubmitFilesService,
+	submitRevisionService SubmitRevisionService,
 	allowFunctions []string,
 ) {
 	if allowFunction(allowFunctions, FuncOpenFile) {
@@ -32,7 +34,7 @@ func InitializeFunctions(
 	}
 	// TODO:
 	if !noSubmit && allowFunction(allowFunctions, FuncSubmitFiles) {
-		InitSubmitFilesGitHubFunction()
+		InitSubmitFilesGitHubFunction(submitFilesService)
 	}
 	if allowFunction(allowFunctions, FuncGetWebSearchResult) {
 		InitGetWebSearchResult()
@@ -51,6 +53,9 @@ func InitializeFunctions(
 	}
 	if allowFunction(allowFunctions, FuncSwitchBranch) {
 		InitSwitchBranchFunction()
+	}
+	if allowFunction(allowFunctions, FuncSubmitRevision) {
+		InitSubmitRevisionFunction(submitRevisionService)
 	}
 }
 
@@ -110,24 +115,7 @@ func marshalFuncArgs(args string, input any) error {
 
 const defaultSuccessReturning = "tool use succeeded."
 
-type optionalArg struct {
-	SubmitFilesFunction SubmitFilesCallerType
-}
-
-type FunctionOption func(o *optionalArg)
-
-func SetSubmitFiles(fn SubmitFilesCallerType) FunctionOption {
-	return func(o *optionalArg) {
-		o.SubmitFilesFunction = fn
-	}
-}
-
-func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, argsJson string, optArg ...FunctionOption) (string, error) {
-	option := &optionalArg{}
-	for _, o := range optArg {
-		o(option)
-	}
-
+func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, argsJson string) (string, error) {
 	// TODO: make large switch statement smaller
 	switch funcName {
 	case FuncOpenFile:
@@ -186,7 +174,7 @@ func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, ar
 		if err := marshalFuncArgs(argsJson, &input); err != nil {
 			return "", fmt.Errorf("failed to unmarshal args: %w", err)
 		}
-		out, err := SubmitFiles(option.SubmitFilesFunction, input)
+		out, err := functionsMap[FuncSubmitFiles].Func.(SubmitFilesType)(input)
 		if err != nil {
 			return "", err
 		}
@@ -274,6 +262,18 @@ func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, ar
 			return "", err
 		}
 		return fmt.Sprintf("%s\n%s\n", defaultSuccessReturning, r), nil
+
+	case FuncSubmitRevision:
+		l.Info("functions: do %s\n", FuncSubmitRevision)
+		input := SubmitRevisionInput{}
+		if err := marshalFuncArgs(argsJson, &input); err != nil {
+			return "", fmt.Errorf("failed to unmarshal args: %w", err)
+		}
+		out, err := functionsMap[FuncSubmitRevision].Func.(SubmitRevisionType)(input)
+		if err != nil {
+			return "", err
+		}
+		return out.Message, nil
 	}
 
 	return "", errors.New("function not found")

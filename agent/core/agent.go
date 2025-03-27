@@ -15,38 +15,35 @@ type AgentLike interface {
 }
 
 type Agent struct {
-	name                string
-	parameter           Parameter
-	currentStep         Step
-	logg                logger.Logger
-	submitServiceCaller functions.SubmitFilesCallerType
-	llmForwarder        LLMForwarder
-	prompt              prompt.Prompt
-	history             []LLMMessage
-	store               *store.Store
-	tools               []functions.Function
+	name         string
+	parameter    Parameter
+	currentStep  Step
+	logg         logger.Logger
+	llmForwarder LLMForwarder
+	prompt       prompt.Prompt
+	history      []LLMMessage
+	store        *store.Store
+	tools        []functions.Function
 }
 
 func NewAgent(
 	parameter Parameter,
 	name string,
 	logg logger.Logger,
-	submitServiceCaller functions.SubmitFilesCallerType,
 	prompt prompt.Prompt,
 	forwarder LLMForwarder,
 	store *store.Store,
 	tools []functions.Function,
 ) Agent {
 	return Agent{
-		name:                name,
-		parameter:           parameter,
-		currentStep:         Step{},
-		logg:                logg,
-		submitServiceCaller: submitServiceCaller,
-		prompt:              prompt,
-		llmForwarder:        forwarder,
-		store:               store,
-		tools:               tools,
+		name:         name,
+		parameter:    parameter,
+		currentStep:  Step{},
+		logg:         logg,
+		prompt:       prompt,
+		llmForwarder: forwarder,
+		store:        store,
+		tools:        tools,
 	}
 }
 
@@ -91,9 +88,6 @@ func (a *Agent) Work() (lastOutput string, err error) {
 					a.store,
 					fnCtx.Function.Name,
 					fnCtx.FunctionArgs.String(),
-					functions.SetSubmitFiles(
-						a.submitServiceCaller,
-					),
 				)
 
 				if err != nil {

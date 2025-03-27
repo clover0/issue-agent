@@ -1,15 +1,17 @@
 package functions
 
-import "context"
-
 type SubmitFilesServiceInput struct {
-	BaseBranch string
-	GitEmail   string
-	GitName    string
-	PRLabels   []string
+	GitHubOwner   string
+	Repository    string
+	BaseBranch    string
+	GitEmail      string
+	GitName       string
+	PRLabels      []string
+	Reviewers     []string
+	TeamReviewers []string
 }
 
-type SubmitFilesCallerType func(input SubmitFilesInput) (SubmitFilesOutput, error)
+type SubmitFilesType func(input SubmitFilesInput) (SubmitFilesOutput, error)
 
 type SubmitFilesOutput struct {
 	Message           string
@@ -18,5 +20,5 @@ type SubmitFilesOutput struct {
 }
 
 type SubmitFilesService interface {
-	Caller(ctx context.Context, input SubmitFilesServiceInput) SubmitFilesCallerType
+	SubmitFiles(callerInput SubmitFilesInput) (SubmitFilesOutput, error)
 }

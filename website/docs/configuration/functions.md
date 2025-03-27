@@ -16,6 +16,13 @@ get_pull_request: Get a GitHub Pull Request
     pr_number
         Pull Request Number to get
 
+submit_revision: Submit revision is a function to correct and resubmit after submission.
+    commit_message_short
+        Short commit message indicating purpose to resubmit
+
+    commit_message_detail
+        Detail commit message indicating resubmitting content
+
 remove_file: Remove a file specified by the path
     path
         Path of the file to be removed

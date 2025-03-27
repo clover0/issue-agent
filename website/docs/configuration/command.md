@@ -34,5 +34,35 @@ Command and Flags
       The number of agents to review.
       If a value greater than 0 is specified, then that number of reviews will be performed by agents with different roles.
       Default: 0
+    --reviewers
+      The list of GitHub user `login` as reviewers. If you want to add multiple reviewers, separate them with a comma.
+    --team_reviewers
+      The list of GitHub Team `slug` as team_reviewers. If you want to add multiple team reviewers, separate them with a comma.
+
+  react:
+    Usage:
+      react RESOURCE_FORMAT [flags]
+    RESOURCE_FORMAT:
+        issue_comment(pull request comment): OWNER/REPO/issues/comments/COMMENT_ID
+        pull_request_review_comment: OWNER/REPO/pulls/comments/COMMENT_ID
+    Example:
+       react owner/example/issues/comments/123456 [flags]
+    Flags:
+    --aws_profile
+      AWS profile to use a specific profile from credentials.
+    --aws_region
+      AWS region to use for credentials and Bedrock.
+      Default(If use aws_profile): aws profile's default session region.
+    --config
+      Path to the configuration file.
+      Default: agent/config/default_config.yml in this project.
+    --language
+      Language spoken by agent.
+      Default: English.
+    --log_level
+      Log level. If you want to see LLM completions, set it to 'debug'.
+      Default: info.
+    --model
+      LLM name. For the model name, check the documentation of each LLM provider.
 
 ```

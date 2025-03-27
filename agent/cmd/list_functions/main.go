@@ -19,9 +19,15 @@ func main() {
 
 	lo := logger.NewPrinter(conf.LogLevel)
 
+	ghClient := github.NewClient(nil).WithAuthToken("")
+	submitService := agithub.NopSubmitFileService{}
+	revisionService := agithub.NopSubmitRevisionService{}
+
 	functions.InitializeFunctions(
 		*conf.Agent.GitHub.NoSubmit,
-		agithub.NewGitHubService(conf.Agent.GitHub.Owner, "test", github.NewClient(nil).WithAuthToken(""), lo),
+		agithub.NewGitHubService(conf.Agent.GitHub.Owner, "repo", ghClient, lo),
+		submitService,
+		revisionService,
 		conf.Agent.AllowFunctions,
 	)
 

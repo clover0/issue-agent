@@ -3,7 +3,9 @@ package agithub
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"strconv"
+	"strings"
 
 	"github.com/google/go-github/v69/github"
 
@@ -67,6 +69,8 @@ func (s GitHubService) GetPullRequest(prNumber string) (functions.GetPullRequest
 	}
 
 	return functions.GetPullRequestOutput{
+		Head:    pr.GetHead().GetRef(),
+		Base:    pr.GetBase().GetRef(),
 		RawDiff: diff,
 		Title:   pr.GetTitle(),
 		Content: pr.GetBody(),
@@ -84,4 +88,64 @@ func (s GitHubService) GetBranch(branchName string) (string, error) {
 	}
 
 	return branch.GetName(), nil
+}
+
+func (s GitHubService) GetComment(commentNumber string) (functions.GetCommentOutput, error) {
+	c := context.Background()
+	number, err := strconv.ParseInt(commentNumber, 10, 64)
+	if err != nil {
+		return functions.GetCommentOutput{}, fmt.Errorf("failed to convert comment number to int %s", commentNumber)
+	}
+
+	comment, _, err := s.client.Issues.GetComment(c, s.owner, s.repository, number)
+	if err != nil {
+		return functions.GetCommentOutput{}, fmt.Errorf("failed to get comment: %w", err)
+	}
+
+	u, err := url.Parse(*comment.IssueURL)
+	if err != nil {
+		return functions.GetCommentOutput{}, fmt.Errorf("failed to parse issue url: %w", err)
+	}
+
+	parts := strings.Split(u.Path, "/")
+	issueNumber := parts[len(parts)-1]
+
+	return functions.GetCommentOutput{
+		IssueNumber: issueNumber,
+		Content:     comment.GetBody(),
+	}, nil
+}
+
+func (s GitHubService) GetReviewComment(reviewID string) (functions.GetReviewOutput, error) {
+	c := context.Background()
+	id, err := strconv.ParseInt(reviewID, 10, 64)
+	if err != nil {
+		return functions.GetReviewOutput{}, fmt.Errorf("failed to convert review id to int %s", reviewID)
+	}
+
+	review, _, err := s.client.PullRequests.GetComment(c, s.owner, s.repository, id)
+	if err != nil {
+		return functions.GetReviewOutput{}, fmt.Errorf("failed to get review: %w", err)
+	}
+
+	u, err := url.Parse(review.GetPullRequestURL())
+	if err != nil {
+		return functions.GetReviewOutput{}, fmt.Errorf("failed to parse pull request url: %w", err)
+	}
+
+	parts := strings.Split(u.Path, "/")
+	issueNumber := parts[len(parts)-1]
+
+	startLine := review.GetOriginalStartLine()
+	if startLine == 0 {
+		startLine = review.GetOriginalLine()
+	}
+	return functions.GetReviewOutput{
+		IssuesNumber: issueNumber,
+		Path:         review.GetPath(),
+		StartLine:    startLine,
+		EndLine:      review.GetOriginalLine(),
+		Content:      review.GetBody(),
+	}, nil
+
 }

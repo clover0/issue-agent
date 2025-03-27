@@ -53,6 +53,12 @@ agent:
     pr_labels:
       - "issue-agent"
 
+    # The list of GitHub user `login` as reviewers. If you want to add multiple reviewers, separate them with a comma.
+    reviewers: []
+
+    # The list of GitHub Team `slug` as team_reviewers If you want to add multiple team reviewers, separate them with a comma.
+    team_reviewers: []
+
   # Allow agent to use function.
   # Belows are the default functions.
   allow_functions:
@@ -67,3 +73,4 @@ agent:
     - search_files
     - remove_file
     - switch_branch
+    - submit_revision

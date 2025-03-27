@@ -2,6 +2,7 @@ package functions
 
 import (
 	"bytes"
+	"fmt"
 	"text/template"
 )
 
@@ -41,6 +42,8 @@ type GetPullRequestInput struct {
 }
 
 type GetPullRequestOutput struct {
+	Head    string
+	Base    string
 	RawDiff string
 	Title   string
 	Content string
@@ -49,6 +52,48 @@ type GetPullRequestOutput struct {
 type GetIssueOutput struct {
 	Path    string
 	Content string
+}
+
+type GetCommentOutput struct {
+	// IssueNumber is the issue number.
+	// When comment is on the pull request, IssueNumber is the pull request number.
+	IssueNumber string
+
+	Content string
+}
+
+type GetReviewOutput struct {
+	IssuesNumber string
+	Path         string
+	StartLine    int
+	EndLine      int
+	Content      string
+}
+
+func (g GetReviewOutput) ToLLMString() string {
+	tmpl := `
+The following file information received a code review.
+
+# Review information
+* Review file path: {{ .Path }}
+* Review start line number: {{ .StartLine }}
+* Review end line number: {{ .EndLine }}
+
+# Review content
+{{ .Content }}
+`
+	t, err := template.New("reviewComments").Parse(tmpl)
+	if err != nil {
+		return fmt.Errorf("failed to parse review template: %w", err).Error()
+	}
+
+	var buf bytes.Buffer
+	err = t.Execute(&buf, g)
+	if err != nil {
+		return fmt.Errorf("failed to execute review template: %w", err).Error()
+	}
+
+	return buf.String()
 }
 
 func (g GetPullRequestOutput) ToLLMString() string {

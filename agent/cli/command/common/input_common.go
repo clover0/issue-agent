@@ -1,20 +1,19 @@
-package cli
+package common
 
 import (
 	"flag"
 )
 
 type CommonInput struct {
-	Config       string
-	AWSProfile   string
-	AWSRegion    string
-	LogLevel     string
-	Language     string
-	Model        string
-	ReviewAgents int
+	Config     string
+	AWSProfile string
+	AWSRegion  string
+	LogLevel   string
+	Language   string
+	Model      string
 }
 
-func addCommonFlags(fs *flag.FlagSet, cfg *CommonInput) {
+func AddCommonFlags(fs *flag.FlagSet, cfg *CommonInput) {
 	fs.StringVar(&cfg.Config, "config", "", `Path to the configuration file. 
 Default: agent/config/default_config.yml in this project.`)
 
@@ -31,7 +30,4 @@ Default: English.`)
 
 	fs.StringVar(&cfg.Model, "model", "", "LLM name. For the model name, check the documentation of each LLM provider.")
 
-	fs.IntVar(&cfg.ReviewAgents, "review_agents", 0, `The number of agents to review.
-The number of agents to review. A value greater than 0 will review to the created PR.
-Default: 0`)
 }
