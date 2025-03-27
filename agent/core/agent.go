@@ -72,14 +72,14 @@ func (a *Agent) Work() (lastOutput string, err error) {
 	for loop {
 		steps++
 		if steps > a.parameter.MaxSteps {
-			a.logg.Info(fmt.Sprintf("Reached to the max steps %d\n", a.parameter.MaxSteps))
+			a.logg.Info(fmt.Sprintf("reached to the max steps %d\n", a.parameter.MaxSteps))
 			break
 		}
 		stepLabel := fmt.Sprintf("[STEP:%d]", steps)
 
 		switch a.currentStep.Do {
 		case Exec:
-			a.logg.Info(logger.Blue(stepLabel + "execution functions:\n"))
+			a.logg.Info(logger.Blue(stepLabel + "execute functions:\n"))
 			var input []ReturnToLLMInput
 			for _, fnCtx := range a.currentStep.FunctionContexts {
 				var returningStr string
@@ -91,6 +91,7 @@ func (a *Agent) Work() (lastOutput string, err error) {
 				)
 
 				if err != nil {
+					a.logg.Error(logger.Red("function error")+": %s\n", err)
 					returningStr = fmt.Sprintf("Error caused. error message: %s\nChange the arguments before using it again. "+
 						"If you still get an error, change the tool you are using", err.Error())
 				}
@@ -106,7 +107,7 @@ func (a *Agent) Work() (lastOutput string, err error) {
 			a.logg.Info(logger.Green(stepLabel + "forwarding message to LLM and waiting for response\n"))
 			history, err = a.llmForwarder.ForwardLLM(ctx, completionInput, a.currentStep.ReturnToLLMContexts, history)
 			if err != nil {
-				a.logg.Error("unrecoverable ContinueCompletion: %s\n", err)
+				a.logg.Error("unrecoverable error: %s\n", err)
 				return lastOutput, err
 			}
 			a.updateHistory(history)
@@ -122,8 +123,8 @@ func (a *Agent) Work() (lastOutput string, err error) {
 			return lastOutput, fmt.Errorf("unrecoverable error: %s", a.currentStep.UnrecoverableErr)
 
 		default:
-			a.logg.Error("does not exist step type\n")
-			return lastOutput, fmt.Errorf("does not exist step type")
+			a.logg.Error("%s does not exist in step types\n", a.currentStep.Do)
+			return lastOutput, fmt.Errorf("%s does not exist in step type", a.currentStep.Do)
 		}
 	}
 	return lastOutput, nil
