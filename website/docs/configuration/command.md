@@ -96,3 +96,7 @@ Using functions:
 - search_files
 - remove_file
 - submit_revision
+
+
+Issue Agent does not save conversation history.
+Therefore, When user uses the `react` command, the agent will not remember the previous conversation.

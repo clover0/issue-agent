@@ -40,4 +40,4 @@ Once the agent starts working, there is no interaction between the agent and the
 * ✅ Pull requests are created only in repository belonging to GitHub issue.
 * ✅ To read an issue in one GitHub repository and submit a PR to that repository.
 * 🚫 Interactive development work between an Agent and the human who directs the Agent
-* 🚫 The Agent does not have the ability to execute arbitrary code. The Agent can only execute predefined functions.
+* 🚫 The Agent can not execute arbitrary code. The Agent can only execute predefined functions.
