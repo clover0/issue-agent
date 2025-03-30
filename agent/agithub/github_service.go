@@ -48,6 +48,7 @@ func (s GitHubService) GetIssue(issueNumber string) (functions.GetIssueOutput, e
 
 	return functions.GetIssueOutput{
 		Path:    strconv.Itoa(issue.GetNumber()),
+		Title:   issue.GetTitle(),
 		Content: issue.GetBody(),
 	}, nil
 }

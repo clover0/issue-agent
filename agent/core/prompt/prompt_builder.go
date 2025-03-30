@@ -16,20 +16,22 @@ type Prompt struct {
 
 func BuildRequirementPrompt(promptTpl PromptTemplate, language string, baseBranch string, issue functions.GetIssueOutput) (Prompt, error) {
 	return BuildPrompt(promptTpl, "planner", map[string]any{
-		"language":    language,
-		"issue":       issue.Content,
-		"issueNumber": issue.Path,
-		"baseBranch":  baseBranch,
+		"language":     language,
+		"issueTitle":   issue.Title,
+		"issueContent": issue.Content,
+		"issueNumber":  issue.Path,
+		"baseBranch":   baseBranch,
 	})
 }
 
 func BuildDeveloperPrompt(promptTpl PromptTemplate, language string, baseBranch string, issue functions.GetIssueOutput, instruction string) (Prompt, error) {
 	return BuildPrompt(promptTpl, "developer", map[string]any{
-		"language":    language,
-		"issue":       issue.Content,
-		"issueNumber": issue.Path,
-		"instruction": instruction,
-		"baseBranch":  baseBranch,
+		"language":     language,
+		"issueTitle":   issue.Title,
+		"issueContent": issue.Content,
+		"issueNumber":  issue.Path,
+		"instruction":  instruction,
+		"baseBranch":   baseBranch,
 	})
 }
 
