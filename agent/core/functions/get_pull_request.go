@@ -51,6 +51,7 @@ type GetPullRequestOutput struct {
 
 type GetIssueOutput struct {
 	Path    string
+	Title   string
 	Content string
 }
 

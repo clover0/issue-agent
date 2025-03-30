@@ -31,7 +31,8 @@ agents:
       The task is bellow:
 
       <task>
-      {{.issue}}
+      Title: {{.title}}
+      {{.issueContent}}
       </task>
 
       <instructions>
@@ -86,8 +87,9 @@ agents:
       The task is bellow:
 
       <task>
-      Issue Number {{.issueNumber}}
-      {{.issue}}
+      Issue Number: {{.issueNumber}}
+      Title: {{.title}}
+      {{.issueContent}}
       </task>
 
       <what-to-do-last>
