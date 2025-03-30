@@ -7,7 +7,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.29.9
 	github.com/aws/aws-sdk-go-v2/service/bedrockruntime v1.26.1
 	github.com/go-git/go-git/v5 v5.14.0
-	github.com/go-playground/validator/v10 v10.25.0
+	github.com/go-playground/validator/v10 v10.26.0
 	github.com/google/go-github/v69 v69.2.0
 	github.com/google/go-github/v70 v70.0.0
 	github.com/openai/openai-go v0.1.0-alpha.62
