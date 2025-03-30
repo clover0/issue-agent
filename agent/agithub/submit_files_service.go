@@ -38,15 +38,10 @@ func (s SubmitFileGitHubService) SubmitFiles(input functions.SubmitFilesInput) (
 	errorf := func(format string, a ...any) error {
 		return fmt.Errorf("submit file service: "+format, a...)
 	}
-	var err error
 	ctx := context.Background()
 
-	// TODO: validation before this caller
-	if s.callerInput.GitEmail == "" {
-		return submitFileOut, errorf("git email is not set")
-	}
-	if s.callerInput.GitName == "" {
-		return submitFileOut, errorf("git  name is not set")
+	if err := s.validateGitConfig(); err != nil {
+		return submitFileOut, errorf("failed to validate git config: %w", err)
 	}
 
 	repo, err := git.PlainOpen(".")
@@ -54,24 +49,12 @@ func (s SubmitFileGitHubService) SubmitFiles(input functions.SubmitFilesInput) (
 		return submitFileOut, errorf("failed to open repository: %w", err)
 	}
 
-	head, err := repo.Head()
-	if err != nil {
-		return submitFileOut, errorf("failed to get HEAD: %w", err)
-	}
-	if head.Name().Short() == s.callerInput.BaseBranch {
-		return submitFileOut, errorf("cannot submit in the base branch. create and switch to a new branch")
+	if err := s.guardPushToBaseBranch(repo); err != nil {
+		return submitFileOut, errorf("failed on guard push to base branch: %w", err)
 	}
 
-	cfg, err := repo.Config()
-	if err != nil {
-		return submitFileOut, err
-	}
-
-	cfg.User.Email = s.callerInput.GitEmail
-	cfg.User.Name = s.callerInput.GitName
-
-	if err := repo.SetConfig(cfg); err != nil {
-		return submitFileOut, err
+	if err := s.setGitConfig(repo); err != nil {
+		return submitFileOut, errorf("failed to set git config: %w", err)
 	}
 
 	wt, err := repo.Worktree()
@@ -83,28 +66,9 @@ func (s SubmitFileGitHubService) SubmitFiles(input functions.SubmitFilesInput) (
 		return submitFileOut, errorf("failed to add files: %w", err)
 	}
 
-	statuses, err := wt.Status()
-	if err != nil {
-		return submitFileOut, errorf("failed to get worktree status: %w", err)
+	if err := s.resetSymlink(wt); err != nil {
+		return submitFileOut, errorf("failed to reset symlink: %w", err)
 	}
-
-	// reset symlink because go-git's file system behavior causes symlinks to be relative paths, resulting in extra diffs.
-	for path, status := range statuses {
-		if status.Staging != git.Modified {
-			continue
-		}
-		f, err := os.Lstat(path)
-		if err != nil {
-			return submitFileOut, fmt.Errorf("failed to open file %s: %w", path, err)
-		}
-		if f.Mode()&os.ModeSymlink != 0 {
-			s.logger.Debug(fmt.Sprintf("reset symlink: %s\n", path))
-			if err := wt.Reset(&git.ResetOptions{Files: []string{path}}); err != nil {
-				return submitFileOut, errorf("failed to reset symlink: %w", err)
-			}
-		}
-	}
-	s.logger.Info(statuses.String())
 
 	if _, err := wt.Commit(
 		fmt.Sprintf("%s\n\n%s", input.CommitMessageShort, input.CommitMessageDetail),
@@ -126,14 +90,13 @@ func (s SubmitFileGitHubService) SubmitFiles(input functions.SubmitFilesInput) (
 	if err != nil {
 		return submitFileOut, errorf("failed to get HEAD: %w", err)
 	}
-	currentBranch := ref.Name().Short()
-	prBranch := currentBranch
+	pushedBranch := ref.Name().Short()
 
 	s.logger.Debug(fmt.Sprintf("created PR parameter: name=%s, email=%s, base-branch=%s branch=%s\n",
-		s.callerInput.GitName, s.callerInput.GitEmail, s.callerInput.BaseBranch, currentBranch))
+		s.callerInput.GitName, s.callerInput.GitEmail, s.callerInput.BaseBranch, pushedBranch))
 	pr, _, err := s.client.PullRequests.Create(ctx, s.callerInput.GitHubOwner, s.callerInput.Repository, &github.NewPullRequest{
 		Title: &input.CommitMessageShort,
-		Head:  &prBranch,
+		Head:  &pushedBranch,
 		Base:  &s.callerInput.BaseBranch,
 		Body:  &input.PullRequestContent,
 	})
@@ -170,10 +133,81 @@ func (s SubmitFileGitHubService) SubmitFiles(input functions.SubmitFilesInput) (
 
 	return functions.SubmitFilesOutput{
 		Message: fmt.Sprintf("success creating pull request.\ncreated pull request number: %d\nbranch: %s.\n switched %s branch.",
-			*pr.Number, prBranch, s.callerInput.BaseBranch),
-		PushedBranch:      prBranch,
+			*pr.Number, pushedBranch, s.callerInput.BaseBranch),
+		PushedBranch:      pushedBranch,
 		PullRequestNumber: *pr.Number,
 	}, nil
+}
+
+// validateGitConfig validate git config.
+func (s SubmitFileGitHubService) validateGitConfig() error {
+	if s.callerInput.GitEmail == "" {
+		return fmt.Errorf("git email is not set")
+	}
+	if s.callerInput.GitName == "" {
+		return fmt.Errorf("git name is not set")
+	}
+
+	return nil
+}
+
+// guardPushToBaseBranch guard pushing to base branch.
+// If the current branch is the base branch, return an error.
+func (s SubmitFileGitHubService) guardPushToBaseBranch(repo *git.Repository) error {
+	head, err := repo.Head()
+	if err != nil {
+		return fmt.Errorf("failed to get HEAD: %w", err)
+	}
+	if head.Name().Short() == s.callerInput.BaseBranch {
+		return fmt.Errorf("cannot submit in the base branch. create and switch to a new branch")
+	}
+
+	return nil
+}
+
+// setGitConfig set git config.
+func (s SubmitFileGitHubService) setGitConfig(repo *git.Repository) error {
+	cfg, err := repo.Config()
+	if err != nil {
+		return fmt.Errorf("failed to get config: %w", err)
+	}
+
+	cfg.User.Email = s.callerInput.GitEmail
+	cfg.User.Name = s.callerInput.GitName
+
+	if err := repo.SetConfig(cfg); err != nil {
+		return fmt.Errorf("failed to set config: %w", err)
+	}
+
+	return nil
+}
+
+// resetSymlink reset symlink from git staging.
+// Because go-git's file system behavior causes symlinks to be relative paths, resulting in extra diffs.
+func (s SubmitFileGitHubService) resetSymlink(wt *git.Worktree) error {
+	statuses, err := wt.Status()
+	if err != nil {
+		return fmt.Errorf("failed to get worktree status: %w", err)
+	}
+
+	for path, status := range statuses {
+		if status.Staging != git.Modified {
+			continue
+		}
+		f, err := os.Lstat(path)
+		if err != nil {
+			return fmt.Errorf("failed to open file %s: %w", path, err)
+		}
+		if f.Mode()&os.ModeSymlink != 0 {
+			s.logger.Debug(fmt.Sprintf("reset symlink: %s\n", path))
+			if err := wt.Reset(&git.ResetOptions{Files: []string{path}}); err != nil {
+				return fmt.Errorf("failed to reset symlink: %w", err)
+			}
+		}
+	}
+	s.logger.Info(statuses.String())
+
+	return nil
 }
 
 func (s SubmitFileGitHubService) reviewRequest(ctx context.Context, pr *github.PullRequest, reviewers []string, teamReviewers []string) error {
