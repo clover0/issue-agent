@@ -11,7 +11,7 @@ require (
 	github.com/google/go-github/v69 v69.2.0
 	github.com/google/go-github/v70 v70.0.0
 	github.com/openai/openai-go v0.1.0-alpha.62
-	golang.org/x/net v0.37.0
+	golang.org/x/net v0.38.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
