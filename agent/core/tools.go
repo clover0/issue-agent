@@ -12,6 +12,7 @@ func PlanTools() []functions.Function {
 		m[functions.FuncListFiles],
 		m[functions.FuncSearchFiles],
 		m[functions.FuncGetPullRequest],
+		m[functions.FuncGetIssue],
 	}
 }
 
@@ -26,5 +27,6 @@ func CommentingTools() []functions.Function {
 		m[functions.FuncSearchFiles],
 		m[functions.FuncGetPullRequest],
 		m[functions.FuncSubmitRevision],
+		m[functions.FuncGetIssue],
 	}
 }

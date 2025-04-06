@@ -34,14 +34,14 @@ func NewGitHubService(
 	}
 }
 
-func (s GitHubService) GetIssue(issueNumber string) (functions.GetIssueOutput, error) {
+func (s GitHubService) GetIssue(repository string, issueNumber string) (functions.GetIssueOutput, error) {
 	number, err := strconv.Atoi(issueNumber)
 	if err != nil {
 		return functions.GetIssueOutput{}, fmt.Errorf("failed to convert issue number to int: %w", err)
 	}
 
 	c := context.Background()
-	issue, _, err := s.client.Issues.Get(c, s.owner, s.repository, number)
+	issue, _, err := s.client.Issues.Get(c, s.owner, repository, number)
 	if err != nil {
 		return functions.GetIssueOutput{}, fmt.Errorf("failed to get issue: %w", err)
 	}

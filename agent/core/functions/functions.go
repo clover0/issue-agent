@@ -15,7 +15,7 @@ import (
 
 func InitializeFunctions(
 	noSubmit bool,
-	repoService RepositoryService,
+	repoService GitHubService,
 	submitFilesService SubmitFilesService,
 	submitRevisionService SubmitRevisionService,
 	allowFunctions []string,
@@ -56,6 +56,9 @@ func InitializeFunctions(
 	}
 	if allowFunction(allowFunctions, FuncSubmitRevision) {
 		InitSubmitRevisionFunction(submitRevisionService)
+	}
+	if allowFunction(allowFunctions, FuncGetIssue) {
+		InitGetIssueFunction(repoService)
 	}
 }
 
@@ -274,6 +277,18 @@ func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, ar
 			return "", err
 		}
 		return out.Message, nil
+
+	case FuncGetIssue:
+		l.Info("functions: do %s\n", FuncGetIssue)
+		input := GetIssueInput{}
+		if err := marshalFuncArgs(argsJson, &input); err != nil {
+			return "", fmt.Errorf("failed to unmarshal args: %w", err)
+		}
+		out, err := functionsMap[FuncGetIssue].Func.(GetIssueType)(input)
+		if err != nil {
+			return "", err
+		}
+		return out.ToLLMString(), nil
 	}
 
 	return "", errors.New("function not found")

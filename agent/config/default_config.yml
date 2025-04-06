@@ -74,3 +74,4 @@ agent:
     - remove_file
     - switch_branch
     - submit_revision
+    - get_issue
