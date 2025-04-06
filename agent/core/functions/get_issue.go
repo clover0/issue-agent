@@ -23,7 +23,7 @@ func InitGetIssueFunction(service GitHubService) Function {
 					"description": "GitHub Issue Number to get",
 				},
 			},
-			"required":             []string{"repository", "issue_number"},
+			"required":             []string{"repository_name", "issue_number"},
 			"additionalProperties": false,
 		},
 	}
