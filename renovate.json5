@@ -5,6 +5,7 @@
   automerge: false,
   addLabels: ["dependencies", "renovate"],
   branchPrefix: "renovate/",
+  rangeStrategy: "bump",
   packageRules: [
     {
       // we must use the tag reference
@@ -14,7 +15,7 @@
       enabled: false,
     },
     {
-      groupName: "go",
+      groupName: "Go",
       matchManagers: ["dockerfile", "gomod"],
       matchDepTypes: ["golang"],
       groupSlug: "go-version",
