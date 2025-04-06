@@ -84,7 +84,7 @@ func OrchestrateAgentsByIssue(
 		Model:    conf.Agent.Model,
 	}
 
-	issue, err := ghService.GetIssue(issueNumber)
+	issue, err := ghService.GetIssue(workRepository, issueNumber)
 	if err != nil {
 		return fmt.Errorf("failed to get issue: %w", err)
 	}

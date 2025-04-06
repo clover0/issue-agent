@@ -8,13 +8,15 @@ import (
 
 const FuncGetPullRequest = "get_pull_request"
 
-type RepositoryService interface {
+// TODO: move to a separate file
+type GitHubService interface {
+	GetIssue(repository string, prNumber string) (GetIssueOutput, error)
 	GetPullRequest(prNumber string) (GetPullRequestOutput, error)
 }
 
 type GetPullRequestType func(input GetPullRequestInput) (GetPullRequestOutput, error)
 
-func InitGetPullRequestFunction(service RepositoryService) Function {
+func InitGetPullRequestFunction(service GitHubService) Function {
 	f := Function{
 		Name:        FuncGetPullRequest,
 		Description: "Get a GitHub Pull Request",
@@ -45,12 +47,6 @@ type GetPullRequestOutput struct {
 	Head    string
 	Base    string
 	RawDiff string
-	Title   string
-	Content string
-}
-
-type GetIssueOutput struct {
-	Path    string
 	Title   string
 	Content string
 }
@@ -128,7 +124,7 @@ func (g GetPullRequestOutput) ToLLMString() string {
 	return buf.String()
 }
 
-func GetPullRequestCaller(service RepositoryService) GetPullRequestType {
+func GetPullRequestCaller(service GitHubService) GetPullRequestType {
 	return func(input GetPullRequestInput) (GetPullRequestOutput, error) {
 		return service.GetPullRequest(input.PRNumber)
 	}
