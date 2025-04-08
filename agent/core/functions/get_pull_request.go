@@ -12,6 +12,7 @@ const FuncGetPullRequest = "get_pull_request"
 type GitHubService interface {
 	GetIssue(repository string, prNumber string) (GetIssueOutput, error)
 	GetPullRequest(prNumber string) (GetPullRequestOutput, error)
+	CreateIssueComment(issueNumber string, comment string) (CreateIssueCommentOutput, error)
 }
 
 type GetPullRequestType func(input GetPullRequestInput) (GetPullRequestOutput, error)
@@ -44,11 +45,12 @@ type GetPullRequestInput struct {
 }
 
 type GetPullRequestOutput struct {
-	Head    string
-	Base    string
-	RawDiff string
-	Title   string
-	Content string
+	PRNumber string
+	Head     string
+	Base     string
+	RawDiff  string
+	Title    string
+	Content  string
 }
 
 type GetCommentOutput struct {
@@ -97,6 +99,10 @@ func (g GetPullRequestOutput) ToLLMString() string {
 	errMsg := "failed to convert pull-request to string for LLM"
 
 	tmpl := `
+<pr-number>
+{{ .PRNumber }}
+</pr-number>
+
 <pull-request-title>
 {{ .Title }}
 </pull-request-title>

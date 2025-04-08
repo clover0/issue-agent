@@ -131,7 +131,6 @@ agents:
       * Use only the standard library of the programming language or use only libraries used in the repository.
       * When creating a new implementation, check carefully if it exists in any other directories.
       * Plan and run a check to see how the code you have changed works correctly without linting or compile, and fix it.
-      * Finally you must use submit_revision tool.
       </important-rules>
 
     user_prompt: |-
@@ -146,7 +145,6 @@ agents:
       <instructions>
       * Read pull request.
       * Follow the comment and complete the task.
-      * Finally you must use submit_revision.
       </instructions>
 
   - name: review-manager

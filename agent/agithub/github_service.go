@@ -70,11 +70,12 @@ func (s GitHubService) GetPullRequest(prNumber string) (functions.GetPullRequest
 	}
 
 	return functions.GetPullRequestOutput{
-		Head:    pr.GetHead().GetRef(),
-		Base:    pr.GetBase().GetRef(),
-		RawDiff: diff,
-		Title:   pr.GetTitle(),
-		Content: pr.GetBody(),
+		PRNumber: prNumber,
+		Head:     pr.GetHead().GetRef(),
+		Base:     pr.GetBase().GetRef(),
+		RawDiff:  diff,
+		Title:    pr.GetTitle(),
+		Content:  pr.GetBody(),
 	}, nil
 }
 
@@ -148,5 +149,20 @@ func (s GitHubService) GetReviewComment(reviewID string) (functions.GetReviewOut
 		EndLine:      review.GetOriginalLine(),
 		Content:      review.GetBody(),
 	}, nil
+}
 
+func (s GitHubService) CreateIssueComment(issueNumber string, comment string) (functions.CreateIssueCommentOutput, error) {
+	c := context.Background()
+	number, err := strconv.Atoi(issueNumber)
+	if err != nil {
+		return functions.CreateIssueCommentOutput{}, fmt.Errorf("failed to convert issue number to int: %w", err)
+	}
+
+	issueComment := &github.IssueComment{Body: &comment}
+	_, _, err = s.client.Issues.CreateComment(c, s.owner, s.repository, number, issueComment)
+	if err != nil {
+		return functions.CreateIssueCommentOutput{}, fmt.Errorf("failed to create issue comment: %w", err)
+	}
+
+	return functions.CreateIssueCommentOutput{}, nil
 }
