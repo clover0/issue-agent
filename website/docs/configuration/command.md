@@ -83,6 +83,7 @@ Using functions:
 - switch_branch
 - submit_revision
 - get_issue
+- create_pull_request_comment
 
 
 ## `react` command
@@ -98,6 +99,7 @@ Using functions:
 - remove_file
 - submit_revision
 - get_issue
+- create_pull_request_comment
 
 
 Issue Agent does not save conversation history.

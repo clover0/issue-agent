@@ -80,5 +80,10 @@ get_issue: Get a GitHub issue from organization(owner) passed as CLI input.
     issue_number
         GitHub Issue Number to get
 
+create_pull_request_comment: Create a comment on a GitHub pull request from `owner/repo` passed as CLI input.
+    pr_number
+        GitHub Pull Request Number to create comment to
+    comment
+        Comment by markdown on the pull request
 
 ```
