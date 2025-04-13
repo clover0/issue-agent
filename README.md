@@ -11,7 +11,7 @@ When a developer creates an issue in a repository and passes to this agent,
 it autonomously works to solve the issue and submits its results as a Pull Request on GitHub.
 
 ### Design
-- **Data transmission is limited to the LLM provider only**
+- **Data transmission is limited to the LLM provider and GitHub only**
 - **Only execution of predefined tools is allowed, not arbitrary shell execution**
 
 ![issue-agent-arch.png](docs/assets/readme/issue-agent-arch.png)
