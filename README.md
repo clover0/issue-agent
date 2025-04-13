@@ -10,6 +10,11 @@ Powered by Large Language Models (LLMs).
 When a developer creates an issue in a repository and passes to this agent, 
 it autonomously works to solve the issue and submits its results as a Pull Request on GitHub.
 
+### Design
+- **Data transmission is limited to the LLM provider and GitHub only**
+- **Only execution of predefined tools is allowed, not arbitrary shell execution**
+
+![issue-agent-arch.png](docs/assets/readme/issue-agent-arch.png)
 
 ## Quick Installation & Usage
 ### Installation
@@ -18,6 +23,8 @@ it autonomously works to solve the issue and submits its results as a Pull Reque
 
 
 ### Usage
+
+#### CLI
 ```shell
 issue-agent help
 ```
@@ -27,6 +34,58 @@ $ issue-agent create-pr clover0/example-repository/issues/123 \
   --base_branch main \
   --model claude-3-7-sonnet-20250219
 ```
+
+#### GitHub Action
+1. Set up the workflow file in your repository.
+```yaml
+name: Run Agent
+
+on:
+  issues:
+    types:
+      - labeled
+
+  create-pr:
+    if: ${{ github.event.label.name == 'run-agent' }}
+    name: Create PR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Issue Agent
+        uses: clover0/setup-issue-agent@v1
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # 4.0.2
+        with:
+          role-to-assume: "arn:aws:iam::<AWS-ACCOUNT>:role/<ROLE-NAME>"
+          role-session-name: run-agent-${{ github.run_id }}
+          aws-region: "<AWS-REGION>"
+
+      - uses: actions/create-github-app-token@c1a285145b9d317df6ced56c09f525b5c2b6f755 # v1.11.1
+        id: app-token
+        with:
+          app-id: ${{ secrets.TOKEN_APP_ID }}
+          private-key: ${{ secrets.TOKEN_APP_PRIVATE_KEY }}
+
+      - name: Run Issue Agent Action
+        run: |
+          issue-agent create-pr ${GITHUB_REPOSITORY}/issues/${{ github.event.issue.number }} \
+                    --base_branch master \
+                    --model us.anthropic.claude-3-7-sonnet-20250219-v1:0 \
+                    --aws_region us-east-1
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+```
+See [setup-issue-agent](https://github.com/clover0/setup-issue-agent) for more details.
+
+
+2. Label the issue with `run-agent` to trigger the workflow.   
+In the following example, an issue for refactoring the Terraform code has been created.
+
+![issue-agent-issue.png](docs/assets/readme/issue-agent-issue.png)
+
+3. Issue Agent will create a Pull Request with the solution.
+![issue-agent-pr.png](docs/assets/readme/issue-agent-pr.png)
+![issue-agent-pr-diff.png](docs/assets/readme/issue-agent-pr-diff.png)
 
 
 ## Documentation
