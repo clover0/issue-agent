@@ -2,7 +2,7 @@
 # It is used to build the agent binary in this container and run at runner binary using this container.
 # From CLI command to run this agent container as End to End test.
 
-FROM golang:1.24.2-bookworm@sha256:e719692f259f78b4496dbfe80628fbbef542da15314a24ddb98f26bac39833cf AS development
+FROM golang:1.24.2-bookworm@sha256:00eccd446e023d3cd9566c25a6e6a02b90db3e1e0bbe26a48fc29cd96e800901 AS development
 
 WORKDIR /agent/src/
 
