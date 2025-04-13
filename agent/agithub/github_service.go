@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/google/go-github/v69/github"
+	"github.com/google/go-github/v70/github"
 
 	"github.com/clover0/issue-agent/core/functions"
 	"github.com/clover0/issue-agent/logger"
