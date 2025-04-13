@@ -8,7 +8,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/bedrockruntime v1.29.0
 	github.com/go-git/go-git/v5 v5.15.0
 	github.com/go-playground/validator/v10 v10.26.0
-	github.com/google/go-github/v69 v69.2.0
 	github.com/google/go-github/v70 v70.0.0
 	github.com/openai/openai-go v0.1.0-alpha.62
 	golang.org/x/net v0.39.0
@@ -45,7 +44,6 @@ require (
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/pjbgf/sha1cd v0.3.2 // indirect
-	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	github.com/sergi/go-diff v1.3.2-0.20230802210424-5b0b94c5c0d3 // indirect
 	github.com/skeema/knownhosts v1.3.1 // indirect
 	github.com/tidwall/gjson v1.18.0 // indirect
@@ -54,10 +52,7 @@ require (
 	github.com/tidwall/sjson v1.2.5 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	golang.org/x/crypto v0.37.0 // indirect
-	golang.org/x/mod v0.21.0 // indirect
-	golang.org/x/sync v0.13.0 // indirect
 	golang.org/x/sys v0.32.0 // indirect
 	golang.org/x/text v0.24.0 // indirect
-	golang.org/x/tools v0.26.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )
