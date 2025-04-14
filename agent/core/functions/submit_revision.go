@@ -5,7 +5,7 @@ const FuncSubmitRevision = "submit_revision"
 func InitSubmitRevisionFunction(service SubmitRevisionService) Function {
 	f := Function{
 		Name:        FuncSubmitRevision,
-		Description: "Submit revision is a function to correct and resubmit after submission.",
+		Description: "Submit revision commits changed files using git add and git commit, finally git push on working branch.",
 		Func:        SubmitRevisionCaller(service),
 		Parameters: map[string]interface{}{
 			"type": "object",
