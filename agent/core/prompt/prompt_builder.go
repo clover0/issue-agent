@@ -41,6 +41,7 @@ func BuildCommentReactorPrompt(promptTpl PromptTemplate, language string,
 	return BuildPrompt(promptTpl, "comment-reactor", map[string]any{
 		"language":      language,
 		"workingBranch": pr.Head,
+		"prNumber":      pr.PRNumber,
 		"issueNumber":   comment.IssueNumber,
 		"comment":       comment.Content,
 		"prLLMString":   pr.ToLLMString(),
