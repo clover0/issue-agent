@@ -1,4 +1,4 @@
-package models
+package models_test
 
 import (
 	"os"
@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/clover0/issue-agent/core"
+	"github.com/clover0/issue-agent/models"
 	"github.com/clover0/issue-agent/test/assert"
 	"github.com/clover0/issue-agent/test/loggertest"
 )
@@ -27,17 +28,17 @@ func TestSelectForwarder(t *testing.T) {
 		"AWS Bedrock model": {
 			model:    "anthropic.claude-3-5-sonnet-v1",
 			wantErr:  false,
-			wantType: BedrockLLMForwarder{},
+			wantType: models.BedrockLLMForwarder{},
 		},
 		"OpenAI model": {
 			model:    "gpt-4",
 			wantErr:  false,
-			wantType: OpenAILLMForwarder{},
+			wantType: models.OpenAILLMForwarder{},
 		},
 		"Anthropic model": {
 			model:    "claude-3",
 			wantErr:  false,
-			wantType: AnthropicLLMForwarder{},
+			wantType: models.AnthropicLLMForwarder{},
 		},
 		"Empty model": {
 			model:    "",
@@ -55,7 +56,7 @@ func TestSelectForwarder(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			forwarder, err := SelectForwarder(mockLogger, tt.model)
+			forwarder, err := models.SelectForwarder(mockLogger, tt.model)
 
 			if tt.wantErr {
 				assert.HasError(t, err)

@@ -106,6 +106,7 @@ func (s *BedrockMessageService) Create(
 		ModelId: aws.String(modelID),
 		InferenceConfig: &types.InferenceConfiguration{
 			Temperature: pointer.Float32(0),
+			MaxTokens:   pointer.Ptr(int32(ClaudeMaxTokens(modelID))),
 		},
 		System:     []types.SystemContentBlock{&types.SystemContentBlockMemberText{Value: systemMessage}},
 		Messages:   messages,
