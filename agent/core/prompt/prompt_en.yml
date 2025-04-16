@@ -112,6 +112,7 @@ agents:
       <system-environment>
       * You are in the root directory of the repository.
       * Git working branch is {{.workingBranch}}.
+      * Opening GitHub Pull Request Number is {{.prNumber}}.
       </system-environment>
 
       <constraints>
