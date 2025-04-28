@@ -19,7 +19,7 @@ func InitSwitchBranchFunction() Function {
 			"type": "object",
 			"properties": map[string]interface{}{
 				"branch": map[string]interface{}{
-
+					"type":        "string",
 					"description": "The branch name you want to switch.",
 				},
 				"create_branch": map[string]interface{}{
