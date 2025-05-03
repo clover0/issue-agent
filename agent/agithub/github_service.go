@@ -170,6 +170,7 @@ func (s GitHubService) CreateIssueComment(issueNumber string, comment string) (f
 
 func (s GitHubService) CreateReviewCommentOne(review functions.CreatePullRequestReviewCommentInput) (functions.CreatePullRequestReviewCommentOutput, error) {
 	c := context.Background()
+
 	prNumber, err := strconv.Atoi(review.PRNumber)
 	if err != nil {
 		return functions.CreatePullRequestReviewCommentOutput{}, fmt.Errorf("failed to convert prNumber to int: %w", err)
@@ -179,6 +180,7 @@ func (s GitHubService) CreateReviewCommentOne(review functions.CreatePullRequest
 	if review.ReviewStartLine == review.ReviewEndLine {
 		startLine = nil
 	}
+
 	reviewComment := []*github.DraftReviewComment{{
 		Path:      pointer.Ptr(review.ReviewFilePath),
 		Body:      pointer.Ptr(review.ReviewComment),
