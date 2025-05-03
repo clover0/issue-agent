@@ -9,14 +9,14 @@ func InitCreatePullRequestCommentFunction(service GitHubService) Function {
 		Name:        FuncCreatePullRequestComment,
 		Description: "Create a comment on a GitHub pull request from `owner/repo` passed as CLI input.",
 		Func:        CreatePullRequestCommentCaller(service),
-		Parameters: map[string]interface{}{
+		Parameters: map[string]any{
 			"type": "object",
-			"properties": map[string]interface{}{
-				"pr_number": map[string]interface{}{
+			"properties": map[string]any{
+				"pr_number": map[string]any{
 					"type":        "string",
 					"description": "GitHub Pull Request Number to create comment to",
 				},
-				"comment": map[string]interface{}{
+				"comment": map[string]any{
 					"type":        "string",
 					"description": "Comment by markdown on the pull request",
 				},
