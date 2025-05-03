@@ -9,28 +9,28 @@ func InitCreatePullRequestReviewCommentFunction(service GitHubService) Function 
 		Name:        FuncCreatePullRequestReviewComment,
 		Description: "Create a review comment on a GitHub pull request for a specific file and line range.",
 		Func:        CreatePullRequestReviewCommentCaller(service),
-		Parameters: map[string]interface{}{
+		Parameters: map[string]any{
 			"type": "object",
-			"properties": map[string]interface{}{
-				"pr_number": map[string]interface{}{
+			"properties": map[string]any{
+				"pr_number": map[string]any{
 					"type":        "string",
 					"description": "GitHub Pull Request Number to create comment to",
 				},
-				"review_file_path": map[string]interface{}{
+				"review_file_path": map[string]any{
 					"type":        "string",
 					"description": "File path from repository root for review",
 				},
-				"review_start_line": map[string]interface{}{
+				"review_start_line": map[string]any{
 					"type":        "number",
 					"description": "Review start line number on file",
 					"minimum":     1,
 				},
-				"review_end_line": map[string]interface{}{
+				"review_end_line": map[string]any{
 					"type":        "number",
 					"description": "Review end line number on file",
 					"minimum":     1,
 				},
-				"review_comment": map[string]interface{}{
+				"review_comment": map[string]any{
 					"type":        "string",
 					"description": "Comment to be added to the pull request review",
 				},

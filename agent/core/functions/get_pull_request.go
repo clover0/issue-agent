@@ -23,10 +23,10 @@ func InitGetPullRequestFunction(service GitHubService) Function {
 		Name:        FuncGetPullRequest,
 		Description: "Get a GitHub Pull Request",
 		Func:        GetPullRequestCaller(service),
-		Parameters: map[string]interface{}{
+		Parameters: map[string]any{
 			"type": "object",
-			"properties": map[string]interface{}{
-				"pr_number": map[string]interface{}{
+			"properties": map[string]any{
+				"pr_number": map[string]any{
 					"type":        "string",
 					"description": "Pull Request Number to get",
 				},

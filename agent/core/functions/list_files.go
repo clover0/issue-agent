@@ -15,14 +15,14 @@ func InitListFilesFunction() Function {
 		Description: strings.ReplaceAll(`List the files within the direc tory like Unix ls command.
 Each line contains the file mode, byte size, and name. If you want to list subdirectories recursively, use the depth option.`, "\n", ""),
 		Func: ListFiles,
-		Parameters: map[string]interface{}{
+		Parameters: map[string]any{
 			"type": "object",
-			"properties": map[string]interface{}{
-				"path": map[string]interface{}{
+			"properties": map[string]any{
+				"path": map[string]any{
 					"type":        "string",
 					"description": "The valid path to list within its directory",
 				},
-				"depth": map[string]interface{}{
+				"depth": map[string]any{
 					"type":        "number",
 					"description": "The depth of the directory to list subdirectory recursively. Default is 2",
 					"minimum":     1,

@@ -15,14 +15,14 @@ func InitPutFileFunction() Function {
 		Name:        FuncPutFile,
 		Description: "Put new file content to path",
 		Func:        PutFile,
-		Parameters: map[string]interface{}{
+		Parameters: map[string]any{
 			"type": "object",
-			"properties": map[string]interface{}{
-				"path": map[string]interface{}{
+			"properties": map[string]any{
+				"path": map[string]any{
 					"type":        "string",
 					"description": "Path of the file to be changed to the new content",
 				},
-				"content_text": map[string]interface{}{
+				"content_text": map[string]any{
 					"type":        "string",
 					"description": "The new content of the file",
 				},

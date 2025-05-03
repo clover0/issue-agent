@@ -17,14 +17,14 @@ func InitSearchFilesFunction() Function {
 		Description: strings.ReplaceAll(`Search for files containing specific keyword (e.g., "xxx")
  within a directory path recursively`, "\n", ""),
 		Func: SearchFiles,
-		Parameters: map[string]interface{}{
+		Parameters: map[string]any{
 			"type": "object",
-			"properties": map[string]interface{}{
-				"keyword": map[string]interface{}{
+			"properties": map[string]any{
+				"keyword": map[string]any{
 					"type":        "string",
 					"description": "The keyword to search for.",
 				},
-				"path": map[string]interface{}{
+				"path": map[string]any{
 					"type":        "string",
 					"description": "The path to search within its directory",
 				},
