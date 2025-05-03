@@ -76,3 +76,4 @@ agent:
     - submit_revision
     - get_issue
     - create_pull_request_comment
+    - create_pull_request_review_comment

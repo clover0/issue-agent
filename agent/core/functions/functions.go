@@ -63,6 +63,9 @@ func InitializeFunctions(
 	if allowFunction(allowFunctions, FuncCreatePullRequestComment) {
 		InitCreatePullRequestCommentFunction(repoService)
 	}
+	if allowFunction(allowFunctions, FuncCreatePullRequestReviewComment) {
+		InitCreatePullRequestReviewCommentFunction(repoService)
+	}
 }
 
 func allowFunction(allowFunctions []string, name string) bool {
@@ -300,6 +303,18 @@ func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, ar
 			return "", fmt.Errorf("failed to unmarshal args: %w", err)
 		}
 		out, err := functionsMap[FuncCreatePullRequestComment].Func.(CreatePullRequestCommentType)(input)
+		if err != nil {
+			return "", err
+		}
+		return out.ToLLMString(), nil
+
+	case FuncCreatePullRequestReviewComment:
+		l.Info("functions: do %s\n", FuncCreatePullRequestReviewComment)
+		input := CreatePullRequestReviewCommentInput{}
+		if err := marshalFuncArgs(argsJson, &input); err != nil {
+			return "", fmt.Errorf("failed to unmarshal args: %w", err)
+		}
+		out, err := functionsMap[FuncCreatePullRequestReviewComment].Func.(CreatePullRequestReviewCommentType)(input)
 		if err != nil {
 			return "", err
 		}

@@ -100,6 +100,7 @@ Using functions:
 - submit_revision
 - get_issue
 - create_pull_request_comment
+- create_pull_request_review_comment
 
 
 Issue Agent does not save conversation history.
