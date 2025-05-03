@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/config"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/google/go-github/v70/github"
@@ -82,21 +83,25 @@ func (s SubmitFileGitHubService) SubmitFiles(input functions.SubmitFilesInput) (
 		return submitFileOut, errorf("failed to commit: %w", err)
 	}
 
-	if err := repo.Push(&git.PushOptions{RemoteName: "origin"}); err != nil {
-		return submitFileOut, errorf("failed to push: %w", err)
-	}
-
 	ref, err := repo.Head()
 	if err != nil {
 		return submitFileOut, errorf("failed to get HEAD: %w", err)
 	}
-	pushedBranch := ref.Name().Short()
 
+	if err := repo.Push(&git.PushOptions{
+		RemoteName: "origin",
+		Progress:   os.Stdout,
+		RefSpecs:   []config.RefSpec{config.RefSpec(fmt.Sprintf("%s:%s", ref.Name(), ref.Name()))},
+	}); err != nil {
+		return submitFileOut, errorf("failed to push: %w", err)
+	}
+
+	currentBranch := ref.Name().Short()
 	s.logger.Debug(fmt.Sprintf("created PR parameter: name=%s, email=%s, base-branch=%s branch=%s\n",
-		s.callerInput.GitName, s.callerInput.GitEmail, s.callerInput.BaseBranch, pushedBranch))
+		s.callerInput.GitName, s.callerInput.GitEmail, s.callerInput.BaseBranch, currentBranch))
 	pr, _, err := s.client.PullRequests.Create(ctx, s.callerInput.GitHubOwner, s.callerInput.Repository, &github.NewPullRequest{
 		Title: &input.CommitMessageShort,
-		Head:  &pushedBranch,
+		Head:  &currentBranch,
 		Base:  &s.callerInput.BaseBranch,
 		Body:  &input.PullRequestContent,
 	})
@@ -133,8 +138,8 @@ func (s SubmitFileGitHubService) SubmitFiles(input functions.SubmitFilesInput) (
 
 	return functions.SubmitFilesOutput{
 		Message: fmt.Sprintf("success creating pull request.\ncreated pull request number: %d\nbranch: %s.\n switched %s branch.",
-			*pr.Number, pushedBranch, s.callerInput.BaseBranch),
-		PushedBranch:      pushedBranch,
+			*pr.Number, currentBranch, s.callerInput.BaseBranch),
+		PushedBranch:      currentBranch,
 		PullRequestNumber: *pr.Number,
 	}, nil
 }

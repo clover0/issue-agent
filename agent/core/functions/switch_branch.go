@@ -58,14 +58,23 @@ func SwitchBranch(input SwitchBranchInput) (string, error) {
 		return "", fmt.Errorf("failed to get worktree: %w", err)
 	}
 
+	href, err := repo.Head()
+	if err != nil {
+		return "", fmt.Errorf("failed to get head reference: %w", err)
+	}
+
 	branchName := input.Branch
 	if input.CreateBranch {
 		branchName = makeBranchName()
+		ref := plumbing.NewHashReference(plumbing.NewBranchReferenceName(branchName), href.Hash())
+		if err := repo.Storer.SetReference(ref); err != nil {
+			return "", fmt.Errorf("failed to create branch reference: %w", err)
+		}
 	}
+
 	if err := wt.Checkout(&git.CheckoutOptions{
 		Branch: plumbing.NewBranchReferenceName(branchName),
 		Keep:   true,
-		Create: input.CreateBranch,
 	}); err != nil {
 		return "", fmt.Errorf("failed to checkout branch %s: %w", branchName, err)
 	}
