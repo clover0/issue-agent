@@ -36,7 +36,7 @@ func CreatePR(flags []string) error {
 
 	if *conf.Agent.GitHub.CloneRepository {
 		if err := agithub.CloneRepository(lo, conf, cliIn.WorkRepository, cliIn.BaseBranch); err != nil {
-			lo.Error("failed to clone repository")
+			lo.Error("failed to clone repository\n")
 			return err
 		}
 	}
