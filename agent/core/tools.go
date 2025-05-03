@@ -29,5 +29,6 @@ func CommentingTools() []functions.Function {
 		m[functions.FuncSubmitRevision],
 		m[functions.FuncGetIssue],
 		m[functions.FuncCreatePullRequestComment],
+		m[functions.FuncCreatePullRequestReviewComment],
 	}
 }

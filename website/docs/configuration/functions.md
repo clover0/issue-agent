@@ -86,4 +86,16 @@ create_pull_request_comment: Create a comment on a GitHub pull request from `own
     comment
         Comment by markdown on the pull request
 
+create_pull_request_review_comment: Create a review comment on a GitHub pull request for a specific file and line range.
+    pr_number
+        GitHub Pull Request Number to create comment to
+    review_file_path
+        File path from repository root for review
+    review_start_line
+        Review start line number on file
+    review_end_line
+        Review end line number on file
+    review_comment
+        Comment to be added to the pull request review
+
 ```

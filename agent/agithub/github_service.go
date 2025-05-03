@@ -11,6 +11,7 @@ import (
 
 	"github.com/clover0/issue-agent/core/functions"
 	"github.com/clover0/issue-agent/logger"
+	"github.com/clover0/issue-agent/util/pointer"
 )
 
 type GitHubService struct {
@@ -165,4 +166,34 @@ func (s GitHubService) CreateIssueComment(issueNumber string, comment string) (f
 	}
 
 	return functions.CreateIssueCommentOutput{}, nil
+}
+
+func (s GitHubService) CreateReviewCommentOne(review functions.CreatePullRequestReviewCommentInput) (functions.CreatePullRequestReviewCommentOutput, error) {
+	c := context.Background()
+	prNumber, err := strconv.Atoi(review.PRNumber)
+	if err != nil {
+		return functions.CreatePullRequestReviewCommentOutput{}, fmt.Errorf("failed to convert prNumber to int: %w", err)
+	}
+
+	startLine := pointer.Ptr(review.ReviewStartLine)
+	if review.ReviewStartLine == review.ReviewEndLine {
+		startLine = nil
+	}
+	reviewComment := []*github.DraftReviewComment{{
+		Path:      pointer.Ptr(review.ReviewFilePath),
+		Body:      pointer.Ptr(review.ReviewComment),
+		Side:      pointer.Ptr("RIGHT"),
+		StartLine: startLine,
+		Line:      pointer.Ptr(review.ReviewEndLine),
+	}}
+
+	_, _, err = s.client.PullRequests.CreateReview(c, s.owner, s.repository, prNumber, &github.PullRequestReviewRequest{
+		Event:    pointer.Ptr("COMMENT"),
+		Comments: reviewComment,
+	})
+	if err != nil {
+		return functions.CreatePullRequestReviewCommentOutput{}, fmt.Errorf("failed to create review comment: %w", err)
+	}
+
+	return functions.CreatePullRequestReviewCommentOutput{}, nil
 }
