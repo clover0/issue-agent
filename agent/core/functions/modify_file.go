@@ -16,14 +16,14 @@ func InitModifyFileFunction() Function {
 		Description: strings.ReplaceAll(`Modify the file at path with the contents of content_text.
  Modified file must be full file content including modified content`, "\n", ""),
 		Func: ModifyFile,
-		Parameters: map[string]interface{}{
+		Parameters: map[string]any{
 			"type": "object",
-			"properties": map[string]interface{}{
-				"path": map[string]interface{}{
+			"properties": map[string]any{
+				"path": map[string]any{
 					"type":        "string",
 					"description": "Path of the file to be modified",
 				},
-				"content_text": map[string]interface{}{
+				"content_text": map[string]any{
 					"type":        "string",
 					"description": "The new content of the file",
 				},

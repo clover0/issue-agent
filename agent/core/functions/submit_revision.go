@@ -7,14 +7,14 @@ func InitSubmitRevisionFunction(service SubmitRevisionService) Function {
 		Name:        FuncSubmitRevision,
 		Description: "Submit revision commits changed files using git add and git commit, finally git push on working branch.",
 		Func:        SubmitRevisionCaller(service),
-		Parameters: map[string]interface{}{
+		Parameters: map[string]any{
 			"type": "object",
-			"properties": map[string]interface{}{
-				"commit_message_short": map[string]interface{}{
+			"properties": map[string]any{
+				"commit_message_short": map[string]any{
 					"type":        "string",
 					"description": "Short commit message indicating purpose to resubmit",
 				},
-				"commit_message_detail": map[string]interface{}{
+				"commit_message_detail": map[string]any{
 					"type":        "string",
 					"description": "Detail commit message indicating resubmitting content",
 				},

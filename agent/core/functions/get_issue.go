@@ -11,14 +11,14 @@ func InitGetIssueFunction(service GitHubService) Function {
 		Name:        FuncGetIssue,
 		Description: "Get a GitHub issue from organization(owner) passed as CLI input.",
 		Func:        GetIssueCaller(service),
-		Parameters: map[string]interface{}{
+		Parameters: map[string]any{
 			"type": "object",
-			"properties": map[string]interface{}{
-				"repository_name": map[string]interface{}{
+			"properties": map[string]any{
+				"repository_name": map[string]any{
 					"type":        "string",
 					"description": "GitHub repository name to get the issue from. The `repo` part of the `owner/repo` format.",
 				},
-				"issue_number": map[string]interface{}{
+				"issue_number": map[string]any{
 					"type":        "string",
 					"description": "GitHub Issue Number to get",
 				},

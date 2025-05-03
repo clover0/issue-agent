@@ -20,10 +20,10 @@ func InitGetWebSearchResult() Function {
 		Description: strings.ReplaceAll(`Get a list of results from an Internet search conducted with keywords.
  You should get the page information from the url of the result next.`, "\n", ""),
 		Func: GetWebSearchResult,
-		Parameters: map[string]interface{}{
+		Parameters: map[string]any{
 			"type": "object",
-			"properties": map[string]interface{}{
-				"keyword": map[string]interface{}{
+			"properties": map[string]any{
+				"keyword": map[string]any{
 					"type":        "string",
 					"description": "Keyword to search for on the Internet",
 				},
