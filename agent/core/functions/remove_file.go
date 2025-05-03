@@ -12,10 +12,10 @@ func InitRemoveFileFunction() Function {
 		Name:        FuncRemoveFile,
 		Description: "Remove a file specified by the path",
 		Func:        RemoveFile,
-		Parameters: map[string]interface{}{
+		Parameters: map[string]any{
 			"type": "object",
-			"properties": map[string]interface{}{
-				"path": map[string]interface{}{
+			"properties": map[string]any{
+				"path": map[string]any{
 					"type":        "string",
 					"description": "Path of the file to be removed",
 				},

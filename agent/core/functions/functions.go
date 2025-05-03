@@ -82,7 +82,7 @@ type Function struct {
 	Name        FuncName
 	Description string
 	Func        any
-	Parameters  map[string]interface{}
+	Parameters  map[string]any
 }
 
 var functionsMap = map[string]Function{}

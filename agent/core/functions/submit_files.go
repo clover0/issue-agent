@@ -7,18 +7,18 @@ func InitSubmitFilesGitHubFunction(service SubmitFilesService) Function {
 		Name:        FuncSubmitFiles,
 		Description: "Submit the modified files by Creation GitHub Pull Request",
 		Func:        SubmitFileCaller(service),
-		Parameters: map[string]interface{}{
+		Parameters: map[string]any{
 			"type": "object",
-			"properties": map[string]interface{}{
-				"commit_message_short": map[string]interface{}{
+			"properties": map[string]any{
+				"commit_message_short": map[string]any{
 					"type":        "string",
 					"description": "Short Commit message indicating purpose to change the file",
 				},
-				"commit_message_detail": map[string]interface{}{
+				"commit_message_detail": map[string]any{
 					"type":        "string",
 					"description": "Detail commit message indicating changes to the file",
 				},
-				"pull_request_content": map[string]interface{}{
+				"pull_request_content": map[string]any{
 					"type":        "string",
 					"description": "Pull Request Content",
 				},

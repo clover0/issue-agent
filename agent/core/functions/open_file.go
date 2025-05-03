@@ -15,10 +15,10 @@ func InitOpenFileFunction() Function {
 		Name:        FuncOpenFile,
 		Description: "Open the file full content",
 		Func:        OpenFile,
-		Parameters: map[string]interface{}{
+		Parameters: map[string]any{
 			"type": "object",
-			"properties": map[string]interface{}{
-				"path": map[string]interface{}{
+			"properties": map[string]any{
+				"path": map[string]any{
 					"type":        "string",
 					"description": "The path of the file to open",
 				},

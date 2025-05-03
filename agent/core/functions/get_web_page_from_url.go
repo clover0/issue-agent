@@ -16,10 +16,10 @@ func InitFuncGetWebPageFromURLFunction() Function {
 		Name:        FuncGetWebPageFromURL,
 		Description: "Get the web page from the URL",
 		Func:        GetWebPageFromURL,
-		Parameters: map[string]interface{}{
+		Parameters: map[string]any{
 			"type": "object",
-			"properties": map[string]interface{}{
-				"url": map[string]interface{}{
+			"properties": map[string]any{
+				"url": map[string]any{
 					"type":        "string",
 					"description": fmt.Sprintf("The URL to get the Web page. More than %d characters are cut off", maxTextLength),
 				},
