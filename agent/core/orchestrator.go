@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/google/go-github/v70/github"
+	"github.com/google/go-github/v71/github"
 
 	"github.com/clover0/issue-agent/agithub"
 	"github.com/clover0/issue-agent/config"
