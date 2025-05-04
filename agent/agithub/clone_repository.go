@@ -1,6 +1,7 @@
 package agithub
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -25,6 +26,9 @@ func CloneRepository(lo logger.Logger, conf config.Config, workRepository string
 		Depth:         1,
 		ReferenceName: plumbing.ReferenceName(refBranch),
 	}); err != nil {
+		if errors.Is(err, plumbing.ErrReferenceNotFound) {
+			return fmt.Errorf("branch %s not found in repository %s/%s\n", refBranch, conf.Agent.GitHub.Owner, workRepository)
+		}
 		return err
 	}
 	lo.Info("cloned repository successfully\n")
