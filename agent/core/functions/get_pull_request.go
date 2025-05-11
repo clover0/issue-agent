@@ -8,16 +8,6 @@ import (
 
 const FuncGetPullRequest = "get_pull_request"
 
-// TODO: move to a separate file
-type GitHubService interface {
-	GetIssue(repository string, prNumber string) (GetIssueOutput, error)
-	GetPullRequest(prNumber string) (GetPullRequestOutput, error)
-	GetRepositoryContent(input GetRepositoryContentInput) (GetRepositoryContentOutput, error)
-
-	CreateIssueComment(issueNumber string, comment string) (CreateIssueCommentOutput, error)
-	CreateReviewCommentOne(input CreatePullRequestReviewCommentInput) (CreatePullRequestReviewCommentOutput, error)
-}
-
 type GetPullRequestType func(input GetPullRequestInput) (GetPullRequestOutput, error)
 
 func InitGetPullRequestFunction(service GitHubService) Function {
