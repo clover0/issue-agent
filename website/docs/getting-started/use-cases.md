@@ -13,7 +13,7 @@ This section describe common use cases for Issue Agent.
 
 ### Let's take a closer look
 
-Additions or modifications of wording accompanying feature additions or changes.
+Additions or modifications of wording following feature additions or changes.
 
 **GitHub Issue #1**
 
@@ -60,9 +60,9 @@ Issue Agent will create a Pull Request:
 @@ -1,5 +1,5 @@
 -Please make sure to recieve the package on time.
 +Please make sure to receive the package on time.
- 
+
  This document is an example with a typo.
- 
+
 -We often see common typos like "recieve."
 +We often see common typos like "receive."
 ```
@@ -107,3 +107,74 @@ Issue Agent will create a Pull Request:
 ...
 
 Repeat Issue #1 and the creation of pull requests by Issue Agent for the range which we want to apply.
+
+
+## Code review with guidelines from another repository
+
+For code reviews, it's common to have review guidelines or checklists in a separate repository. Issue Agent can load these guidelines and use them to perform a review.
+
+
+!!! warning "Another repository"
+
+    When referring to "another repository", it is limited to repositories owned by your organization or yourself, 
+    in order to avoid retrieving content from untrusted repositories.
+    If you want to refer to a public repository, you need to copy the file to your own repository.
+
+    ### Usable Patterns
+    - your-org/repo1
+    - your-org/repo2
+
+    When repo2 refers to repo1 (e.g., using guidelines or making references), this is **allowed**.
+
+    ### Not Supported Patterns
+    - public-user/repoA
+    - your-org/repo2
+
+    When repo2 refers to repoA (e.g., trying to access content from a public user's repository), this is **not permitted**.
+
+
+There is the following GitHub Issue.
+
+```markdown
+Review the pull request #123 using the review guidelines 
+from the repository `organization/review-guidelines` at path `guidelines/code-review-checklist.md`.
+```
+
+Issue Agent thinks and executes the functions:
+
+Get review guidelines from another repository.
+
+- get_repository_content
+    - from `organization/review-guidelines`
+    - path `guidelines/code-review-checklist.md`
+
+Get pull request details.
+
+- get_pull_request
+    - number 123
+
+Repository and code analysis.
+
+- list_files
+- open_file
+
+
+Perform review based on guidelines.
+
+- create_pull_request_review_comment
+- ...
+
+Issue Agent will create review comments on the pull request:
+
+```
+[In file src/main.js, line 45]
+According to the code review guidelines, error handling should be implemented for all API calls.
+Consider adding try/catch block here to handle potential network errors.
+
+[In file src/utils/helpers.js, line 120]
+The review guidelines recommend using descriptive variable names.
+Consider renaming `x` to something more descriptive of its purpose.
+```
+
+This use case demonstrates how Issue Agent can leverage existing documentation 
+and guidelines from different repositories to perform more standardized and thorough reviews.

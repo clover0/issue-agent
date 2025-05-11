@@ -98,4 +98,10 @@ create_pull_request_review_comment: Create a review comment on a GitHub pull req
     review_comment
         Comment to be added to the pull request review
 
+get_repository_content: Get contents of a file or directory in a GitHub repository.
+    repository_name
+        GitHub repository name to get the content. This is `repo` part of the `owner/repo` format.
+    path
+        File path from repository root
+
 ```

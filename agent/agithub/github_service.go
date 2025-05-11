@@ -152,6 +152,41 @@ func (s GitHubService) GetReviewComment(reviewID string) (functions.GetReviewOut
 	}, nil
 }
 
+const contentSeparator = "---"
+
+func (s GitHubService) GetRepositoryContent(input functions.GetRepositoryContentInput) (functions.GetRepositoryContentOutput, error) {
+	c := context.Background()
+
+	content, dirContent, _, err := s.client.Repositories.GetContents(c, s.owner, input.RepositoryName, input.Path, nil)
+	if err != nil {
+		return functions.GetRepositoryContentOutput{}, fmt.Errorf("failed to get repository content: %w", err)
+	}
+
+	var contents []*github.RepositoryContent
+
+	if content != nil {
+		contents = append(contents, content)
+	}
+
+	if len(dirContent) > 0 {
+		contents = append(contents, dirContent...)
+	}
+
+	var contentStr string
+	for _, cont := range contents {
+		decoded, err := cont.GetContent()
+		if err != nil {
+			return functions.GetRepositoryContentOutput{}, fmt.Errorf("failed to decode content: %w", err)
+		}
+		contentStr += fmt.Sprintf("%s\nfile name: %s\nfile path: %s\n\n%s",
+			contentSeparator, cont.GetName(), cont.GetPath(), decoded)
+	}
+
+	return functions.GetRepositoryContentOutput{
+		Content: contentStr,
+	}, nil
+}
+
 func (s GitHubService) CreateIssueComment(issueNumber string, comment string) (functions.CreateIssueCommentOutput, error) {
 	c := context.Background()
 	number, err := strconv.Atoi(issueNumber)
