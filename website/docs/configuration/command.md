@@ -84,6 +84,7 @@ Using functions:
 - submit_revision
 - get_issue
 - create_pull_request_comment
+- get_repository_content
 
 
 ## `react` command
@@ -101,6 +102,7 @@ Using functions:
 - get_issue
 - create_pull_request_comment
 - create_pull_request_review_comment
+- get_repository_content
 
 
 Issue Agent does not save conversation history.
