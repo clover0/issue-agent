@@ -23,7 +23,7 @@ jobs:
           private-key: ${{ secrets.TOKEN_GEN_PRIVATE_KEY }}
 
       - name: Create PR for release or create tag
-        uses: Songmu/tagpr@35daec35e8e3172806c763d8f196e6434fd44fbd # v1.5.2
+        uses: Songmu/tagpr@812f0c28980cb9a1e5cf427b65c1ac6a1d2b4377 # v1.6.1
         id: tagpr
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
