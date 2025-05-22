@@ -17,7 +17,7 @@ func TestBuildRequirementPrompt(t *testing.T) {
 		promptTpl := prompt.Template{
 			Agents: []prompt.AgentPromptTemplate{
 				{
-					Name:           "requirement",
+					Name:           "planner",
 					SystemTemplate: "System: {{.language}} issue {{.issueNumber}}",
 					UserTemplate:   "User: {{.issueTitle}} - {{.issueContent}} - {{.baseBranch}}",
 				},

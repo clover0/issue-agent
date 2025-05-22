@@ -10,7 +10,7 @@ import (
 )
 
 func BuildRequirementPrompt(promptTpl Template, language string, baseBranch string, issue functions.GetIssueOutput) (Prompt, error) {
-	tmpl, err := FindPromptTemplate(promptTpl, "requirement")
+	tmpl, err := FindPromptTemplate(promptTpl, "planner")
 	if err != nil {
 		return Prompt{}, fmt.Errorf("failed to find requirement prompt template: %w", err)
 	}
