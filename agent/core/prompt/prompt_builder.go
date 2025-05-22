@@ -10,7 +10,12 @@ import (
 )
 
 func BuildRequirementPrompt(promptTpl Template, language string, baseBranch string, issue functions.GetIssueOutput) (Prompt, error) {
-	return BuildPrompt(promptTpl, "planner", map[string]any{
+	tmpl, err := FindPromptTemplate(promptTpl, "requirement")
+	if err != nil {
+		return Prompt{}, fmt.Errorf("failed to find requirement prompt template: %w", err)
+	}
+
+	return BuildPrompt(tmpl, map[string]any{
 		"language":     language,
 		"issueTitle":   issue.Title,
 		"issueContent": issue.Content,
@@ -20,7 +25,12 @@ func BuildRequirementPrompt(promptTpl Template, language string, baseBranch stri
 }
 
 func BuildDeveloperPrompt(promptTpl Template, language string, baseBranch string, issue functions.GetIssueOutput, instruction string) (Prompt, error) {
-	return BuildPrompt(promptTpl, "developer", map[string]any{
+	tmpl, err := FindPromptTemplate(promptTpl, "developer")
+	if err != nil {
+		return Prompt{}, fmt.Errorf("failed to find developer prompt template: %w", err)
+	}
+
+	return BuildPrompt(tmpl, map[string]any{
 		"language":     language,
 		"issueTitle":   issue.Title,
 		"issueContent": issue.Content,
@@ -33,7 +43,12 @@ func BuildDeveloperPrompt(promptTpl Template, language string, baseBranch string
 func BuildCommentReactorPrompt(promptTpl Template, language string,
 	comment functions.GetCommentOutput,
 	pr functions.GetPullRequestOutput) (Prompt, error) {
-	return BuildPrompt(promptTpl, "comment-reactor", map[string]any{
+	tmpl, err := FindPromptTemplate(promptTpl, "comment-reactor")
+	if err != nil {
+		return Prompt{}, fmt.Errorf("failed to find comment-reactor prompt template: %w", err)
+	}
+
+	return BuildPrompt(tmpl, map[string]any{
 		"language":      language,
 		"workingBranch": pr.Head,
 		"prNumber":      pr.PRNumber,
@@ -57,42 +72,44 @@ func BuildReviewManagerPrompt(promptTpl Template, cnf config.Config, issue funct
 		m["noFiles"] = "no changed files"
 	}
 
-	return BuildPrompt(promptTpl, "review-manager", m)
+	tmpl, err := FindPromptTemplate(promptTpl, "review-manager")
+	if err != nil {
+		return Prompt{}, fmt.Errorf("failed to find review-manager prompt template: %w", err)
+	}
+
+	return BuildPrompt(tmpl, m)
 }
 
 func BuildReviewerPrompt(promptTpl Template, language string, prNumber int, reviewerPrompt string) (Prompt, error) {
-	return BuildPrompt(promptTpl, "reviewer", map[string]any{
+	tmpl, err := FindPromptTemplate(promptTpl, "reviewer")
+	if err != nil {
+		return Prompt{}, fmt.Errorf("failed to find reviewer prompt template: %w", err)
+	}
+
+	return BuildPrompt(tmpl, map[string]any{
 		"language":       language,
 		"prNumber":       prNumber,
 		"reviewerPrompt": reviewerPrompt,
 	})
 }
 
-func FindPromptTemplate(promptTpl Template, name string) (Prompt, error) {
+func FindPromptTemplate(promptTpl Template, name string) (AgentPromptTemplate, error) {
 	for _, p := range promptTpl.Agents {
 		if p.Name == name {
-			return Prompt{
-				SystemPrompt:    p.SystemTemplate,
-				StartUserPrompt: p.UserTemplate,
-			}, nil
+			return p, nil
 		}
 	}
 
-	return Prompt{}, fmt.Errorf("failed to find %s prompt. you must have  name=%s prompt in the prompt template", name, name)
+	return AgentPromptTemplate{}, fmt.Errorf("failed to find %s prompt. you must have  name=%s prompt in the prompt template", name, name)
 }
 
-func BuildPrompt(promptTpl Template, templateName string, templateMap map[string]any) (Prompt, error) {
-	prpt, err := FindPromptTemplate(promptTpl, templateName)
-	if err != nil {
-		return Prompt{}, err
-	}
-
-	systemPrompt, err := parseTemplate(prpt.SystemPrompt, templateMap)
+func BuildPrompt(promptTpl AgentPromptTemplate, templateMap map[string]any) (Prompt, error) {
+	systemPrompt, err := parseTemplate(promptTpl.SystemTemplate, templateMap)
 	if err != nil {
 		return Prompt{}, fmt.Errorf("failed to parse system prompt: %w", err)
 	}
 
-	userPrompt, err := parseTemplate(prpt.StartUserPrompt, templateMap)
+	userPrompt, err := parseTemplate(promptTpl.UserTemplate, templateMap)
 	if err != nil {
 		return Prompt{}, fmt.Errorf("failed to parse user prompt: %w", err)
 	}
