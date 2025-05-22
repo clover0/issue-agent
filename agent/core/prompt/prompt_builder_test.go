@@ -9,11 +9,7 @@ import (
 func TestFindPromptTemplate(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		promptTpl := PromptTemplate{
-			Agents: []struct {
-				Name           string `yaml:"name"`
-				SystemTemplate string `yaml:"system_prompt"`
-				UserTemplate   string `yaml:"user_prompt"`
-			}{
+			Agents: []AgentPromptTemplate{
 				{
 					Name:           "test-template-first",
 					SystemTemplate: "test system template first",
@@ -36,11 +32,7 @@ func TestFindPromptTemplate(t *testing.T) {
 
 	t.Run("success on find one", func(t *testing.T) {
 		promptTpl := PromptTemplate{
-			Agents: []struct {
-				Name           string `yaml:"name"`
-				SystemTemplate string `yaml:"system_prompt"`
-				UserTemplate   string `yaml:"user_prompt"`
-			}{
+			Agents: []AgentPromptTemplate{
 				{
 					Name:           "test-template",
 					SystemTemplate: "test system template first",
@@ -63,11 +55,7 @@ func TestFindPromptTemplate(t *testing.T) {
 
 	t.Run("not_found", func(t *testing.T) {
 		promptTpl := PromptTemplate{
-			Agents: []struct {
-				Name           string `yaml:"name"`
-				SystemTemplate string `yaml:"system_prompt"`
-				UserTemplate   string `yaml:"user_prompt"`
-			}{
+			Agents: []AgentPromptTemplate{
 				{
 					Name:           "other-agent",
 					SystemTemplate: "other system template",

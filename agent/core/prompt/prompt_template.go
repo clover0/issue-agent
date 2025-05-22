@@ -5,11 +5,13 @@ import (
 )
 
 type PromptTemplate struct {
-	Agents []struct {
-		Name           string `yaml:"name"`
-		SystemTemplate string `yaml:"system_prompt"`
-		UserTemplate   string `yaml:"user_prompt"`
-	}
+	Agents []AgentPromptTemplate
+}
+
+type AgentPromptTemplate struct {
+	Name           string `yaml:"name"`
+	SystemTemplate string `yaml:"system_prompt"`
+	UserTemplate   string `yaml:"user_prompt"`
 }
 
 func LoadPrompt() (PromptTemplate, error) {
