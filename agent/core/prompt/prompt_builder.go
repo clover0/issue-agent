@@ -9,12 +9,7 @@ import (
 	"github.com/clover0/issue-agent/core/functions"
 )
 
-type Prompt struct {
-	SystemPrompt    string
-	StartUserPrompt string
-}
-
-func BuildRequirementPrompt(promptTpl PromptTemplate, language string, baseBranch string, issue functions.GetIssueOutput) (Prompt, error) {
+func BuildRequirementPrompt(promptTpl Template, language string, baseBranch string, issue functions.GetIssueOutput) (Prompt, error) {
 	return BuildPrompt(promptTpl, "planner", map[string]any{
 		"language":     language,
 		"issueTitle":   issue.Title,
@@ -24,7 +19,7 @@ func BuildRequirementPrompt(promptTpl PromptTemplate, language string, baseBranc
 	})
 }
 
-func BuildDeveloperPrompt(promptTpl PromptTemplate, language string, baseBranch string, issue functions.GetIssueOutput, instruction string) (Prompt, error) {
+func BuildDeveloperPrompt(promptTpl Template, language string, baseBranch string, issue functions.GetIssueOutput, instruction string) (Prompt, error) {
 	return BuildPrompt(promptTpl, "developer", map[string]any{
 		"language":     language,
 		"issueTitle":   issue.Title,
@@ -35,7 +30,7 @@ func BuildDeveloperPrompt(promptTpl PromptTemplate, language string, baseBranch 
 	})
 }
 
-func BuildCommentReactorPrompt(promptTpl PromptTemplate, language string,
+func BuildCommentReactorPrompt(promptTpl Template, language string,
 	comment functions.GetCommentOutput,
 	pr functions.GetPullRequestOutput) (Prompt, error) {
 	return BuildPrompt(promptTpl, "comment-reactor", map[string]any{
@@ -48,7 +43,7 @@ func BuildCommentReactorPrompt(promptTpl PromptTemplate, language string,
 	})
 }
 
-func BuildReviewManagerPrompt(promptTpl PromptTemplate, cnf config.Config, issue functions.GetIssueOutput, changedFilesPath []string, baseBranch string) (Prompt, error) {
+func BuildReviewManagerPrompt(promptTpl Template, cnf config.Config, issue functions.GetIssueOutput, changedFilesPath []string, baseBranch string) (Prompt, error) {
 	m := make(map[string]any)
 
 	m["language"] = cnf.Language
@@ -65,7 +60,7 @@ func BuildReviewManagerPrompt(promptTpl PromptTemplate, cnf config.Config, issue
 	return BuildPrompt(promptTpl, "review-manager", m)
 }
 
-func BuildReviewerPrompt(promptTpl PromptTemplate, language string, prNumber int, reviewerPrompt string) (Prompt, error) {
+func BuildReviewerPrompt(promptTpl Template, language string, prNumber int, reviewerPrompt string) (Prompt, error) {
 	return BuildPrompt(promptTpl, "reviewer", map[string]any{
 		"language":       language,
 		"prNumber":       prNumber,
@@ -73,7 +68,7 @@ func BuildReviewerPrompt(promptTpl PromptTemplate, language string, prNumber int
 	})
 }
 
-func FindPromptTemplate(promptTpl PromptTemplate, name string) (Prompt, error) {
+func FindPromptTemplate(promptTpl Template, name string) (Prompt, error) {
 	for _, p := range promptTpl.Agents {
 		if p.Name == name {
 			return Prompt{
@@ -86,7 +81,7 @@ func FindPromptTemplate(promptTpl PromptTemplate, name string) (Prompt, error) {
 	return Prompt{}, fmt.Errorf("failed to find %s prompt. you must have  name=%s prompt in the prompt template", name, name)
 }
 
-func BuildPrompt(promptTpl PromptTemplate, templateName string, templateMap map[string]any) (Prompt, error) {
+func BuildPrompt(promptTpl Template, templateName string, templateMap map[string]any) (Prompt, error) {
 	prpt, err := FindPromptTemplate(promptTpl, templateName)
 	if err != nil {
 		return Prompt{}, err

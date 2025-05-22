@@ -8,7 +8,7 @@ import (
 
 func TestFindPromptTemplate(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
-		promptTpl := PromptTemplate{
+		promptTpl := Template{
 			Agents: []AgentPromptTemplate{
 				{
 					Name:           "test-template-first",
@@ -31,7 +31,7 @@ func TestFindPromptTemplate(t *testing.T) {
 	})
 
 	t.Run("success on find one", func(t *testing.T) {
-		promptTpl := PromptTemplate{
+		promptTpl := Template{
 			Agents: []AgentPromptTemplate{
 				{
 					Name:           "test-template",
@@ -54,7 +54,7 @@ func TestFindPromptTemplate(t *testing.T) {
 	})
 
 	t.Run("not_found", func(t *testing.T) {
-		promptTpl := PromptTemplate{
+		promptTpl := Template{
 			Agents: []AgentPromptTemplate{
 				{
 					Name:           "other-agent",
