@@ -4,7 +4,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type PromptTemplate struct {
+type Template struct {
 	Agents []AgentPromptTemplate
 }
 
@@ -14,8 +14,8 @@ type AgentPromptTemplate struct {
 	UserTemplate   string `yaml:"user_prompt"`
 }
 
-func LoadPrompt() (PromptTemplate, error) {
-	var pt PromptTemplate
+func LoadPrompt() (Template, error) {
+	var pt Template
 
 	data := DefaultTemplate()
 	err := yaml.Unmarshal(data, &pt)
