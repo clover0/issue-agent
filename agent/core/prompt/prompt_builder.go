@@ -73,19 +73,23 @@ func BuildReviewerPrompt(promptTpl PromptTemplate, language string, prNumber int
 	})
 }
 
-func BuildPrompt(promptTpl PromptTemplate, templateName string, templateMap map[string]any) (Prompt, error) {
-	var prpt Prompt
+func FindPromptTemplate(promptTpl PromptTemplate, name string) (Prompt, error) {
 	for _, p := range promptTpl.Agents {
-		if p.Name == templateName {
-			prpt = Prompt{
+		if p.Name == name {
+			return Prompt{
 				SystemPrompt:    p.SystemTemplate,
 				StartUserPrompt: p.UserTemplate,
-			}
-			break
+			}, nil
 		}
 	}
-	if prpt.StartUserPrompt == "" {
-		return Prompt{}, fmt.Errorf("failed to find %s prompt. you must have  name=%s prompt in the prompt template", templateName, templateName)
+
+	return Prompt{}, fmt.Errorf("failed to find %s prompt. you must have  name=%s prompt in the prompt template", name, name)
+}
+
+func BuildPrompt(promptTpl PromptTemplate, templateName string, templateMap map[string]any) (Prompt, error) {
+	prpt, err := FindPromptTemplate(promptTpl, templateName)
+	if err != nil {
+		return Prompt{}, err
 	}
 
 	systemPrompt, err := parseTemplate(prpt.SystemPrompt, templateMap)
