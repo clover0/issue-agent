@@ -18,13 +18,17 @@ import (
 )
 
 type OpenAI struct {
-	client *openai.Client
-	logger logger.Logger
+	client        *openai.Client
+	sendLogger    logger.Logger
+	receiveLogger logger.Logger
 }
 
-func NewOpenAI(logger logger.Logger, apiKey string) OpenAI {
+func NewOpenAI(lo logger.Logger, apiKey string) OpenAI {
+	sendLogger := lo.AddPrefix("[OpenAIForwarder] ").SetColor(logger.Green)
+	receiveLogger := lo.AddPrefix("[OpenAIReceive] ").SetColor(logger.Yellow)
 	return OpenAI{
-		logger: logger,
+		sendLogger:    sendLogger,
+		receiveLogger: receiveLogger,
 		client: openai.NewClient(
 			option.WithAPIKey(apiKey),
 		),
@@ -67,9 +71,9 @@ func (o OpenAI) StartCompletion(ctx context.Context, input core.StartCompletionI
 	params, historyInitial := o.createCompletionParams(input)
 	history = append(history, historyInitial...)
 
-	o.logger.Info(logger.Green(fmt.Sprintf("model: %s, sending message\n", input.Model)))
-	o.logger.Debug("system prompt:\n%s\n", input.SystemPrompt)
-	o.logger.Debug("user prompt:\n%s\n", input.StartUserPrompt)
+	o.sendLogger.Info(fmt.Sprintf("model: %s, sending message\n", input.Model))
+	o.sendLogger.Debug("system prompt:\n%s\n", input.SystemPrompt)
+	o.sendLogger.Debug("user prompt:\n%s\n", input.StartUserPrompt)
 	chat, err := o.client.Chat.Completions.New(ctx, params)
 	if err != nil {
 		return nil, err
@@ -90,12 +94,12 @@ func (o OpenAI) StartCompletion(ctx context.Context, input core.StartCompletionI
 	}
 	history = append(history, lastMsg)
 
-	o.logger.Debug(fmt.Sprintf("prompt token: %d, completion token: %d\n",
+	o.sendLogger.Debug(fmt.Sprintf("prompt token: %d, completion token: %d\n",
 		chat.Usage.PromptTokens, chat.Usage.CompletionTokens,
 	))
 
-	o.logger.Info(logger.Yellow("returned messages:\n"))
-	lastMsg.ShowAssistantMessage(o.logger)
+	o.receiveLogger.Info("returned messages:\n")
+	lastMsg.ShowAssistantMessage(o.receiveLogger)
 
 	return history, nil
 }
@@ -180,8 +184,8 @@ func (o OpenAI) ContinueCompletion(
 	}
 	history = append(history, lastMsg)
 
-	o.logger.Info(logger.Yellow("returned messages:\n"))
-	lastMsg.ShowAssistantMessage(o.logger)
+	o.receiveLogger.Info("returned messages:\n")
+	lastMsg.ShowAssistantMessage(o.receiveLogger)
 
 	return history, nil
 }
@@ -237,8 +241,8 @@ func (o OpenAI) CompletionNextStep(_ context.Context, history []core.LLMMessage)
 
 func (o OpenAI) debugShowSendingMsg(param openai.ChatCompletionNewParams) {
 	if len(param.Messages.Value) > 0 {
-		o.logger.Info(logger.Green(fmt.Sprintf("model: %s, sending messages:\n", param.Model.String())))
+		o.sendLogger.Info(fmt.Sprintf("model: %s, sending messages:\n", param.Model.String()))
 		// TODO: show all messages. But now, show only the last message
-		o.logger.Debug(fmt.Sprintf("%s\n", param.Messages.Value[len(param.Messages.Value)-1]))
+		o.sendLogger.Debug(fmt.Sprintf("%s\n", param.Messages.Value[len(param.Messages.Value)-1]))
 	}
 }

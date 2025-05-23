@@ -17,16 +17,24 @@ import (
 // TODO: refactor using ptr package
 
 type BedrockLLMForwarder struct {
-	Bedrock BedrockClient
+	Bedrock      BedrockClient
+	sendLogger   logger.Logger
+	returnLogger logger.Logger
 }
 
 func NewBedrockLLMForwarder(l logger.Logger) (core.LLMForwarder, error) {
+	sendLogger := l.AddPrefix("[BedrockForwarder]").SetColor(logger.Green)
+
+	returnLogger := l.AddPrefix("[BedrockReturn]").SetColor(logger.Yellow)
+
 	bed, err := NewBedrock(l)
 	if err != nil {
 		return nil, err
 	}
 	return BedrockLLMForwarder{
-		Bedrock: bed,
+		Bedrock:      bed,
+		sendLogger:   sendLogger,
+		returnLogger: returnLogger,
 	}, nil
 }
 
@@ -36,9 +44,9 @@ func (a BedrockLLMForwarder) StartForward(input core.StartCompletionInput) ([]co
 
 	history = append(history, initialHistory...)
 
-	a.Bedrock.logger.Info(logger.Green(fmt.Sprintf("model: %s, sending message\n", input.Model)))
-	a.Bedrock.logger.Debug("system prompt:\n%s\n", input.SystemPrompt)
-	a.Bedrock.logger.Debug("user prompt:\n%s\n", input.StartUserPrompt)
+	a.sendLogger.Info(fmt.Sprintf("model: %s, sending message\n", input.Model))
+	a.sendLogger.Debug("system prompt:\n%s\n", input.SystemPrompt)
+	a.sendLogger.Debug("user prompt:\n%s\n", input.StartUserPrompt)
 	resp, err := a.Bedrock.Messages.Create(context.TODO(),
 		input.Model,
 		input.SystemPrompt,
@@ -56,7 +64,7 @@ func (a BedrockLLMForwarder) StartForward(input core.StartCompletionInput) ([]co
 
 	history = append(history, assistantHist)
 
-	a.Bedrock.logger.Info(logger.Yellow("returned messages:\n"))
+	a.returnLogger.Info("returned messages:\n")
 	assistantHist.ShowAssistantMessage(a.Bedrock.logger)
 
 	return history, nil
@@ -163,8 +171,8 @@ func (a BedrockLLMForwarder) ForwardLLM(
 		Content: content,
 	})
 
-	a.Bedrock.logger.Info(logger.Green(fmt.Sprintf("model: %s, sending message\n", input.Model)))
-	a.Bedrock.logger.Debug("%s\n", newMsg.RawContent)
+	a.sendLogger.Info(fmt.Sprintf("model: %s, sending message\n", input.Model))
+	a.sendLogger.Debug("%s\n", newMsg.RawContent)
 
 	resp, err := a.Bedrock.Messages.Create(
 		context.TODO(),
@@ -182,7 +190,7 @@ func (a BedrockLLMForwarder) ForwardLLM(
 	}
 	history = append(history, assistantHist)
 
-	a.Bedrock.logger.Info(logger.Yellow("LLM returned messages:\n"))
+	a.returnLogger.Info("LLM returned messages:\n")
 	assistantHist.ShowAssistantMessage(a.Bedrock.logger)
 
 	return history, nil

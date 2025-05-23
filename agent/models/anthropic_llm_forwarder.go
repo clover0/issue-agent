@@ -11,7 +11,9 @@ import (
 )
 
 type AnthropicLLMForwarder struct {
-	anthropic AnthropicClient
+	anthropic     AnthropicClient
+	sendLogger    logger.Logger
+	receiveLogger logger.Logger
 }
 
 func NewAnthropicLLMForwarder(l logger.Logger) (core.LLMForwarder, error) {
@@ -20,8 +22,13 @@ func NewAnthropicLLMForwarder(l logger.Logger) (core.LLMForwarder, error) {
 		return nil, fmt.Errorf("ANTHROPIC_API_KEY is not set")
 	}
 
+	sendLogger := l.AddPrefix("[AnthropicForwarder] ").SetColor(logger.Green)
+	receiveLogger := l.AddPrefix("[AnthropicReturn] ").SetColor(logger.Yellow)
+
 	return AnthropicLLMForwarder{
-		anthropic: NewAnthropic(l, token),
+		anthropic:     NewAnthropic(l, token),
+		sendLogger:    sendLogger,
+		receiveLogger: receiveLogger,
 	}, nil
 }
 
@@ -30,9 +37,9 @@ func (a AnthropicLLMForwarder) StartForward(input core.StartCompletionInput) ([]
 	params, initialHistory := a.createParams(input)
 	history = append(history, initialHistory...)
 
-	a.anthropic.logger.Info(logger.Green(fmt.Sprintf("model: %s, sending message\n", input.Model)))
-	a.anthropic.logger.Debug("system prompt:\n%s\n", input.SystemPrompt)
-	a.anthropic.logger.Debug("user prompt:\n%s\n", input.StartUserPrompt)
+	a.sendLogger.Info(fmt.Sprintf("model: %s, sending message\n", input.Model))
+	a.sendLogger.Debug("system prompt:\n%s\n", input.SystemPrompt)
+	a.sendLogger.Debug("user prompt:\n%s\n", input.StartUserPrompt)
 	resp, err := a.anthropic.Messages.Create(context.TODO(), params)
 	if err != nil {
 		return nil, err
@@ -71,7 +78,7 @@ func (a AnthropicLLMForwarder) StartForward(input core.StartCompletionInput) ([]
 	}
 	history = append(history, lastMsg)
 
-	a.anthropic.logger.Info(logger.Yellow("returned messages:\n"))
+	a.receiveLogger.Info("returned messages:\n")
 	lastMsg.ShowAssistantMessage(a.anthropic.logger)
 
 	return history, nil
@@ -177,8 +184,8 @@ func (a AnthropicLLMForwarder) ForwardLLM(
 		"content": content,
 	})
 
-	a.anthropic.logger.Info(logger.Green(fmt.Sprintf("model: %s, sending message\n", input.Model)))
-	a.anthropic.logger.Debug("%s\n", newMsg.RawContent)
+	a.sendLogger.Info(fmt.Sprintf("model: %s, sending message\n", input.Model))
+	a.sendLogger.Debug("%s\n", newMsg.RawContent)
 
 	resp, err := a.anthropic.Messages.Create(context.TODO(), params)
 	if err != nil {
@@ -220,7 +227,7 @@ func (a AnthropicLLMForwarder) ForwardLLM(
 	}
 	history = append(history, lastMsg)
 
-	a.anthropic.logger.Info(logger.Yellow("returned messages:\n"))
+	a.receiveLogger.Info("returned messages:\n")
 	lastMsg.ShowAssistantMessage(a.anthropic.logger)
 
 	return history, nil

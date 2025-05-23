@@ -51,12 +51,12 @@ type LLMMessage struct {
 }
 
 func (l LLMMessage) ShowAssistantMessage(out logger.Logger) {
-	out.Info(logger.Yellow(fmt.Sprintf("finish_reason: %s, input token: %d, output token: %d, total token: %d\n",
-		l.FinishReason, l.Usage.InputToken, l.Usage.OutputToken, l.Usage.TotalToken)))
+	out.Info(fmt.Sprintf("finish_reason: %s, input token: %d, output token: %d, total token: %d\n",
+		l.FinishReason, l.Usage.InputToken, l.Usage.OutputToken, l.Usage.TotalToken))
 
-	out.Debug(logger.Yellow("message: \n"))
+	out.Debug("message: \n")
 	out.Debug(fmt.Sprintf("%s\n", l.RawContent))
-	out.Debug(logger.Yellow("tools:\n"))
+	out.Debug("tools:\n")
 	for _, t := range l.ReturnedToolCalls {
 		out.Debug(fmt.Sprintf("id: %s, function_name:%s, function_args:%s\n",
 			t.ToolCallerID, t.ToolName, t.Argument))
