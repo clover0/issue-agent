@@ -58,7 +58,8 @@ func (a *Agent) Work() (lastOutput string, err error) {
 		Functions:       a.tools,
 	}
 
-	a.logg.Info(logger.Green("[STEP:1]start communication with LLM\n"))
+	logGreen, logBlue, logRed := a.logg.SetColor(logger.Green), a.logg.SetColor(logger.Blue), a.logg.SetColor(logger.Red)
+	logGreen.Info("[STEP:1]start communication with LLM\n")
 	history, err := a.llmForwarder.StartForward(completionInput)
 	if err != nil {
 		return lastOutput, fmt.Errorf("start llm forward error: %w", err)
@@ -79,7 +80,7 @@ func (a *Agent) Work() (lastOutput string, err error) {
 
 		switch a.currentStep.Do {
 		case Exec:
-			a.logg.Info(logger.Blue(stepLabel + "execute functions:\n"))
+			logBlue.Info(stepLabel + "execute functions:\n")
 			var input []ReturnToLLMInput
 			for _, fnCtx := range a.currentStep.FunctionContexts {
 				var returningStr string
@@ -91,7 +92,7 @@ func (a *Agent) Work() (lastOutput string, err error) {
 				)
 
 				if err != nil {
-					a.logg.Error(logger.Red("function error")+": %s\n", err)
+					logRed.Error("function error"+": %s\n", err)
 					returningStr = fmt.Sprintf("Error caused. error message: %s\nChange the arguments before using it again. "+
 						"If you still get an error, change the tool you are using", err.Error())
 				}
@@ -104,7 +105,7 @@ func (a *Agent) Work() (lastOutput string, err error) {
 			a.currentStep = NewReturnToLLMStep(input)
 
 		case ReturnToLLM:
-			a.logg.Info(logger.Green(stepLabel + "forwarding message to LLM and waiting for response\n"))
+			logGreen.Info(stepLabel + "forwarding message to LLM and waiting for response\n")
 			history, err = a.llmForwarder.ForwardLLM(ctx, completionInput, a.currentStep.ReturnToLLMContexts, history)
 			if err != nil {
 				a.logg.Error("unrecoverable error: %s\n", err)

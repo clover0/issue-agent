@@ -2,6 +2,7 @@ package assert
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -39,6 +40,17 @@ func EqualStringSlices(t *testing.T, got, expected []string) {
 got: %v
 expected: %v
 )`, got, expected)
+	}
+}
+
+func Contains(t *testing.T, str string, element string) {
+	t.Helper()
+
+	if !strings.Contains(str, element) {
+		t.Errorf(`assert.Contains(
+string: %v
+element: %v
+)`, str, element)
 	}
 }
 
