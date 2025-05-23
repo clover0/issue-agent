@@ -14,12 +14,6 @@ const (
 	White   Color = "\033[97m"
 )
 
-var noColor = false
-
-func SetNoColor() {
-	noColor = true
-}
-
 type ColorFunc func(string) string
 
 func (c Color) String() string {
@@ -28,9 +22,6 @@ func (c Color) String() string {
 
 func GetColorize(color Color) ColorFunc {
 	return func(str string) string {
-		if noColor {
-			return str
-		}
 		return color.String() + str + Reset.String()
 	}
 }
