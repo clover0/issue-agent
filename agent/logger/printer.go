@@ -38,7 +38,6 @@ func (p Printer) Debug(msg string, args ...any) {
 
 func (p Printer) Info(msg string, args ...any) {
 	if p.level <= slog.LevelInfo {
-		fmt.Println("test")
 		_, _ = fmt.Fprintf(p.out, p.colorize(p.prefix+msg), args...)
 	}
 }
