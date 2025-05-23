@@ -17,24 +17,24 @@ import (
 // TODO: refactor using ptr package
 
 type BedrockLLMForwarder struct {
-	Bedrock      BedrockClient
-	sendLogger   logger.Logger
-	returnLogger logger.Logger
+	Bedrock       BedrockClient
+	forwardLogger logger.Logger
+	returnLogger  logger.Logger
 }
 
 func NewBedrockLLMForwarder(l logger.Logger) (core.LLMForwarder, error) {
-	sendLogger := l.AddPrefix("[BedrockForwarder]").SetColor(logger.Green)
+	forwardLogger := l.AddPrefix("[BedrockForwarder]").SetColor(logger.Green)
 
-	returnLogger := l.AddPrefix("[BedrockReturn]").SetColor(logger.Yellow)
+	returnLogger := l.AddPrefix("[BedrockReceive]").SetColor(logger.Yellow)
 
 	bed, err := NewBedrock(l)
 	if err != nil {
 		return nil, err
 	}
 	return BedrockLLMForwarder{
-		Bedrock:      bed,
-		sendLogger:   sendLogger,
-		returnLogger: returnLogger,
+		Bedrock:       bed,
+		forwardLogger: forwardLogger,
+		returnLogger:  returnLogger,
 	}, nil
 }
 
@@ -44,9 +44,9 @@ func (a BedrockLLMForwarder) StartForward(input core.StartCompletionInput) ([]co
 
 	history = append(history, initialHistory...)
 
-	a.sendLogger.Info(fmt.Sprintf("model: %s, sending message\n", input.Model))
-	a.sendLogger.Debug("system prompt:\n%s\n", input.SystemPrompt)
-	a.sendLogger.Debug("user prompt:\n%s\n", input.StartUserPrompt)
+	a.forwardLogger.Info(fmt.Sprintf("model: %s, sending message\n", input.Model))
+	a.forwardLogger.Debug("system prompt:\n%s\n", input.SystemPrompt)
+	a.forwardLogger.Debug("user prompt:\n%s\n", input.StartUserPrompt)
 	resp, err := a.Bedrock.Messages.Create(context.TODO(),
 		input.Model,
 		input.SystemPrompt,
@@ -171,8 +171,8 @@ func (a BedrockLLMForwarder) ForwardLLM(
 		Content: content,
 	})
 
-	a.sendLogger.Info(fmt.Sprintf("model: %s, sending message\n", input.Model))
-	a.sendLogger.Debug("%s\n", newMsg.RawContent)
+	a.forwardLogger.Info(fmt.Sprintf("model: %s, sending message\n", input.Model))
+	a.forwardLogger.Debug("%s\n", newMsg.RawContent)
 
 	resp, err := a.Bedrock.Messages.Create(
 		context.TODO(),

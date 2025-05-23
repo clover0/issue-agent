@@ -19,15 +19,15 @@ import (
 
 type OpenAI struct {
 	client        *openai.Client
-	sendLogger    logger.Logger
+	forwardLogger logger.Logger
 	receiveLogger logger.Logger
 }
 
 func NewOpenAI(lo logger.Logger, apiKey string) OpenAI {
-	sendLogger := lo.AddPrefix("[OpenAIForwarder] ").SetColor(logger.Green)
+	forwardLogger := lo.AddPrefix("[OpenAIForwarder] ").SetColor(logger.Green)
 	receiveLogger := lo.AddPrefix("[OpenAIReceive] ").SetColor(logger.Yellow)
 	return OpenAI{
-		sendLogger:    sendLogger,
+		forwardLogger: forwardLogger,
 		receiveLogger: receiveLogger,
 		client: openai.NewClient(
 			option.WithAPIKey(apiKey),
@@ -71,9 +71,9 @@ func (o OpenAI) StartCompletion(ctx context.Context, input core.StartCompletionI
 	params, historyInitial := o.createCompletionParams(input)
 	history = append(history, historyInitial...)
 
-	o.sendLogger.Info(fmt.Sprintf("model: %s, sending message\n", input.Model))
-	o.sendLogger.Debug("system prompt:\n%s\n", input.SystemPrompt)
-	o.sendLogger.Debug("user prompt:\n%s\n", input.StartUserPrompt)
+	o.forwardLogger.Info(fmt.Sprintf("model: %s, sending message\n", input.Model))
+	o.forwardLogger.Debug("system prompt:\n%s\n", input.SystemPrompt)
+	o.forwardLogger.Debug("user prompt:\n%s\n", input.StartUserPrompt)
 	chat, err := o.client.Chat.Completions.New(ctx, params)
 	if err != nil {
 		return nil, err
@@ -94,7 +94,7 @@ func (o OpenAI) StartCompletion(ctx context.Context, input core.StartCompletionI
 	}
 	history = append(history, lastMsg)
 
-	o.sendLogger.Debug(fmt.Sprintf("prompt token: %d, completion token: %d\n",
+	o.forwardLogger.Debug(fmt.Sprintf("prompt token: %d, completion token: %d\n",
 		chat.Usage.PromptTokens, chat.Usage.CompletionTokens,
 	))
 
@@ -241,8 +241,8 @@ func (o OpenAI) CompletionNextStep(_ context.Context, history []core.LLMMessage)
 
 func (o OpenAI) debugShowSendingMsg(param openai.ChatCompletionNewParams) {
 	if len(param.Messages.Value) > 0 {
-		o.sendLogger.Info(fmt.Sprintf("model: %s, sending messages:\n", param.Model.String()))
+		o.forwardLogger.Info(fmt.Sprintf("model: %s, sending messages:\n", param.Model.String()))
 		// TODO: show all messages. But now, show only the last message
-		o.sendLogger.Debug(fmt.Sprintf("%s\n", param.Messages.Value[len(param.Messages.Value)-1]))
+		o.forwardLogger.Debug(fmt.Sprintf("%s\n", param.Messages.Value[len(param.Messages.Value)-1]))
 	}
 }
