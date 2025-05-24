@@ -104,4 +104,15 @@ get_repository_content: Get contents of a file or directory in a GitHub reposito
     path
         File path from repository root
 
+invoke_agent: Run an AI Agent powered by LLM with your system prompt and first user prompt.
+    name
+        The name of the agent.
+
+    system_prompt
+        System prompt is an instruction given to AI systems that define their behavior parameters, including role, response style, and functional limitations, set invisibly before conversations begin.
+
+    first_user_prompt
+        The first user prompt is the initial question or command given to the AI agent.
+
+
 ```

@@ -2,7 +2,6 @@ package functions
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"slices"
 	"strings"
@@ -71,6 +70,14 @@ func InitializeFunctions(
 	}
 }
 
+// InitializeInvokeAgentFunction initializes the invoke agent function.
+// `invoke_agent` function requires the other functions. so it should be initialized after the other all functions.
+func InitializeInvokeAgentFunction(allowFunctions []string, agentCaller AgentInvokerIF) {
+	if allowFunction(allowFunctions, FuncInvokeAgent) {
+		InitInvokeAgentFunction(agentCaller)
+	}
+}
+
 func allowFunction(allowFunctions []string, name string) bool {
 	return slices.Contains(allowFunctions, name)
 }
@@ -110,6 +117,9 @@ func FunctionByName(name string) (Function, error) {
 // AllFunctions returns all functions
 // WARNING: Call InitializeFunctions before calling this function
 func AllFunctions() []Function {
+	if len(functionsMap) == 0 {
+		panic("functionsMap is empty, please call InitializeFunctions first")
+	}
 	var fns []Function
 	for _, f := range functionsMap {
 		fns = append(fns, f)
@@ -334,7 +344,19 @@ func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, ar
 			return "", err
 		}
 		return out.ToLLMString(), nil
+
+	case FuncInvokeAgent:
+		l.Info("functions: do %s\n", FuncInvokeAgent)
+		input := InvokeAgentInput{}
+		if err := marshalFuncArgs(argsJson, &input); err != nil {
+			return "", fmt.Errorf("failed to unmarshal args: %w", err)
+		}
+		out, err := functionsMap[FuncInvokeAgent].Func.(InvokeAgentType)(input)
+		if err != nil {
+			return "", err
+		}
+		return out.ToLLMString(), nil
 	}
 
-	return "", errors.New("function not found")
+	return "", fmt.Errorf("function not found %s", funcName)
 }

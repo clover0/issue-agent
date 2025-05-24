@@ -11,7 +11,10 @@ import (
 )
 
 type AgentLike interface {
-	Work()
+	Work() (lastOutput string, err error)
+	History() []LLMMessage
+	LastHistory() LLMMessage
+	ChangedFiles() []store.File
 }
 
 type Agent struct {
@@ -34,8 +37,8 @@ func NewAgent(
 	forwarder LLMForwarder,
 	store *store.Store,
 	tools []functions.Function,
-) Agent {
-	return Agent{
+) AgentLike {
+	return &Agent{
 		name:         name,
 		parameter:    parameter,
 		currentStep:  Step{},

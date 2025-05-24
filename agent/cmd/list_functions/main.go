@@ -30,6 +30,7 @@ func main() {
 		revisionService,
 		conf.Agent.AllowFunctions,
 	)
+	functions.InitializeInvokeAgentFunction(conf.Agent.AllowFunctions, agentCallerMock{})
 
 	out := "Functions List\n"
 	for _, f := range functions.AllFunctions() {
@@ -47,4 +48,10 @@ func main() {
 	}
 
 	lo.Info(out)
+}
+
+type agentCallerMock struct{}
+
+func (a agentCallerMock) Invoke(input functions.InvokeAgentInput) (functions.InvokeAgentOutput, error) {
+	return functions.InvokeAgentOutput{}, nil
 }
