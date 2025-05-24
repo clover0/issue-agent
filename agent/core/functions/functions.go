@@ -115,7 +115,7 @@ func FunctionByName(name string) (Function, error) {
 }
 
 // AllFunctions returns all functions
-// WARNING: Invoke InitializeFunctions before calling this function
+// WARNING: Call InitializeFunctions before calling this function
 func AllFunctions() []Function {
 	if len(functionsMap) == 0 {
 		panic("functionsMap is empty, please call InitializeFunctions first")
