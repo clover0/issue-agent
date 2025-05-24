@@ -17,6 +17,7 @@ func PlanTools() []functions.Function {
 	}
 }
 
+// TODO: rename
 func CommentingTools() []functions.Function {
 	m := functions.FunctionsMap()
 
@@ -32,5 +33,13 @@ func CommentingTools() []functions.Function {
 		m[functions.FuncCreatePullRequestComment],
 		m[functions.FuncCreatePullRequestReviewComment],
 		m[functions.FuncGetRepositoryContent],
+	}
+}
+
+func InvokeAgentTools() []functions.Function {
+	m := functions.FunctionsMap()
+
+	return []functions.Function{
+		m[functions.FuncInvokeAgent],
 	}
 }

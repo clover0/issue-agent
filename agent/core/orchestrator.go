@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/google/go-github/v71/github"
@@ -64,6 +65,11 @@ func OrchestrateAgentsByIssue(
 		})
 	submitRevisionService := agithub.NopSubmitRevisionService{}
 
+	parameter := Parameter{
+		MaxSteps: conf.Agent.MaxSteps,
+		Model:    conf.Agent.Model,
+	}
+
 	functions.InitializeFunctions(
 		*conf.Agent.GitHub.NoSubmit,
 		ghService,
@@ -71,18 +77,25 @@ func OrchestrateAgentsByIssue(
 		submitRevisionService,
 		conf.Agent.AllowFunctions,
 	)
+
+	tools := functions.AllFunctions()
+	functions.InitializeInvokeAgentFunction(
+		conf.Agent.AllowFunctions,
+		NewAgentInvoker(
+			parameter,
+			lo,
+			llmForwarder,
+			tools,
+		))
+
+	tools = functions.AllFunctions()
 	lo.Info("allowed functions: %s\n", strings.Join(util.Map(
-		functions.AllFunctions(),
+		tools,
 		func(e functions.Function) string { return e.Name.String() },
 	), ","))
 	lo.Info("agents make a pull request to %s/%s\n", conf.Agent.GitHub.Owner, workRepository)
 
 	dataStore := corestore.NewStore()
-
-	parameter := Parameter{
-		MaxSteps: conf.Agent.MaxSteps,
-		Model:    conf.Agent.Model,
-	}
 
 	issue, err := ghService.GetIssue(workRepository, issueNumber)
 	if err != nil {
@@ -108,7 +121,7 @@ func OrchestrateAgentsByIssue(
 		return err
 	}
 	developerAgent, err := RunAgent("developerAgent",
-		prompt, parameter, lo, &dataStore, llmForwarder, functions.AllFunctions())
+		prompt, parameter, lo, &dataStore, llmForwarder, tools)
 	if err != nil {
 		lo.Error("developer agent failed: %s\n", err)
 		return err
@@ -280,6 +293,11 @@ func OrchestrateAgentsByComment(
 			GitName:     conf.Agent.Git.UserName,
 		})
 
+	parameter := Parameter{
+		MaxSteps: conf.Agent.MaxSteps,
+		Model:    conf.Agent.Model,
+	}
+
 	functions.InitializeFunctions(
 		*conf.Agent.GitHub.NoSubmit,
 		ghService,
@@ -287,28 +305,25 @@ func OrchestrateAgentsByComment(
 		submitRevisionService,
 		conf.Agent.AllowFunctions,
 	)
+
+	functions.InitializeInvokeAgentFunction(
+		conf.Agent.AllowFunctions,
+		NewAgentInvoker(
+			parameter,
+			lo,
+			llmForwarder,
+			CommentingTools(),
+		))
+
+	tools := slices.Concat(CommentingTools(), InvokeAgentTools())
+
 	lo.Info("allowed functions: %s\n", strings.Join(util.Map(
-		functions.AllFunctions(), // TODO: commenting tools
+		tools,
 		func(e functions.Function) string { return e.Name.String() },
 	), ","))
 	lo.Info("agents will push to %s/%s branch %s\n", conf.Agent.GitHub.Owner, workRepository, pr.Head)
 
 	dataStore := corestore.NewStore()
-
-	parameter := Parameter{
-		MaxSteps: conf.Agent.MaxSteps,
-		Model:    conf.Agent.Model,
-	}
-
-	// switch to head branch
-	//_, err = functions.SwitchBranch(functions.SwitchBranchInput{
-	//	Branch:       pr.Head,
-	//	CreateBranch: false,
-	//})
-	//if err != nil {
-	//	return fmt.Errorf("failed to switch branch: %w", err)
-	//}
-	//lo.Info("switched branch to %s\n", pr.Head)
 
 	prompt, err := coreprompt.BuildCommentReactorPrompt(promptTemplate, conf.Language, comment, pr)
 	if err != nil {
@@ -318,7 +333,7 @@ func OrchestrateAgentsByComment(
 
 	_, err = RunAgent("commentReactorAgent",
 		prompt, parameter, lo, &dataStore, llmForwarder,
-		CommentingTools(),
+		tools,
 	)
 	if err != nil {
 		lo.Error("developer agent failed: %s\n", err)
@@ -337,7 +352,7 @@ func RunAgent(
 	dataStore *corestore.Store,
 	llmForwarder LLMForwarder,
 	tools []functions.Function,
-) (Agent, error) {
+) (AgentLike, error) {
 	ag := NewAgent(
 		parameter,
 		name,
@@ -350,7 +365,7 @@ func RunAgent(
 
 	if _, err := ag.Work(); err != nil {
 		lo.Error("requirement agent failed: %s\n", err)
-		return Agent{}, err
+		return &Agent{}, err
 	}
 
 	return ag, nil
