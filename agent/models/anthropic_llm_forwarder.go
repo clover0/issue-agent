@@ -280,7 +280,7 @@ func (a AnthropicLLMForwarder) createParams(input core.StartCompletionInput) (J,
 			"disable_parallel_tool_use": true,
 		},
 		"tools":      tools,
-		"max_tokens": ClaudeMaxTokens(input.Model),
+		"max_tokens": ClaudeMaxOutputTokens(input.Model),
 	}
 
 	return body, []core.LLMMessage{

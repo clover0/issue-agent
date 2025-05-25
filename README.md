@@ -118,19 +118,21 @@ Issue Agent makes life easier, especially for routine or repetitive tasks:
 ## Supported AI Models
 We recommend Anthropic's Claude models for optimal performance:
 
-| Provider          | Supported Models                                     |
-|-------------------|------------------------------------------------------|
-| **OpenAI**        | gpt-4o, gpt-4o-mini                                  |
-| **Anthropic**⭐️   | claude-3-5-sonnet-latest, claude-3-7-sonnet-20250219 |
-| **AWS Bedrock**⭐️ | See AWS Bedrock section                              |
+| Provider          | Supported Models                                                                                       |
+|-------------------|--------------------------------------------------------------------------------------------------------|
+| **OpenAI**        | gpt-4o, gpt-4o-mini                                                                                    |
+| **Anthropic**⭐️   | claude-sonnet-4-20250514, claude-opus-4-20250514, claude-3-5-sonnet-latest, claude-3-7-sonnet-20250219 |
+| **AWS Bedrock**⭐️ | See AWS Bedrock section                                                                                |
 
 
 ### AWS Bedrock
 The following models are supported.
 
+- claude-sonnet-4 (ModelID = us.anthropic.claude-sonnet-4-20250514-v1:0, Cross-region inference)
+- claude-opus-4 (ModelID = us.anthropic.claude-opus-4-20250514-v1:0, Cross-region inference)
+- claude-3-7-sonnet (ModelID = anthropic.claude-3-7-sonnet-20250219-v1:0)
+- claude-3-7-sonnet (ModelID = us.anthropic.claude-3-7-sonnet-20250219-v1:0, Cross-region inference)
 - claude-3-5-sonnet v2 (ModelID = anthropic.claude-3-5-sonnet-20241022-v2:0)
 - claude-3-5-sonnet v2 (ModelID = us.anthropic.claude-3-5-sonnet-20241022-v2:0, Cross-region inference)
 - claude-3-5-sonnet v1 (ModelID = anthropic.claude-3-5-sonnet-20240620-v1:0)
 - claude-3-5-sonnet v1 (ModelID = us.anthropic.claude-3-5-sonnet-20240620-v1:0, Cross-region inference)
-- claude-3-7-sonnet (ModelID = anthropic.claude-3-7-sonnet-20250219-v1:0)
-- claude-3-7-sonnet (ModelID = us.anthropic.claude-3-7-sonnet-20250219-v1:0, Cross-region inference)
