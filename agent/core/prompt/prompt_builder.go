@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"text/template"
 
-	"github.com/clover0/issue-agent/config"
 	"github.com/clover0/issue-agent/core/functions"
 )
 
@@ -55,41 +54,6 @@ func BuildCommentReactorPrompt(promptTpl Template, language string,
 		"issueNumber":   comment.IssueNumber,
 		"comment":       comment.Content,
 		"prLLMString":   pr.ToLLMString(),
-	})
-}
-
-func BuildReviewManagerPrompt(promptTpl Template, cnf config.Config, issue functions.GetIssueOutput, changedFilesPath []string, baseBranch string) (Prompt, error) {
-	m := make(map[string]any)
-
-	m["language"] = cnf.Language
-	m["filePaths"] = changedFilesPath
-	m["issue"] = issue.Content
-	m["reviewAgents"] = cnf.Agent.ReviewAgents
-	m["baseBranch"] = baseBranch
-
-	m["noFiles"] = ""
-	if len(changedFilesPath) == 0 {
-		m["noFiles"] = "no changed files"
-	}
-
-	tmpl, err := FindPromptTemplate(promptTpl, "review-manager")
-	if err != nil {
-		return Prompt{}, fmt.Errorf("failed to find review-manager prompt template: %w", err)
-	}
-
-	return BuildPrompt(tmpl, m)
-}
-
-func BuildReviewerPrompt(promptTpl Template, language string, prNumber int, reviewerPrompt string) (Prompt, error) {
-	tmpl, err := FindPromptTemplate(promptTpl, "reviewer")
-	if err != nil {
-		return Prompt{}, fmt.Errorf("failed to find reviewer prompt template: %w", err)
-	}
-
-	return BuildPrompt(tmpl, map[string]any{
-		"language":       language,
-		"prNumber":       prNumber,
-		"reviewerPrompt": reviewerPrompt,
 	})
 }
 

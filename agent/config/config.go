@@ -27,10 +27,9 @@ type Config struct {
 	WorkDir  string `yaml:"workdir"`
 	LogLevel string `yaml:"log_level" validate:"log_level"`
 	Agent    struct {
-		Model        string `yaml:"model" validate:"required"`
-		MaxSteps     int    `yaml:"max_steps" validate:"gte=0"`
-		ReviewAgents int    `yaml:"review_agents"`
-		Git          struct {
+		Model    string `yaml:"model" validate:"required"`
+		MaxSteps int    `yaml:"max_steps" validate:"gte=0"`
+		Git      struct {
 			UserName  string `yaml:"user_name"`
 			UserEmail string `yaml:"user_email"`
 		} `yaml:"git"`
