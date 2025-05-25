@@ -16,19 +16,19 @@ func TestClaudeMaxTokens(t *testing.T) {
 	}{
 		"AWS Bedrock: anthropic.claude-3-7-sonnet-20250219-v1:0": {
 			model: "anthropic.claude-3-7-sonnet-20250219-v1:0",
-			want:  models.Claude3_7MaxTokens,
+			want:  models.ClaudeMaxTokens64K,
 		},
 		"Anthropic: claude-3-5 model": {
 			model: "claude-3-5-sonnet-20240620",
-			want:  models.Claude3_5MaxTokens,
+			want:  models.ClaudeDefaultMaxTokens,
 		},
 		"unsupported model": {
 			model: "unknown-model",
-			want:  models.Claude3_5MaxTokens,
+			want:  models.ClaudeDefaultMaxTokens,
 		},
 		"empty model string": {
 			model: "",
-			want:  models.Claude3_5MaxTokens,
+			want:  models.ClaudeDefaultMaxTokens,
 		},
 	}
 
@@ -36,7 +36,7 @@ func TestClaudeMaxTokens(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			result := models.ClaudeMaxTokens(tt.model)
+			result := models.ClaudeMaxOutputTokens(tt.model)
 
 			assert.Equal(t, tt.want, result)
 		})
