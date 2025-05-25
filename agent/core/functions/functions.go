@@ -139,9 +139,9 @@ const defaultSuccessReturning = "tool use succeeded."
 
 func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, argsJson string) (string, error) {
 	// TODO: make large switch statement smaller
+	l.Info("functions: do %s\n", funcName)
 	switch funcName {
 	case FuncOpenFile:
-		l.Info("functions: do %s\n", FuncOpenFile)
 		input := OpenFileInput{}
 		if err := marshalFuncArgs(argsJson, &input); err != nil {
 			return "", fmt.Errorf("failed to unmarshal args: %w", err)
@@ -153,7 +153,6 @@ func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, ar
 		return file.Content, nil
 
 	case FuncListFiles:
-		l.Info("functions: do %s\n", FuncListFiles)
 		input := ListFilesInput{}
 		if err := marshalFuncArgs(argsJson, &input); err != nil {
 			return "", fmt.Errorf("failed to unmarshal args: %w", err)
@@ -165,7 +164,6 @@ func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, ar
 		return strings.Join(files, "\n"), nil
 
 	case FuncPutFile:
-		l.Info("functions: do %s\n", FuncPutFile)
 		input := PutFileInput{}
 		if err := marshalFuncArgs(argsJson, &input); err != nil {
 			return "", fmt.Errorf("failed to unmarshal args: %w", err)
@@ -178,7 +176,6 @@ func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, ar
 		return defaultSuccessReturning, nil
 
 	case FuncModifyFile:
-		l.Info("functions: do %s\n", FuncModifyFile)
 		input := ModifyFileInput{}
 		if err := marshalFuncArgs(argsJson, &input); err != nil {
 			return "", fmt.Errorf("failed to unmarshal args: %w", err)
@@ -191,7 +188,6 @@ func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, ar
 		return defaultSuccessReturning, nil
 
 	case FuncSubmitFiles:
-		l.Info("functions: do %s\n", FuncSubmitFiles)
 		input := SubmitFilesInput{}
 		if err := marshalFuncArgs(argsJson, &input); err != nil {
 			return "", fmt.Errorf("failed to unmarshal args: %w", err)
@@ -208,7 +204,6 @@ func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, ar
 			defaultSuccessReturning, out.Message), nil
 
 	case FuncGetWebSearchResult:
-		l.Info("functions: do %s\n", FuncGetWebSearchResult)
 		input := GetWebSearchResultInput{}
 		if err := marshalFuncArgs(argsJson, &input); err != nil {
 			return "", fmt.Errorf("failed to unmarshal args: %w", err)
@@ -221,7 +216,6 @@ func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, ar
 		return r, nil
 
 	case FuncGetWebPageFromURL:
-		l.Info("functions: do %s\n", FuncGetWebPageFromURL)
 		input := GetWebPageFromURLInput{}
 		if err := marshalFuncArgs(argsJson, &input); err != nil {
 			return "", fmt.Errorf("failed to unmarshal args: %w", err)
@@ -234,7 +228,6 @@ func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, ar
 		return r, nil
 
 	case FuncGetPullRequest:
-		l.Info("functions: do %s\n", FuncGetPullRequest)
 		input := GetPullRequestInput{}
 		if err := marshalFuncArgs(argsJson, &input); err != nil {
 			return "", fmt.Errorf("failed to unmarshal args: %w", err)
@@ -250,7 +243,6 @@ func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, ar
 		return r.ToLLMString(), nil
 
 	case FuncSearchFiles:
-		l.Info("functions: do %s\n", FuncSearchFiles)
 		input := SearchFilesInput{}
 		if err := marshalFuncArgs(argsJson, &input); err != nil {
 			return "", fmt.Errorf("failed to unmarshal args: %w", err)
@@ -262,7 +254,6 @@ func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, ar
 		return strings.Join(r, "\n"), nil
 
 	case FuncRemoveFile:
-		l.Info("functions: do %s\n", FuncRemoveFile)
 		input := RemoveFileInput{}
 		if err := marshalFuncArgs(argsJson, &input); err != nil {
 			return "", fmt.Errorf("failed to unmarshal args: %w", err)
@@ -274,7 +265,6 @@ func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, ar
 		return defaultSuccessReturning, nil
 
 	case FuncSwitchBranch:
-		l.Info("functions: do %s\n", FuncSwitchBranch)
 		input := SwitchBranchInput{}
 		if err := marshalFuncArgs(argsJson, &input); err != nil {
 			return "", fmt.Errorf("failed to unmarshal args: %w", err)
@@ -286,7 +276,6 @@ func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, ar
 		return fmt.Sprintf("%s\n%s\n", defaultSuccessReturning, r), nil
 
 	case FuncSubmitRevision:
-		l.Info("functions: do %s\n", FuncSubmitRevision)
 		input := SubmitRevisionInput{}
 		if err := marshalFuncArgs(argsJson, &input); err != nil {
 			return "", fmt.Errorf("failed to unmarshal args: %w", err)
@@ -298,7 +287,6 @@ func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, ar
 		return out.Message, nil
 
 	case FuncGetIssue:
-		l.Info("functions: do %s\n", FuncGetIssue)
 		input := GetIssueInput{}
 		if err := marshalFuncArgs(argsJson, &input); err != nil {
 			return "", fmt.Errorf("failed to unmarshal args: %w", err)
@@ -310,7 +298,6 @@ func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, ar
 		return out.ToLLMString(), nil
 
 	case FuncCreatePullRequestComment:
-		l.Info("functions: do %s\n", FuncCreatePullRequestComment)
 		input := CreatePullRequestCommentInput{}
 		if err := marshalFuncArgs(argsJson, &input); err != nil {
 			return "", fmt.Errorf("failed to unmarshal args: %w", err)
@@ -322,7 +309,6 @@ func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, ar
 		return out.ToLLMString(), nil
 
 	case FuncCreatePullRequestReviewComment:
-		l.Info("functions: do %s\n", FuncCreatePullRequestReviewComment)
 		input := CreatePullRequestReviewCommentInput{}
 		if err := marshalFuncArgs(argsJson, &input); err != nil {
 			return "", fmt.Errorf("failed to unmarshal args: %w", err)
@@ -334,7 +320,6 @@ func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, ar
 		return out.ToLLMString(), nil
 
 	case FuncGetRepositoryContent:
-		l.Info("functions: do %s\n", FuncGetRepositoryContent)
 		input := GetRepositoryContentInput{}
 		if err := marshalFuncArgs(argsJson, &input); err != nil {
 			return "", fmt.Errorf("failed to unmarshal args: %w", err)
@@ -346,7 +331,6 @@ func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, ar
 		return out.ToLLMString(), nil
 
 	case FuncInvokeAgent:
-		l.Info("functions: do %s\n", FuncInvokeAgent)
 		input := InvokeAgentInput{}
 		if err := marshalFuncArgs(argsJson, &input); err != nil {
 			return "", fmt.Errorf("failed to unmarshal args: %w", err)
