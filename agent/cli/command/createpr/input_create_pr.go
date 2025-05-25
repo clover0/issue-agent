@@ -18,7 +18,6 @@ type CreatePRInput struct {
 	GithubIssueNumber string
 	WorkRepository    string `validate:"required"`
 	BaseBranch        string `validate:"required"`
-	ReviewAgents      int
 	Reviewers         reviewers
 	TeamReviewers     reviewers
 }
@@ -59,10 +58,6 @@ func (c *CreatePRInput) MergeConfig(conf config.Config) config.Config {
 		conf.Agent.GitHub.Owner = c.GitHubOwner
 	}
 
-	if c.ReviewAgents > 0 {
-		conf.Agent.ReviewAgents = c.ReviewAgents
-	}
-
 	if len(c.TeamReviewers) > 0 {
 		conf.Agent.GitHub.TeamReviewers = c.TeamReviewers
 	}
@@ -95,8 +90,6 @@ func CreatePRFlags() (*flag.FlagSet, *CreatePRInput) {
 	common.AddCommonFlags(cmd, flagMapper.Common)
 
 	cmd.StringVar(&flagMapper.BaseBranch, "base_branch", "", "Base Branch for pull request")
-	cmd.IntVar(&flagMapper.ReviewAgents, "review_agents", 0, `The number of agents to review. A value greater than 0 will review to the created PR.
-Default: 0`)
 	cmd.Var(&flagMapper.Reviewers, "reviewers", "The list of GitHub user `login` as reviewers. If you want to add multiple reviewers, separate them with a comma.")
 	cmd.Var(&flagMapper.TeamReviewers, "team_reviewers", "The list of GitHub Team `slug` as team_reviewers. If you want to add multiple team reviewers, separate them with a comma.")
 
