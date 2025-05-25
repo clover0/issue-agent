@@ -88,7 +88,7 @@ func (a *Agent) Work() (lastOutput string, err error) {
 			for _, fnCtx := range a.currentStep.FunctionContexts {
 				var returningStr string
 				returningStr, err = functions.ExecFunction(
-					a.logg,
+					a.logg.AddPrefix(stepLabel),
 					a.store,
 					fnCtx.Function.Name,
 					fnCtx.FunctionArgs.String(),
