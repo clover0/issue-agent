@@ -100,9 +100,9 @@ var functionsMap = map[string]Function{}
 // TODO: no dependent on openai-go
 func (f Function) ToFunctionCalling() openai.FunctionDefinitionParam {
 	return openai.FunctionDefinitionParam{
-		Name:        openai.F(f.Name.String()),
-		Description: openai.F(f.Name.String()),
-		Parameters:  openai.F(openai.FunctionParameters(f.Parameters)),
+		Name:        f.Name.String(),
+		Description: openai.String(f.Name.String()),
+		Parameters:  openai.FunctionParameters(f.Parameters),
 	}
 }
 

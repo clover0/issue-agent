@@ -18,7 +18,7 @@ import (
 )
 
 type OpenAI struct {
-	client        *openai.Client
+	client        openai.Client
 	forwardLogger logger.Logger
 	receiveLogger logger.Logger
 }
@@ -39,8 +39,7 @@ func (o OpenAI) createCompletionParams(input core.StartCompletionInput) (openai.
 	toolFuncs := make([]openai.ChatCompletionToolParam, len(input.Functions))
 	for i, f := range input.Functions {
 		toolFuncs[i] = openai.ChatCompletionToolParam{
-			Function: openai.F(f.ToFunctionCalling()),
-			Type:     openai.F(openai.ChatCompletionToolTypeFunction),
+			Function: f.ToFunctionCalling(),
 		}
 	}
 
@@ -56,13 +55,13 @@ func (o OpenAI) createCompletionParams(input core.StartCompletionInput) (openai.
 	}
 
 	return openai.ChatCompletionNewParams{
-		Model: openai.F(input.Model),
-		Messages: openai.F([]openai.ChatCompletionMessageParamUnion{
+		Model: input.Model,
+		Messages: []openai.ChatCompletionMessageParamUnion{
 			openai.SystemMessage(input.SystemPrompt),
 			openai.UserMessage(input.StartUserPrompt),
-		}),
-		Temperature: openai.F(0.0),
-		Tools:       openai.F(toolFuncs),
+		},
+		Temperature: openai.Float(0.0),
+		Tools:       toolFuncs,
 	}, historyInitial
 }
 
@@ -113,7 +112,7 @@ func (o OpenAI) ContinueCompletion(
 	params, _ := o.createCompletionParams(input)
 
 	// build from history
-	params.Messages.Value = []openai.ChatCompletionMessageParamUnion{}
+	params.Messages = []openai.ChatCompletionMessageParamUnion{}
 	for _, h := range history {
 		switch h.Role {
 		case core.LLMAssistant:
@@ -126,13 +125,13 @@ func (o OpenAI) ContinueCompletion(
 				return nil, errors.New("RawMessageStruct can't convert ChatCompletionMessage")
 			}
 
-			params.Messages.Value = append(params.Messages.Value, m)
+			params.Messages = append(params.Messages, m.ToParam())
 		case core.LLMUser:
-			params.Messages.Value = append(params.Messages.Value, openai.UserMessage(h.RawContent))
+			params.Messages = append(params.Messages, openai.UserMessage(h.RawContent))
 		case core.LLMSystem:
-			params.Messages.Value = append(params.Messages.Value, openai.SystemMessage(h.RawContent))
+			params.Messages = append(params.Messages, openai.SystemMessage(h.RawContent))
 		case core.LLMTool:
-			params.Messages.Value = append(params.Messages.Value,
+			params.Messages = append(params.Messages,
 				openai.ToolMessage(h.RespondToolCall.ToolCallerID, h.RawContent),
 			)
 		}
@@ -143,7 +142,7 @@ func (o OpenAI) ContinueCompletion(
 	for _, v := range llmContexts {
 		if v.ToolCallerID != "" {
 			// tool message
-			params.Messages.Value = append(params.Messages.Value, openai.ToolMessage(v.ToolCallerID, v.Content))
+			params.Messages = append(params.Messages, openai.ToolMessage(v.ToolCallerID, v.Content))
 			newMsg = core.LLMMessage{
 				Role:       core.LLMTool,
 				RawContent: v.Content,
@@ -154,7 +153,7 @@ func (o OpenAI) ContinueCompletion(
 			}
 		} else {
 			// user message
-			params.Messages.Value = append(params.Messages.Value, openai.UserMessage(v.Content))
+			params.Messages = append(params.Messages, openai.UserMessage(v.Content))
 			newMsg = core.LLMMessage{
 				Role:       core.LLMUser,
 				RawContent: v.Content,
@@ -190,13 +189,13 @@ func (o OpenAI) ContinueCompletion(
 	return history, nil
 }
 
-func convertToFinishReason(finishReason openai.ChatCompletionChoicesFinishReason) core.MessageFinishReason {
+func convertToFinishReason(finishReason string) core.MessageFinishReason {
 	switch finishReason {
-	case openai.ChatCompletionChoicesFinishReasonLength:
+	case "length":
 		return core.FinishLengthOver
-	case openai.ChatCompletionChoicesFinishReasonStop:
+	case "stop":
 		return core.FinishStop
-	case openai.ChatCompletionChoicesFinishReasonToolCalls:
+	case "tool_calls":
 		return core.FinishToolCalls
 	default:
 		panic(fmt.Sprintf("convertToFinishReason: unknown finish reason: %s", finishReason))
@@ -240,9 +239,9 @@ func (o OpenAI) CompletionNextStep(_ context.Context, history []core.LLMMessage)
 }
 
 func (o OpenAI) debugShowSendingMsg(param openai.ChatCompletionNewParams) {
-	if len(param.Messages.Value) > 0 {
-		o.forwardLogger.Info(fmt.Sprintf("model: %s, sending messages:\n", param.Model.String()))
+	if len(param.Messages) > 0 {
+		o.forwardLogger.Info(fmt.Sprintf("model: %s, sending messages:\n", param.Model))
 		// TODO: show all messages. But now, show only the last message
-		o.forwardLogger.Debug(fmt.Sprintf("%s\n", param.Messages.Value[len(param.Messages.Value)-1]))
+		o.forwardLogger.Debug(fmt.Sprintf("%s\n", param.Messages[len(param.Messages)-1].GetContent()))
 	}
 }
