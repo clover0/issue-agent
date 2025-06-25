@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/clover0/issue-agent/logger"
 	"github.com/clover0/issue-agent/util"
@@ -99,11 +100,11 @@ func (s *AnthropicMessageService) Create(ctx context.Context, body J) (*Response
 		if resp.StatusCode >= 400 {
 			respStr := string(b)
 			if resp.StatusCode == http.StatusServiceUnavailable || strings.Contains(respStr, "overloaded") {
-				return util.ErrRetryable
+				return util.NewRetryableError(fmt.Errorf("service unavailable or overloaded"), 1*time.Second)
 			}
 			if resp.StatusCode == http.StatusTooManyRequests {
 				s.client.logger.Info(fmt.Sprintf("%s\nRate limited, retrying after 60 seconds...\n", respStr))
-				return util.ErrRetryAfter60Second
+				return util.NewRetryableError(fmt.Errorf("too many requests, retrying after 60 seconds"), 60*time.Second)
 			}
 			return fmt.Errorf("invalid request or server error %s", b)
 		}
