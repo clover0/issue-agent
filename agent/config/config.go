@@ -104,7 +104,7 @@ func ValidateConfig(config Config) error {
 	}
 	if err := validate.Struct(config); err != nil {
 		errs := err.(validator.ValidationErrors)
-		return fmt.Errorf("validation failed: %w\n", errs)
+		return fmt.Errorf("validation failed: %w", errs)
 	}
 	return nil
 }

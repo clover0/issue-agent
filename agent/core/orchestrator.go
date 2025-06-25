@@ -41,7 +41,7 @@ func OrchestrateAgentsByIssue(
 
 	promptTemplate, err := coreprompt.LoadPrompt()
 	if err != nil {
-		return fmt.Errorf("failed to load prompt template: %w\n", err)
+		return fmt.Errorf("failed to load prompt template: %w", err)
 	}
 
 	// check if the base branch exists
@@ -264,7 +264,7 @@ func OrchestrateAgentsByComment(
 
 	promptTemplate, err := coreprompt.LoadPrompt()
 	if err != nil {
-		return fmt.Errorf("failed to load prompt template: %w\n", err)
+		return fmt.Errorf("failed to load prompt template: %w", err)
 	}
 
 	ghService := agithub.NewGitHubService(conf.Agent.GitHub.Owner, workRepository, gh, lo)
