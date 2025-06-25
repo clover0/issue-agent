@@ -16,7 +16,7 @@ func CloneRepository(lo logger.Logger, conf config.Config, workRepository string
 	token, ok := os.LookupEnv("GITHUB_TOKEN")
 	if !ok {
 		lo.Error("GITHUB_TOKEN is not set")
-		return fmt.Errorf("GITHUB_TOKEN is not set\n")
+		return fmt.Errorf("GITHUB_TOKEN is not set")
 	}
 
 	lo.Info("cloning repository...\n")
@@ -27,7 +27,7 @@ func CloneRepository(lo logger.Logger, conf config.Config, workRepository string
 		ReferenceName: plumbing.ReferenceName(refBranch),
 	}); err != nil {
 		if errors.Is(err, plumbing.ErrReferenceNotFound) {
-			return fmt.Errorf("branch %s not found in repository %s/%s\n", refBranch, conf.Agent.GitHub.Owner, workRepository)
+			return fmt.Errorf("branch %s not found in repository %s/%s", refBranch, conf.Agent.GitHub.Owner, workRepository)
 		}
 		return err
 	}
