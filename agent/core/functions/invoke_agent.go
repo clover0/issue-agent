@@ -14,9 +14,14 @@ type AgentInvokerIF interface {
 
 func InitInvokeAgentFunction(agentInvoker AgentInvokerIF) Function {
 	f := Function{
-		Name:        FuncInvokeAgent,
-		Description: "Run an AI Agent powered by LLM with your system prompt and first user prompt.",
-		Func:        InvokeAgentCaller(agentInvoker),
+		Name: FuncInvokeAgent,
+		Description: strings.ReplaceAll(`Run an AI Agent powered by LLM with your system prompt and first user prompt.
+AI Agents require relevant context to function properly. While the Git environment is shared, other contextual information must be provided externally
+through mechanisms such as system prompts and first user prompts.
+This includes information such as the current branch, Pull Request number tnd issue number.
+When completing work, it is essential to output what was accomplished so that other AI agents can understand what was done.`,
+			"\n", " "),
+		Func: InvokeAgentCaller(agentInvoker),
 		Parameters: map[string]any{
 			"type": "object",
 			"properties": map[string]any{
