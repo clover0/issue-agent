@@ -22,6 +22,8 @@ type CreatePRInput struct {
 	TeamReviewers     reviewers
 }
 
+var _ flag.Value = (*reviewers)(nil)
+
 type reviewers []string
 
 func (s *reviewers) String() string {
@@ -56,6 +58,10 @@ func (c *CreatePRInput) MergeConfig(conf config.Config) config.Config {
 
 	if c.GitHubOwner != "" {
 		conf.Agent.GitHub.Owner = c.GitHubOwner
+	}
+
+	if len(c.Reviewers) > 0 {
+		conf.Agent.GitHub.Reviewers = c.Reviewers
 	}
 
 	if len(c.TeamReviewers) > 0 {
