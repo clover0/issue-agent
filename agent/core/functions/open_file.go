@@ -2,7 +2,6 @@ package functions
 
 import (
 	"io"
-	"log"
 	"os"
 
 	"github.com/clover0/issue-agent/core/store"
@@ -50,7 +49,7 @@ func OpenFile(input OpenFileInput) (store.File, error) {
 
 	data, err := io.ReadAll(file)
 	if err != nil {
-		log.Fatal(err)
+		return store.File{}, err
 	}
 
 	return store.File{
