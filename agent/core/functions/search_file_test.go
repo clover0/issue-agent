@@ -44,16 +44,16 @@ func TestSearchFiles(t *testing.T) {
 	createSymlink("subdir/file3.txt", "symlink_to_file3_in_subdir.txt")
 
 	tests := map[string]struct {
-		input    functions.SearchFilesInput
-		expected []string
-		wantErr  bool
+		input   functions.SearchFilesInput
+		want    []string
+		wantErr bool
 	}{
 		"search with keyword1": {
 			input: functions.SearchFilesInput{
 				Keyword: "keyword1",
 				Path:    tempDir,
 			},
-			expected: []string{
+			want: []string{
 				filepath.Join(tempDir, "file1.txt"),
 				filepath.Join(tempDir, "subdir/file3.txt"),
 			},
@@ -64,7 +64,7 @@ func TestSearchFiles(t *testing.T) {
 				Keyword: "keyword2",
 				Path:    tempDir,
 			},
-			expected: []string{
+			want: []string{
 				filepath.Join(tempDir, "file2.txt"),
 				filepath.Join(tempDir, "subdir/.hidden.txt"),
 			},
@@ -75,23 +75,23 @@ func TestSearchFiles(t *testing.T) {
 				Keyword: "non-existent-keyword",
 				Path:    tempDir,
 			},
-			expected: make([]string, 0),
-			wantErr:  false,
+			want:    make([]string, 0),
+			wantErr: false,
 		},
 		"search in non-existent path": {
 			input: functions.SearchFilesInput{
 				Keyword: "keyword1",
 				Path:    filepath.Join(tempDir, "not-exist"),
 			},
-			expected: nil,
-			wantErr:  true,
+			want:    nil,
+			wantErr: true,
 		},
 		"search in subdirectory only": {
 			input: functions.SearchFilesInput{
 				Keyword: "keyword1",
 				Path:    filepath.Join(tempDir, "subdir"),
 			},
-			expected: []string{
+			want: []string{
 				filepath.Join(tempDir, "subdir/file3.txt"),
 			},
 			wantErr: false,
@@ -110,11 +110,11 @@ func TestSearchFiles(t *testing.T) {
 			}
 
 			slices.Sort(result)
-			slices.Sort(tt.expected)
+			slices.Sort(tt.want)
 
 			assert.NoError(t, err)
-			assert.Equal(t, len(result), len(tt.expected))
-			assert.EqualStringSlices(t, result, tt.expected)
+			assert.Equal(t, len(result), len(tt.want))
+			assert.EqualStringSlices(t, result, tt.want)
 		})
 	}
 }

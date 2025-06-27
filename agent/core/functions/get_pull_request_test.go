@@ -11,8 +11,8 @@ func TestGetPullRequestOutput_ToLLMString(t *testing.T) {
 	t.Parallel()
 
 	tests := map[string]struct {
-		input    functions.GetPullRequestOutput
-		expected string
+		input functions.GetPullRequestOutput
+		want  string
 	}{
 		"valid pull request information": {
 			input: functions.GetPullRequestOutput{
@@ -23,7 +23,7 @@ func TestGetPullRequestOutput_ToLLMString(t *testing.T) {
 				Title:    "Feature: Add new functionality",
 				Content:  "This is an amazing feature",
 			},
-			expected: `
+			want: `
 <pr-number>
 123
 </pr-number>
@@ -50,7 +50,7 @@ diff --git a/file.txt b/file.txt
 
 			result := tt.input.ToLLMString()
 
-			assert.Equal(t, tt.expected, result)
+			assert.Equal(t, tt.want, result)
 		})
 	}
 }
@@ -59,8 +59,8 @@ func TestGetReviewOutput_ToLLMString(t *testing.T) {
 	t.Parallel()
 
 	tests := map[string]struct {
-		input    functions.GetReviewOutput
-		expected string
+		input functions.GetReviewOutput
+		want  string
 	}{
 		"valid review information": {
 			input: functions.GetReviewOutput{
@@ -70,7 +70,7 @@ func TestGetReviewOutput_ToLLMString(t *testing.T) {
 				EndLine:      15,
 				Content:      "This is content",
 			},
-			expected: `
+			want: `
 The following file information received a code review.
 
 # Review information
@@ -89,7 +89,7 @@ This is content
 			t.Parallel()
 
 			result := tt.input.ToLLMString()
-			assert.Equal(t, tt.expected, result)
+			assert.Equal(t, tt.want, result)
 		})
 	}
 }

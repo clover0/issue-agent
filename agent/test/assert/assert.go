@@ -6,15 +6,15 @@ import (
 	"testing"
 )
 
-func Equal[V any](t *testing.T, got, expected V) {
+func Equal[V any](t *testing.T, got, want V) {
 	t.Helper()
-	if reflect.DeepEqual(got, expected) {
+	if reflect.DeepEqual(got, want) {
 		return
 	} else {
 		t.Errorf(`assert.Equal(
 got: %v
-expected: %v
-)`, got, expected)
+want: %v
+)`, got, want)
 		return
 	}
 }
@@ -28,18 +28,18 @@ func Nil(t *testing.T, value any) {
 
 	v := reflect.ValueOf(value)
 	if !v.IsNil() {
-		t.Errorf(`expected nil, got %v`, value)
+		t.Errorf(`want nil, got %v`, value)
 	}
 }
 
-func EqualStringSlices(t *testing.T, got, expected []string) {
+func EqualStringSlices(t *testing.T, got, want []string) {
 	t.Helper()
 
-	if !reflect.DeepEqual(got, expected) {
+	if !reflect.DeepEqual(got, want) {
 		t.Errorf(`assert.EqualStringSlices(
 got: %v
-expected: %v
-)`, got, expected)
+want: %v
+)`, got, want)
 	}
 }
 
@@ -58,7 +58,7 @@ func HasError(t *testing.T, err error) {
 	t.Helper()
 
 	if err == nil {
-		t.Errorf(`expected error, got nil`)
+		t.Errorf(`want error, but got nil`)
 	}
 }
 
@@ -66,6 +66,6 @@ func NoError(t *testing.T, err error) {
 	t.Helper()
 
 	if err != nil {
-		t.Errorf(`expected no error, got %v`, err)
+		t.Errorf(`want no error, but got %v`, err)
 	}
 }
