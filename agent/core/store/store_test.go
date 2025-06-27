@@ -1,30 +1,24 @@
-package store
+package store_test
 
 import (
 	"testing"
 
+	"github.com/clover0/issue-agent/core/store"
 	"github.com/clover0/issue-agent/test/assert"
 )
 
-func TestNewStore(t *testing.T) {
-	s := NewStore()
-
-	assert.Equal(t, len(s.changedFiles), 0)
-	assert.Equal(t, len(s.submittedWorks), 0)
-}
-
 func TestAddChangedFile(t *testing.T) {
-	s := NewStore()
-	f := File{}
+	s := store.NewStore()
+	f := store.File{}
 
 	s.AddChangedFile(f)
 
-	assert.Equal(t, len(s.changedFiles), 1)
+	assert.Equal(t, len(s.ChangedFiles()), 1)
 }
 
 func TestChangedFiles(t *testing.T) {
-	s := NewStore()
-	f := File{}
+	s := store.NewStore()
+	f := store.File{}
 
 	s.AddChangedFile(f)
 	files := s.ChangedFiles()
@@ -34,9 +28,9 @@ func TestChangedFiles(t *testing.T) {
 }
 
 func TestAddAndGetSubmittedWork(t *testing.T) {
-	s := NewStore()
+	s := store.NewStore()
 	key := "test_key"
-	work := SubmittedWork{}
+	work := store.SubmittedWork{}
 
 	result := s.GetSubmittedWork("non_existent")
 

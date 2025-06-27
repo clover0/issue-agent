@@ -1,8 +1,9 @@
-package react
+package react_test
 
 import (
 	"testing"
 
+	"github.com/clover0/issue-agent/cli/command/react"
 	"github.com/clover0/issue-agent/test/assert"
 )
 
@@ -11,13 +12,13 @@ func TestBindReactGitHubArg(t *testing.T) {
 
 	tests := map[string]struct {
 		input   string
-		want    ArgGitHubReact
+		want    react.ArgGitHubReact
 		wantErr bool
 	}{
 		"valid: pull request comment input": {
 			input: "owner/repo/issues/comments/123456",
-			want: ArgGitHubReact{
-				ReactType:  Comment,
+			want: react.ArgGitHubReact{
+				ReactType:  react.Comment,
 				Owner:      "owner",
 				Repository: "repo",
 				PRNumber:   "",
@@ -28,8 +29,8 @@ func TestBindReactGitHubArg(t *testing.T) {
 		},
 		"valid: pull request review comment input": {
 			input: "owner/repo/pulls/comments/789012",
-			want: ArgGitHubReact{
-				ReactType:  ReviewComment,
+			want: react.ArgGitHubReact{
+				ReactType:  react.ReviewComment,
 				Owner:      "owner",
 				Repository: "repo",
 				PRNumber:   "",
@@ -40,27 +41,27 @@ func TestBindReactGitHubArg(t *testing.T) {
 		},
 		"invalid input: wrong format": {
 			input:   "owner/repo/something/comments/123456",
-			want:    ArgGitHubReact{},
+			want:    react.ArgGitHubReact{},
 			wantErr: true,
 		},
 		"invalid input: missing comment ID": {
 			input:   "owner/repo/issues/comments/",
-			want:    ArgGitHubReact{},
+			want:    react.ArgGitHubReact{},
 			wantErr: true,
 		},
 		"invalid input: too many segments": {
 			input:   "owner/repo/issues/comments/123456/extra",
-			want:    ArgGitHubReact{},
+			want:    react.ArgGitHubReact{},
 			wantErr: true,
 		},
 		"invalid input: not enough segments": {
 			input:   "owner/issues/comments/123456",
-			want:    ArgGitHubReact{},
+			want:    react.ArgGitHubReact{},
 			wantErr: true,
 		},
 		"invalid input: empty string": {
 			input:   "",
-			want:    ArgGitHubReact{},
+			want:    react.ArgGitHubReact{},
 			wantErr: true,
 		},
 	}
@@ -69,7 +70,7 @@ func TestBindReactGitHubArg(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			got, err := BindReactGitHubArg(tt.input)
+			got, err := react.BindReactGitHubArg(tt.input)
 
 			if tt.wantErr {
 				assert.HasError(t, err)
