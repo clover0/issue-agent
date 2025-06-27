@@ -29,5 +29,4 @@ Default: info.`)
 Default: English.`)
 
 	fs.StringVar(&cfg.Model, "model", "", "LLM name. For the model name, check the documentation of each LLM provider.")
-
 }

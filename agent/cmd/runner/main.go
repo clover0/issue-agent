@@ -127,6 +127,9 @@ func run(lo logger.Logger) error {
 }
 
 func parseArgs(lo logger.Logger) (*createpr.CreatePRInput, error) {
+	// TODO:
+	// Since we only need to parse the model, aws-profile, and aws-region arguments,
+	// using CreatePRFlags is not suitable for the current implementation.
 	flags, mapper := createpr.CreatePRFlags()
 
 	start := 1

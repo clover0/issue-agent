@@ -22,27 +22,33 @@ const (
 	LogError = "error"
 )
 
+type GitConfig struct {
+	UserName  string `yaml:"user_name"`
+	UserEmail string `yaml:"user_email"`
+}
+
+type GitHubConfig struct {
+	NoSubmit        *bool    `yaml:"no_submit"`
+	CloneRepository *bool    `yaml:"clone_repository"`
+	Owner           string   `yaml:"owner" validate:"required"`
+	PRLabels        []string `yaml:"pr_labels"`
+	Reviewers       []string `yaml:"reviewers"`
+	TeamReviewers   []string `yaml:"team_reviewers"`
+}
+
+type AgentConfig struct {
+	Model          string       `yaml:"model" validate:"required"`
+	MaxSteps       int          `yaml:"max_steps" validate:"gte=0"`
+	Git            GitConfig    `yaml:"git"`
+	GitHub         GitHubConfig `yaml:"github"`
+	AllowFunctions []string     `yaml:"allow_functions"`
+}
+
 type Config struct {
-	Language string `yaml:"language"`
-	WorkDir  string `yaml:"workdir"`
-	LogLevel string `yaml:"log_level" validate:"log_level"`
-	Agent    struct {
-		Model    string `yaml:"model" validate:"required"`
-		MaxSteps int    `yaml:"max_steps" validate:"gte=0"`
-		Git      struct {
-			UserName  string `yaml:"user_name"`
-			UserEmail string `yaml:"user_email"`
-		} `yaml:"git"`
-		GitHub struct {
-			NoSubmit        *bool    `yaml:"no_submit"`
-			CloneRepository *bool    `yaml:"clone_repository"`
-			Owner           string   `yaml:"owner" validate:"required"`
-			PRLabels        []string `yaml:"pr_labels"`
-			Reviewers       []string `yaml:"reviewers"`
-			TeamReviewers   []string `yaml:"team_reviewers"`
-		}
-		AllowFunctions []string `yaml:"allow_functions"`
-	} `yaml:"agent" validate:"required"`
+	Language string      `yaml:"language"`
+	WorkDir  string      `yaml:"workdir"`
+	LogLevel string      `yaml:"log_level" validate:"log_level"`
+	Agent    AgentConfig `yaml:"agent" validate:"required"`
 }
 
 func isValidLogLevel(fl validator.FieldLevel) bool {
