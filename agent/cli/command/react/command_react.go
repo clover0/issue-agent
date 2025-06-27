@@ -2,9 +2,9 @@ package react
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/clover0/issue-agent/agithub"
+	"github.com/clover0/issue-agent/cli/command/common"
 	"github.com/clover0/issue-agent/cli/util"
 	"github.com/clover0/issue-agent/config"
 	"github.com/clover0/issue-agent/core"
@@ -54,16 +54,17 @@ func React(flags []string) error {
 		return nil
 	}
 
+	if err := common.EnsureDirAndEnter(conf.WorkDir); err != nil {
+		return err
+	}
+
 	if *conf.Agent.GitHub.CloneRepository {
-		if err := agithub.CloneRepository(lo, conf, cliIn.WorkRepository, pr.Head); err != nil {
-			lo.Error("failed to clone repository")
-			return err
+		if err := agithub.CloneRepository(lo, conf.Agent.GitHub.Owner, cliIn.WorkRepository, pr.Head); err != nil {
+			return fmt.Errorf("clone repository: %w", err)
 		}
 	}
 
-	// TODO: no dependency with changing directory
-	if err := os.Chdir(conf.WorkDir); err != nil {
-		lo.Error("failed to change directory: %s\n", err)
+	if err := common.EnsureDirAndEnter(cliIn.WorkRepository); err != nil {
 		return err
 	}
 
