@@ -46,7 +46,7 @@ func TestEnsureDirAndEnter(t *testing.T) {
 			wantErr: false,
 		},
 		"enter existing directory": {
-			dir:     tempBaseDir, // TempDir already exists
+			dir:     tempBaseDir,
 			wantErr: false,
 		},
 		"error when directory can't be created": {

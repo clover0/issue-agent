@@ -3,7 +3,6 @@ package core
 import (
 	"context"
 	"fmt"
-	"os"
 	"slices"
 	"strings"
 
@@ -233,12 +232,6 @@ func RunAgent(
 		tools,
 	)
 
-	di, err := os.Getwd()
-	if err != nil {
-		lo.Error("failed to get current working directory: %s\n", err)
-		return &Agent{}, err
-	}
-	fmt.Println("current working directory:", di)
 	if _, err := ag.Work(); err != nil {
 		lo.Error("requirement agent failed: %s\n", err)
 		return &Agent{}, err
