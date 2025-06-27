@@ -1,8 +1,9 @@
-package functions
+package functions_test
 
 import (
 	"testing"
 
+	"github.com/clover0/issue-agent/core/functions"
 	"github.com/clover0/issue-agent/test/assert"
 )
 
@@ -10,11 +11,11 @@ func TestGetPullRequestOutput_ToLLMString(t *testing.T) {
 	t.Parallel()
 
 	tests := map[string]struct {
-		input    GetPullRequestOutput
+		input    functions.GetPullRequestOutput
 		expected string
 	}{
 		"valid pull request information": {
-			input: GetPullRequestOutput{
+			input: functions.GetPullRequestOutput{
 				PRNumber: "123",
 				Head:     "feature-branch",
 				Base:     "main",
@@ -58,11 +59,11 @@ func TestGetReviewOutput_ToLLMString(t *testing.T) {
 	t.Parallel()
 
 	tests := map[string]struct {
-		input    GetReviewOutput
+		input    functions.GetReviewOutput
 		expected string
 	}{
 		"valid review information": {
-			input: GetReviewOutput{
+			input: functions.GetReviewOutput{
 				IssuesNumber: "123",
 				Path:         "src/main.go",
 				StartLine:    10,
