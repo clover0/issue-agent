@@ -1,8 +1,11 @@
-package createpr
+package createpr_test
 
 import (
 	"testing"
 
+	"github.com/clover0/issue-agent/cli/command/common"
+	"github.com/clover0/issue-agent/cli/command/createpr"
+	"github.com/clover0/issue-agent/config"
 	"github.com/clover0/issue-agent/test/assert"
 )
 
@@ -10,56 +13,56 @@ func TestMergeGitHubArg(t *testing.T) {
 	t.Parallel()
 
 	tests := map[string]struct {
-		input    *CreatePRInput
-		arg      ArgGitHubCreatePR
-		expected *CreatePRInput
+		input    *createpr.CreatePRInput
+		arg      createpr.ArgGitHubCreatePR
+		expected *createpr.CreatePRInput
 	}{
 		"merge valid ArgGitHubCreatePR": {
-			input: &CreatePRInput{
+			input: &createpr.CreatePRInput{
 				GitHubOwner:       "",
 				WorkRepository:    "",
 				GithubIssueNumber: "",
 			},
-			arg: ArgGitHubCreatePR{
+			arg: createpr.ArgGitHubCreatePR{
 				Owner:       "newOwner",
 				Repository:  "newRepo",
 				IssueNumber: "456",
 			},
-			expected: &CreatePRInput{
+			expected: &createpr.CreatePRInput{
 				GitHubOwner:       "newOwner",
 				WorkRepository:    "newRepo",
 				GithubIssueNumber: "456",
 			},
 		},
 		"merge with existing values": {
-			input: &CreatePRInput{
+			input: &createpr.CreatePRInput{
 				GitHubOwner:       "existingOwner",
 				WorkRepository:    "existingRepo",
 				GithubIssueNumber: "123",
 			},
-			arg: ArgGitHubCreatePR{
+			arg: createpr.ArgGitHubCreatePR{
 				Owner:       "newOwner",
 				Repository:  "newRepo",
 				IssueNumber: "456",
 			},
-			expected: &CreatePRInput{
+			expected: &createpr.CreatePRInput{
 				GitHubOwner:       "newOwner",
 				WorkRepository:    "newRepo",
 				GithubIssueNumber: "456",
 			},
 		},
 		"merge with empty ArgGitHubCreatePR": {
-			input: &CreatePRInput{
+			input: &createpr.CreatePRInput{
 				GitHubOwner:       "existingOwner",
 				WorkRepository:    "existingRepo",
 				GithubIssueNumber: "123",
 			},
-			arg: ArgGitHubCreatePR{
+			arg: createpr.ArgGitHubCreatePR{
 				Owner:       "",
 				Repository:  "",
 				IssueNumber: "",
 			},
-			expected: &CreatePRInput{
+			expected: &createpr.CreatePRInput{
 				GitHubOwner:       "",
 				WorkRepository:    "",
 				GithubIssueNumber: "",
@@ -79,18 +82,133 @@ func TestMergeGitHubArg(t *testing.T) {
 
 func TestMergeConfig(t *testing.T) {
 	t.Parallel()
-	t.Skipf("TODO")
+
+	tests := map[string]struct {
+		input    *createpr.CreatePRInput
+		config   config.Config
+		expected config.Config
+	}{
+		"merge with empty input": {
+			input: &createpr.CreatePRInput{
+				Common:            &common.CommonInput{},
+				GitHubOwner:       "",
+				WorkRepository:    "",
+				GithubIssueNumber: "",
+				BaseBranch:        "",
+			},
+			config: config.Config{
+				LogLevel: "info",
+				Language: "English",
+				Agent: config.AgentConfig{
+					Model: "gpt-4",
+					GitHub: config.GitHubConfig{
+						Owner: "original-owner",
+					},
+				},
+			},
+			expected: config.Config{
+				LogLevel: "info",
+				Language: "English",
+				Agent: config.AgentConfig{
+					Model: "gpt-4",
+					GitHub: config.GitHubConfig{
+						Owner: "original-owner",
+					},
+				},
+			},
+		},
+		"merge with all fields populated": {
+			input: &createpr.CreatePRInput{
+				Common: &common.CommonInput{
+					LogLevel: "debug",
+					Language: "Japanese",
+					Model:    "claude",
+				},
+				GitHubOwner:       "new-owner",
+				WorkRepository:    "repo",
+				GithubIssueNumber: "123",
+				BaseBranch:        "main",
+				Reviewers:         []string{"reviewer1", "reviewer2"},
+				TeamReviewers:     []string{"team1", "team2"},
+			},
+			config: config.Config{
+				LogLevel: "info",
+				Language: "English",
+				Agent: config.AgentConfig{
+					Model: "gpt-4",
+					GitHub: config.GitHubConfig{
+						Owner: "original-owner",
+					},
+				},
+			},
+			expected: config.Config{
+				LogLevel: "debug",
+				Language: "Japanese",
+				Agent: config.AgentConfig{
+					Model: "claude",
+					GitHub: config.GitHubConfig{
+						Owner:         "new-owner",
+						Reviewers:     []string{"reviewer1", "reviewer2"},
+						TeamReviewers: []string{"team1", "team2"},
+					},
+				},
+			},
+		},
+		"merge with some fields populated": {
+			input: &createpr.CreatePRInput{
+				Common: &common.CommonInput{
+					LogLevel: "debug",
+					Model:    "",
+				},
+				GitHubOwner:       "new-owner",
+				WorkRepository:    "repo",
+				GithubIssueNumber: "123",
+				BaseBranch:        "main",
+			},
+			config: config.Config{
+				LogLevel: "info",
+				Language: "English",
+				Agent: config.AgentConfig{
+					Model: "gpt-4",
+					GitHub: config.GitHubConfig{
+						Owner:         "original-owner",
+						TeamReviewers: []string{"original-team"},
+					},
+				},
+			},
+			expected: config.Config{
+				LogLevel: "debug",
+				Language: "English",
+				Agent: config.AgentConfig{
+					Model: "gpt-4",
+					GitHub: config.GitHubConfig{
+						Owner:         "new-owner",
+						TeamReviewers: []string{"original-team"},
+					},
+				},
+			},
+		},
+	}
+
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			result := tt.input.MergeConfig(tt.config)
+			assert.Equal(t, result, tt.expected)
+		})
+	}
 }
 
 func TestValidate(t *testing.T) {
 	t.Parallel()
 
 	tests := map[string]struct {
-		input   CreatePRInput
+		input   createpr.CreatePRInput
 		wantErr bool
 	}{
 		"valid input": {
-			input: CreatePRInput{
+			input: createpr.CreatePRInput{
 				GitHubOwner:       "owner",
 				WorkRepository:    "repo",
 				BaseBranch:        "main",
@@ -99,7 +217,7 @@ func TestValidate(t *testing.T) {
 			wantErr: false,
 		},
 		"missing required fields": {
-			input: CreatePRInput{
+			input: createpr.CreatePRInput{
 				GitHubOwner: "",
 				BaseBranch:  "main",
 			},
@@ -127,12 +245,12 @@ func TestParseGitHubArg(t *testing.T) {
 
 	tests := map[string]struct {
 		input   string
-		want    ArgGitHubCreatePR
+		want    createpr.ArgGitHubCreatePR
 		wantErr bool
 	}{
 		"valid input": {
 			input: "owner/repo/issues/123",
-			want: ArgGitHubCreatePR{
+			want: createpr.ArgGitHubCreatePR{
 				Owner:       "owner",
 				Repository:  "repo",
 				IssueNumber: "123",
@@ -141,27 +259,27 @@ func TestParseGitHubArg(t *testing.T) {
 		},
 		"invalid input: missing `issues` segment": {
 			input:   "owner/repo/123",
-			want:    ArgGitHubCreatePR{},
+			want:    createpr.ArgGitHubCreatePR{},
 			wantErr: true,
 		},
 		"invalid input: too many segments": {
 			input:   "owner/repo/issues/123/extra",
-			want:    ArgGitHubCreatePR{},
+			want:    createpr.ArgGitHubCreatePR{},
 			wantErr: true,
 		},
 		"invalid input: not enough segments (missing owner)": {
 			input:   "repo/issues/123",
-			want:    ArgGitHubCreatePR{},
+			want:    createpr.ArgGitHubCreatePR{},
 			wantErr: true,
 		},
 		"invalid input: not enough segments (missing repository)": {
 			input:   "owner/issues/123",
-			want:    ArgGitHubCreatePR{},
+			want:    createpr.ArgGitHubCreatePR{},
 			wantErr: true,
 		},
 		"invalid input: empty string": {
 			input:   "",
-			want:    ArgGitHubCreatePR{},
+			want:    createpr.ArgGitHubCreatePR{},
 			wantErr: true,
 		},
 	}
@@ -170,7 +288,7 @@ func TestParseGitHubArg(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			got, err := ParseCreatePRGitHubArg(tt.input)
+			got, err := createpr.ParseCreatePRGitHubArg(tt.input)
 
 			if tt.wantErr {
 				assert.HasError(t, err)
