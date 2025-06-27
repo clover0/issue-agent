@@ -22,38 +22,38 @@ func TestDefaultLoggerDebug(t *testing.T) {
 	t.Parallel()
 
 	tests := map[string]struct {
-		level    string
-		msg      string
-		args     []any
-		prefix   string
-		expected string
+		level  string
+		msg    string
+		args   []any
+		prefix string
+		want   string
 	}{
 		"debug level prints debug message": {
-			level:    "debug",
-			msg:      "test message",
-			expected: "test message",
+			level: "debug",
+			msg:   "test message",
+			want:  "test message",
 		},
 		"info level doesn't print debug message": {
-			level:    "info",
-			msg:      "test message",
-			expected: "",
+			level: "info",
+			msg:   "test message",
+			want:  "",
 		},
 		"error level doesn't print debug message": {
-			level:    "error",
-			msg:      "test message",
-			expected: "",
+			level: "error",
+			msg:   "test message",
+			want:  "",
 		},
 		"debug with format args": {
-			level:    "debug",
-			msg:      "test",
-			args:     []any{"param1", 123},
-			expected: "test",
+			level: "debug",
+			msg:   "test",
+			args:  []any{"param1", 123},
+			want:  "test",
 		},
 		"debug with prefix": {
-			level:    "debug",
-			msg:      "test message",
-			prefix:   "PREFIX: ",
-			expected: "PREFIX: test message",
+			level:  "debug",
+			msg:    "test message",
+			prefix: "PREFIX: ",
+			want:   "PREFIX: test message",
 		},
 	}
 
@@ -68,7 +68,7 @@ func TestDefaultLoggerDebug(t *testing.T) {
 				log.Debug(tt.msg, tt.args...)
 			})
 
-			assert.Contains(t, output, tt.expected)
+			assert.Contains(t, output, tt.want)
 			if len(tt.args) > 0 {
 				assert.Contains(t, output, "param1=123")
 			}
@@ -80,38 +80,38 @@ func TestDefaultLoggerInfo(t *testing.T) {
 	t.Parallel()
 
 	tests := map[string]struct {
-		level    string
-		msg      string
-		args     []any
-		prefix   string
-		expected string
+		level  string
+		msg    string
+		args   []any
+		prefix string
+		want   string
 	}{
 		"debug level prints info message": {
-			level:    "debug",
-			msg:      "test message",
-			expected: "test message",
+			level: "debug",
+			msg:   "test message",
+			want:  "test message",
 		},
 		"info level prints info message": {
-			level:    "info",
-			msg:      "test message",
-			expected: "test message",
+			level: "info",
+			msg:   "test message",
+			want:  "test message",
 		},
 		"error level doesn't print info message": {
-			level:    "error",
-			msg:      "test message",
-			expected: "",
+			level: "error",
+			msg:   "test message",
+			want:  "",
 		},
 		"info with format args": {
-			level:    "info",
-			msg:      "test",
-			args:     []any{"param1", 123},
-			expected: "test",
+			level: "info",
+			msg:   "test",
+			args:  []any{"param1", 123},
+			want:  "test",
 		},
 		"info with prefix": {
-			level:    "info",
-			msg:      "test message",
-			prefix:   "PREFIX: ",
-			expected: "PREFIX: test message",
+			level:  "info",
+			msg:    "test message",
+			prefix: "PREFIX: ",
+			want:   "PREFIX: test message",
 		},
 	}
 
@@ -126,7 +126,7 @@ func TestDefaultLoggerInfo(t *testing.T) {
 				log.Info(tt.msg, tt.args...)
 			})
 
-			assert.Contains(t, output, tt.expected)
+			assert.Contains(t, output, tt.want)
 			if len(tt.args) > 0 {
 				assert.Contains(t, output, "param1=123")
 			}
@@ -138,38 +138,38 @@ func TestDefaultLoggerError(t *testing.T) {
 	t.Parallel()
 
 	tests := map[string]struct {
-		level    string
-		msg      string
-		args     []any
-		prefix   string
-		expected string
+		level  string
+		msg    string
+		args   []any
+		prefix string
+		want   string
 	}{
 		"debug level prints error message": {
-			level:    "debug",
-			msg:      "test message",
-			expected: "test message",
+			level: "debug",
+			msg:   "test message",
+			want:  "test message",
 		},
 		"info level prints error message": {
-			level:    "info",
-			msg:      "test message",
-			expected: "test message",
+			level: "info",
+			msg:   "test message",
+			want:  "test message",
 		},
 		"error level prints error message": {
-			level:    "error",
-			msg:      "test message",
-			expected: "test message",
+			level: "error",
+			msg:   "test message",
+			want:  "test message",
 		},
 		"error with format args": {
-			level:    "error",
-			msg:      "test %s %d",
-			args:     []any{"param1", 123},
-			expected: "test",
+			level: "error",
+			msg:   "test %s %d",
+			args:  []any{"param1", 123},
+			want:  "test",
 		},
 		"error with prefix": {
-			level:    "error",
-			msg:      "test message",
-			prefix:   "PREFIX: ",
-			expected: "PREFIX: test message",
+			level:  "error",
+			msg:    "test message",
+			prefix: "PREFIX: ",
+			want:   "PREFIX: test message",
 		},
 	}
 
@@ -184,7 +184,7 @@ func TestDefaultLoggerError(t *testing.T) {
 				log.Error(tt.msg, tt.args...)
 			})
 
-			assert.Contains(t, output, tt.expected)
+			assert.Contains(t, output, tt.want)
 			if len(tt.args) > 0 {
 				assert.Contains(t, output, "param1=123")
 			}
@@ -199,19 +199,19 @@ func TestDefaultLoggerAddPrefix(t *testing.T) {
 		initialPrefix string
 		addPrefix     string
 		msg           string
-		expected      string
+		want          string
 	}{
 		"add prefix to empty": {
 			initialPrefix: "",
 			addPrefix:     "PREFIX: ",
 			msg:           "test",
-			expected:      "PREFIX: test",
+			want:          "PREFIX: test",
 		},
 		"add prefix to existing": {
 			initialPrefix: "INITIAL: ",
 			addPrefix:     "PREFIX: ",
 			msg:           "test",
-			expected:      "INITIAL: PREFIX: test",
+			want:          "INITIAL: PREFIX: test",
 		},
 	}
 
@@ -227,7 +227,7 @@ func TestDefaultLoggerAddPrefix(t *testing.T) {
 				log.Debug(tt.msg)
 			})
 
-			assert.Contains(t, output, tt.expected)
+			assert.Contains(t, output, tt.want)
 		})
 	}
 }

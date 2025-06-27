@@ -22,38 +22,38 @@ func TestPrinterDebug(t *testing.T) {
 	t.Parallel()
 
 	tests := map[string]struct {
-		level    string
-		msg      string
-		args     []any
-		prefix   string
-		expected string
+		level  string
+		msg    string
+		args   []any
+		prefix string
+		want   string
 	}{
 		"debug level prints debug message": {
-			level:    "debug",
-			msg:      "test message",
-			expected: "test message",
+			level: "debug",
+			msg:   "test message",
+			want:  "test message",
 		},
 		"info level doesn't print debug message": {
-			level:    "info",
-			msg:      "test message",
-			expected: "",
+			level: "info",
+			msg:   "test message",
+			want:  "",
 		},
 		"error level doesn't print debug message": {
-			level:    "error",
-			msg:      "test message",
-			expected: "",
+			level: "error",
+			msg:   "test message",
+			want:  "",
 		},
 		"debug with format args": {
-			level:    "debug",
-			msg:      "test %s %d",
-			args:     []any{"message", 123},
-			expected: "test message 123",
+			level: "debug",
+			msg:   "test %s %d",
+			args:  []any{"message", 123},
+			want:  "test message 123",
 		},
 		"debug with prefix": {
-			level:    "debug",
-			msg:      "test message",
-			prefix:   "PREFIX: ",
-			expected: "PREFIX: test message",
+			level:  "debug",
+			msg:    "test message",
+			prefix: "PREFIX: ",
+			want:   "PREFIX: test message",
 		},
 	}
 
@@ -68,7 +68,7 @@ func TestPrinterDebug(t *testing.T) {
 				p.Debug(tt.msg, tt.args...)
 			})
 
-			assert.Equal(t, output, tt.expected)
+			assert.Equal(t, output, tt.want)
 		})
 	}
 }
@@ -77,38 +77,38 @@ func TestPrinterError(t *testing.T) {
 	t.Parallel()
 
 	tests := map[string]struct {
-		level    string
-		msg      string
-		args     []any
-		prefix   string
-		expected string
+		level  string
+		msg    string
+		args   []any
+		prefix string
+		want   string
 	}{
 		"debug level prints error message": {
-			level:    "debug",
-			msg:      "test message",
-			expected: "test message",
+			level: "debug",
+			msg:   "test message",
+			want:  "test message",
 		},
 		"info level prints error message": {
-			level:    "info",
-			msg:      "test message",
-			expected: "test message",
+			level: "info",
+			msg:   "test message",
+			want:  "test message",
 		},
 		"error level prints error message": {
-			level:    "error",
-			msg:      "test message",
-			expected: "test message",
+			level: "error",
+			msg:   "test message",
+			want:  "test message",
 		},
 		"error with format args": {
-			level:    "error",
-			msg:      "test %s %d",
-			args:     []any{"message", 123},
-			expected: "test message 123",
+			level: "error",
+			msg:   "test %s %d",
+			args:  []any{"message", 123},
+			want:  "test message 123",
 		},
 		"error with prefix": {
-			level:    "error",
-			msg:      "test message",
-			prefix:   "PREFIX: ",
-			expected: "PREFIX: test message",
+			level:  "error",
+			msg:    "test message",
+			prefix: "PREFIX: ",
+			want:   "PREFIX: test message",
 		},
 	}
 
@@ -123,7 +123,7 @@ func TestPrinterError(t *testing.T) {
 				p.Error(tt.msg, tt.args...)
 			})
 
-			assert.Equal(t, output, tt.expected)
+			assert.Equal(t, output, tt.want)
 		})
 	}
 }
@@ -135,19 +135,19 @@ func TestPrinterAddPrefix(t *testing.T) {
 		initialPrefix string
 		addPrefix     string
 		msg           string
-		expected      string
+		want          string
 	}{
 		"add prefix to empty": {
 			initialPrefix: "",
 			addPrefix:     "PREFIX: ",
 			msg:           "test",
-			expected:      "PREFIX: test",
+			want:          "PREFIX: test",
 		},
 		"add prefix to existing": {
 			initialPrefix: "INITIAL: ",
 			addPrefix:     "PREFIX: ",
 			msg:           "test",
-			expected:      "INITIAL: PREFIX: test",
+			want:          "INITIAL: PREFIX: test",
 		},
 	}
 
@@ -163,7 +163,7 @@ func TestPrinterAddPrefix(t *testing.T) {
 				p.Debug("test")
 			})
 
-			assert.Equal(t, output, tt.expected)
+			assert.Equal(t, output, tt.want)
 		})
 	}
 }
@@ -172,16 +172,16 @@ func TestPrinterSetColor(t *testing.T) {
 	t.Parallel()
 
 	tests := map[string]struct {
-		color    logger.Color
-		expected string
+		color logger.Color
+		want  string
 	}{
 		"set color to green": {
-			color:    logger.Green,
-			expected: logger.Green.String() + "test message" + logger.Reset.String(),
+			color: logger.Green,
+			want:  logger.Green.String() + "test message" + logger.Reset.String(),
 		},
 		"set color to red": {
-			color:    logger.Red,
-			expected: logger.Red.String() + "test message" + logger.Reset.String(),
+			color: logger.Red,
+			want:  logger.Red.String() + "test message" + logger.Reset.String(),
 		},
 	}
 
@@ -196,7 +196,7 @@ func TestPrinterSetColor(t *testing.T) {
 				p.Debug("test message")
 			})
 
-			assert.Equal(t, output, tt.expected)
+			assert.Equal(t, output, tt.want)
 		})
 	}
 }

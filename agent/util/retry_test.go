@@ -75,26 +75,26 @@ func TestRetry(t *testing.T) {
 	t.Parallel()
 
 	tests := map[string]struct {
-		maxRetry       int
-		errorSequence  []error
-		expectedCalls  int
-		expectedResult error
+		maxRetry      int
+		errorSequence []error
+		wantCalls     int
+		wantResult    error
 	}{
 		"success on first try": {
 			maxRetry:      3,
 			errorSequence: []error{nil},
-			expectedCalls: 1,
+			wantCalls:     1,
 		},
 		"success after retries": {
 			maxRetry:      3,
 			errorSequence: []error{NewRetryableError(errors.New("retry"), 10*time.Millisecond), NewRetryableError(errors.New("retry"), 10*time.Millisecond), nil},
-			expectedCalls: 3,
+			wantCalls:     3,
 		},
 		"non-retryable error": {
-			maxRetry:       3,
-			errorSequence:  []error{errors.New("non-retryable")},
-			expectedCalls:  1,
-			expectedResult: errors.New("non-retryable"),
+			maxRetry:      3,
+			errorSequence: []error{errors.New("non-retryable")},
+			wantCalls:     1,
+			wantResult:    errors.New("non-retryable"),
 		},
 		"retryable error with success": {
 			maxRetry: 3,
@@ -103,7 +103,7 @@ func TestRetry(t *testing.T) {
 				NewRetryableError(errors.New("retry2"), 10*time.Millisecond),
 				nil,
 			},
-			expectedCalls: 3,
+			wantCalls: 3,
 		},
 		"max retries exceeded": {
 			maxRetry: 2,
@@ -112,8 +112,8 @@ func TestRetry(t *testing.T) {
 				NewRetryableError(errors.New("retry2"), 10*time.Millisecond),
 				NewRetryableError(errors.New("retry3"), 10*time.Millisecond),
 			},
-			expectedCalls:  2,
-			expectedResult: fmt.Errorf("reached maximum retry limit of 2: %w", NewRetryableError(errors.New("retry2"), 10*time.Millisecond)),
+			wantCalls:  2,
+			wantResult: fmt.Errorf("reached maximum retry limit of 2: %w", NewRetryableError(errors.New("retry2"), 10*time.Millisecond)),
 		},
 	}
 
@@ -133,10 +133,10 @@ func TestRetry(t *testing.T) {
 
 			result := Retry(tt.maxRetry, f)
 
-			assert.Equal(t, tt.expectedCalls, callCount)
+			assert.Equal(t, tt.wantCalls, callCount)
 
-			if tt.expectedResult != nil {
-				assert.Equal(t, tt.expectedResult.Error(), result.Error())
+			if tt.wantResult != nil {
+				assert.Equal(t, tt.wantResult.Error(), result.Error())
 				return
 			}
 

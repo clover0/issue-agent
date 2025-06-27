@@ -13,9 +13,9 @@ func TestMergeGitHubArg(t *testing.T) {
 	t.Parallel()
 
 	tests := map[string]struct {
-		input    *createpr.CreatePRInput
-		arg      createpr.ArgGitHubCreatePR
-		expected *createpr.CreatePRInput
+		input *createpr.CreatePRInput
+		arg   createpr.ArgGitHubCreatePR
+		want  *createpr.CreatePRInput
 	}{
 		"merge valid ArgGitHubCreatePR": {
 			input: &createpr.CreatePRInput{
@@ -28,7 +28,7 @@ func TestMergeGitHubArg(t *testing.T) {
 				Repository:  "newRepo",
 				IssueNumber: "456",
 			},
-			expected: &createpr.CreatePRInput{
+			want: &createpr.CreatePRInput{
 				GitHubOwner:       "newOwner",
 				WorkRepository:    "newRepo",
 				GithubIssueNumber: "456",
@@ -45,7 +45,7 @@ func TestMergeGitHubArg(t *testing.T) {
 				Repository:  "newRepo",
 				IssueNumber: "456",
 			},
-			expected: &createpr.CreatePRInput{
+			want: &createpr.CreatePRInput{
 				GitHubOwner:       "newOwner",
 				WorkRepository:    "newRepo",
 				GithubIssueNumber: "456",
@@ -62,7 +62,7 @@ func TestMergeGitHubArg(t *testing.T) {
 				Repository:  "",
 				IssueNumber: "",
 			},
-			expected: &createpr.CreatePRInput{
+			want: &createpr.CreatePRInput{
 				GitHubOwner:       "",
 				WorkRepository:    "",
 				GithubIssueNumber: "",
@@ -75,7 +75,7 @@ func TestMergeGitHubArg(t *testing.T) {
 			t.Parallel()
 
 			result := tt.input.MergeGitHubArg(tt.arg)
-			assert.Equal(t, tt.expected, result)
+			assert.Equal(t, tt.want, result)
 		})
 	}
 }
@@ -84,9 +84,9 @@ func TestMergeConfig(t *testing.T) {
 	t.Parallel()
 
 	tests := map[string]struct {
-		input    *createpr.CreatePRInput
-		config   config.Config
-		expected config.Config
+		input  *createpr.CreatePRInput
+		config config.Config
+		want   config.Config
 	}{
 		"merge with empty input": {
 			input: &createpr.CreatePRInput{
@@ -106,7 +106,7 @@ func TestMergeConfig(t *testing.T) {
 					},
 				},
 			},
-			expected: config.Config{
+			want: config.Config{
 				LogLevel: "info",
 				Language: "English",
 				Agent: config.AgentConfig{
@@ -141,7 +141,7 @@ func TestMergeConfig(t *testing.T) {
 					},
 				},
 			},
-			expected: config.Config{
+			want: config.Config{
 				LogLevel: "debug",
 				Language: "Japanese",
 				Agent: config.AgentConfig{
@@ -176,7 +176,7 @@ func TestMergeConfig(t *testing.T) {
 					},
 				},
 			},
-			expected: config.Config{
+			want: config.Config{
 				LogLevel: "debug",
 				Language: "English",
 				Agent: config.AgentConfig{
@@ -195,7 +195,7 @@ func TestMergeConfig(t *testing.T) {
 			t.Parallel()
 
 			result := tt.input.MergeConfig(tt.config)
-			assert.Equal(t, result, tt.expected)
+			assert.Equal(t, result, tt.want)
 		})
 	}
 }
