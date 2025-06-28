@@ -15,6 +15,7 @@ import (
 
 	"github.com/clover0/issue-agent/core"
 	"github.com/clover0/issue-agent/logger"
+	"github.com/clover0/issue-agent/util"
 )
 
 type OpenAI struct {
@@ -240,6 +241,7 @@ func (o OpenAI) debugShowSendingMsg(param openai.ChatCompletionNewParams) {
 	if len(param.Messages) > 0 {
 		o.forwardLogger.Info(fmt.Sprintf("model: %s, sending messages:\n", param.Model))
 		// TODO: show all messages. But now, show only the last message
-		o.forwardLogger.Debug(fmt.Sprintf("%s\n", param.Messages[len(param.Messages)-1].GetContent()))
+		msg := param.Messages[len(param.Messages)-1].GetContent().AsAny().(string)
+		o.forwardLogger.Debug(fmt.Sprintf("%s\n", util.TruncateLines(msg, 3, 2, "... truncated in debug output ...")))
 	}
 }
