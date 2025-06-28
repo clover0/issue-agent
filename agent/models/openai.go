@@ -86,9 +86,8 @@ func (o OpenAI) StartCompletion(ctx context.Context, input core.StartCompletionI
 		ReturnedToolCalls: convertToToolCalls(msg.Message.ToolCalls),
 		RawMessageStruct:  msg.Message,
 		Usage: core.LLMUsage{
-			InputToken:  int32(chat.Usage.PromptTokens),
-			OutputToken: int32(chat.Usage.CompletionTokens),
-			TotalToken:  int32(chat.Usage.TotalTokens),
+			InputToken:  chat.Usage.PromptTokens,
+			OutputToken: chat.Usage.CompletionTokens,
 		},
 	}
 	history = append(history, lastMsg)
@@ -176,9 +175,8 @@ func (o OpenAI) ContinueCompletion(
 		ReturnedToolCalls: convertToToolCalls(msg.Message.ToolCalls),
 		RawMessageStruct:  msg.Message,
 		Usage: core.LLMUsage{
-			InputToken:  int32(chat.Usage.PromptTokens),
-			OutputToken: int32(chat.Usage.CompletionTokens),
-			TotalToken:  int32(chat.Usage.TotalTokens),
+			InputToken:  chat.Usage.PromptTokens,
+			OutputToken: chat.Usage.CompletionTokens,
 		},
 	}
 	history = append(history, lastMsg)
