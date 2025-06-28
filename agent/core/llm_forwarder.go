@@ -50,9 +50,9 @@ type LLMMessage struct {
 
 func (l LLMMessage) ShowAssistantMessage(out logger.Logger) {
 	out.Info(fmt.Sprintf("finish_reason: %s, cache create token: %d, cache read token: %d, "+
-		"input token: %d, output token: %d, total token: %d\n",
+		"input token: %d, output token: %d, total input token: %d, total output token: %d\n",
 		l.FinishReason, l.Usage.CacheCreateToken, l.Usage.CacheReadToken,
-		l.Usage.InputToken, l.Usage.OutputToken, l.Usage.TotalToken))
+		l.Usage.InputToken, l.Usage.OutputToken, l.Usage.TotalInputToken(), l.Usage.TotalOutputToken()))
 
 	out.Debug("message: \n")
 	out.Debug(fmt.Sprintf("%s\n", l.RawContent))
@@ -61,6 +61,32 @@ func (l LLMMessage) ShowAssistantMessage(out logger.Logger) {
 		out.Debug(fmt.Sprintf("id: %s, function_name:%s, function_args:%s\n",
 			t.ToolCallerID, t.ToolName, t.Argument))
 	}
+}
+
+func TotalInputTokens(messages []LLMMessage) int64 {
+	if len(messages) == 0 {
+		return 0
+	}
+
+	total := int64(0)
+	for _, msg := range messages {
+		total += msg.Usage.TotalInputToken()
+	}
+
+	return total
+}
+
+func TotalOutputTokens(messages []LLMMessage) int64 {
+	if len(messages) == 0 {
+		return 0
+	}
+
+	total := int64(0)
+	for _, msg := range messages {
+		total += msg.Usage.TotalOutputToken()
+	}
+
+	return total
 }
 
 type ToolCall struct {
@@ -87,9 +113,16 @@ const (
 )
 
 type LLMUsage struct {
-	InputToken       int32
-	OutputToken      int32
-	TotalToken       int32
-	CacheCreateToken int32
-	CacheReadToken   int32
+	InputToken       int64
+	OutputToken      int64
+	CacheCreateToken int64
+	CacheReadToken   int64
+}
+
+func (l LLMUsage) TotalInputToken() int64 {
+	return l.InputToken + l.CacheReadToken
+}
+
+func (l LLMUsage) TotalOutputToken() int64 {
+	return l.OutputToken + l.CacheCreateToken
 }

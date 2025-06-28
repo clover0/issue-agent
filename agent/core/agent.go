@@ -131,6 +131,10 @@ func (a *Agent) Work() (lastOutput string, err error) {
 			return lastOutput, fmt.Errorf("%s does not exist in step type", a.currentStep.Do)
 		}
 	}
+
+	a.logg.Info("[%s][consumed tokens] total input tokens:%d, total output tokens: %d\n",
+		a.name, TotalInputTokens(a.History()), TotalOutputTokens(a.History()))
+
 	return lastOutput, nil
 }
 

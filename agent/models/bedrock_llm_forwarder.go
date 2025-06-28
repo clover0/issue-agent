@@ -252,11 +252,10 @@ func (a BedrockLLMForwarder) buildAssistantHistory(bedrockResp bedrockruntime.Co
 		RawContent:        text,
 		ReturnedToolCalls: toolCalls,
 		Usage: core.LLMUsage{
-			InputToken:       *bedrockResp.Usage.InputTokens,
-			OutputToken:      *bedrockResp.Usage.OutputTokens,
-			TotalToken:       *bedrockResp.Usage.TotalTokens,
-			CacheCreateToken: *bedrockResp.Usage.CacheWriteInputTokens,
-			CacheReadToken:   *bedrockResp.Usage.CacheReadInputTokens,
+			InputToken:       int64(*bedrockResp.Usage.InputTokens),
+			OutputToken:      int64(*bedrockResp.Usage.OutputTokens),
+			CacheReadToken:   int64(*bedrockResp.Usage.CacheReadInputTokens),
+			CacheCreateToken: int64(*bedrockResp.Usage.CacheWriteInputTokens),
 		},
 	}, nil
 }

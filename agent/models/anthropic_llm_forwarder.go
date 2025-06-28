@@ -71,12 +71,10 @@ func (a AnthropicLLMForwarder) StartForward(input core.StartCompletionInput) ([]
 		RawContent:        text,
 		ReturnedToolCalls: toolCalls,
 		Usage: core.LLMUsage{
-			InputToken:  int32(resp.Usage.InputTokens),
-			OutputToken: int32(resp.Usage.OutputTokens),
-			// TODO: Fix the total token calculation logic as it is incorrect.
-			TotalToken:       int32(resp.Usage.InputTokens + resp.Usage.OutputTokens),
-			CacheCreateToken: int32(resp.Usage.CacheCreationInputTokens),
-			CacheReadToken:   int32(resp.Usage.CacheReadInputTokens),
+			InputToken:       resp.Usage.InputTokens,
+			OutputToken:      resp.Usage.OutputTokens,
+			CacheReadToken:   resp.Usage.CacheReadInputTokens,
+			CacheCreateToken: resp.Usage.CacheCreationInputTokens,
 		},
 	}
 	history = append(history, lastMsg)
@@ -241,9 +239,10 @@ func (a AnthropicLLMForwarder) ForwardLLM(
 		RawContent:        text,
 		ReturnedToolCalls: toolCalls,
 		Usage: core.LLMUsage{
-			InputToken:  int32(resp.Usage.InputTokens),
-			OutputToken: int32(resp.Usage.OutputTokens),
-			TotalToken:  int32(resp.Usage.InputTokens + resp.Usage.OutputTokens),
+			InputToken:       resp.Usage.InputTokens,
+			OutputToken:      resp.Usage.OutputTokens,
+			CacheReadToken:   resp.Usage.CacheReadInputTokens,
+			CacheCreateToken: resp.Usage.CacheCreationInputTokens,
 		},
 	}
 	history = append(history, lastMsg)
