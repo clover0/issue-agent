@@ -172,7 +172,7 @@ func (a BedrockLLMForwarder) ForwardLLM(
 	})
 
 	a.forwardLogger.Info(fmt.Sprintf("model: %s, sending message\n", input.Model))
-	a.forwardLogger.Debug("%s\n", newMsg.RawContent)
+	a.forwardLogger.Debug("%s\n", newMsg.TruncatedRawContent("... truncated in debug output ..."))
 
 	resp, err := a.Bedrock.Messages.Create(
 		context.TODO(),

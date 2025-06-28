@@ -6,6 +6,7 @@ import (
 
 	"github.com/clover0/issue-agent/core/functions"
 	"github.com/clover0/issue-agent/logger"
+	"github.com/clover0/issue-agent/util"
 )
 
 type StartCompletionInput struct {
@@ -61,6 +62,10 @@ func (l LLMMessage) ShowAssistantMessage(out logger.Logger) {
 		out.Debug(fmt.Sprintf("id: %s, function_name:%s, function_args:%s\n",
 			t.ToolCallerID, t.ToolName, t.Argument))
 	}
+}
+
+func (l LLMMessage) TruncatedRawContent(placeholder string) string {
+	return util.TruncateLines(l.RawContent, 3, 2, placeholder)
 }
 
 func TotalInputTokens(messages []LLMMessage) int64 {

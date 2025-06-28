@@ -204,7 +204,7 @@ func (a AnthropicLLMForwarder) ForwardLLM(
 	})
 
 	a.forwardLogger.Info(fmt.Sprintf("model: %s, sending message\n", input.Model))
-	a.forwardLogger.Debug("%s\n", newMsg.RawContent)
+	a.forwardLogger.Debug("%s\n", newMsg.TruncatedRawContent("... truncated in debug output ..."))
 
 	resp, err := a.anthropic.Messages.Create(context.TODO(), params)
 	if err != nil {
