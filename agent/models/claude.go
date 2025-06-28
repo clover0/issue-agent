@@ -3,8 +3,8 @@ package models
 import "strings"
 
 const (
-	ClaudeMaxTokens64K     = 1024 * 64
-	ClaudeOpusMaxTokens32K = 1024 * 32
+	ClaudeMaxTokens64K     = 1000 * 64
+	ClaudeOpusMaxTokens32K = 1000 * 32
 	ClaudeDefaultMaxTokens = 1024 * 8
 )
 

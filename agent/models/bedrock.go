@@ -101,6 +101,12 @@ func (s *BedrockMessageService) Create(
 	messages []types.Message,
 	toolSpecs []*types.ToolMemberToolSpec,
 ) (response *bedrockruntime.ConverseOutput, _ error) {
+	// add cache point to the last message
+	messages[len(messages)-1].Content = append(messages[len(messages)-1].Content,
+		&types.ContentBlockMemberCachePoint{
+			Value: types.CachePointBlock{Type: types.CachePointTypeDefault},
+		})
+
 	input := &bedrockruntime.ConverseInput{
 		// todo: changeable models
 		ModelId: aws.String(modelID),
@@ -108,13 +114,21 @@ func (s *BedrockMessageService) Create(
 			Temperature: pointer.Float32(0),
 			MaxTokens:   pointer.Ptr(int32(ClaudeMaxOutputTokens(modelID))),
 		},
-		System:     []types.SystemContentBlock{&types.SystemContentBlockMemberText{Value: systemMessage}},
+		System: []types.SystemContentBlock{
+			&types.SystemContentBlockMemberText{Value: systemMessage},
+			&types.SystemContentBlockMemberCachePoint{Value: types.CachePointBlock{Type: types.CachePointTypeDefault}},
+		},
 		Messages:   messages,
 		ToolConfig: &types.ToolConfiguration{},
 	}
 	for _, tool := range toolSpecs {
 		input.ToolConfig.Tools = append(input.ToolConfig.Tools, tool)
 	}
+
+	// for tool cache
+	input.ToolConfig.Tools = append(input.ToolConfig.Tools, &types.ToolMemberCachePoint{
+		Value: types.CachePointBlock{Type: types.CachePointTypeDefault},
+	})
 
 	result, err := s.client.client.Converse(ctx, input)
 	if err != nil {
