@@ -252,9 +252,11 @@ func (a BedrockLLMForwarder) buildAssistantHistory(bedrockResp bedrockruntime.Co
 		RawContent:        text,
 		ReturnedToolCalls: toolCalls,
 		Usage: core.LLMUsage{
-			InputToken:  *bedrockResp.Usage.InputTokens,
-			OutputToken: *bedrockResp.Usage.OutputTokens,
-			TotalToken:  *bedrockResp.Usage.TotalTokens,
+			InputToken:       *bedrockResp.Usage.InputTokens,
+			OutputToken:      *bedrockResp.Usage.OutputTokens,
+			TotalToken:       *bedrockResp.Usage.TotalTokens,
+			CacheCreateToken: *bedrockResp.Usage.CacheWriteInputTokens,
+			CacheReadToken:   *bedrockResp.Usage.CacheReadInputTokens,
 		},
 	}, nil
 }
@@ -281,6 +283,11 @@ func (a BedrockLLMForwarder) buildStartParams(input core.StartCompletionInput) (
 		Content: []types.ContentBlock{
 			&types.ContentBlockMemberText{
 				Value: input.StartUserPrompt,
+			},
+			&types.ContentBlockMemberCachePoint{
+				Value: types.CachePointBlock{
+					Type: types.CachePointTypeDefault,
+				},
 			},
 		},
 	})

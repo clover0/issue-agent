@@ -73,7 +73,10 @@ func (a AnthropicLLMForwarder) StartForward(input core.StartCompletionInput) ([]
 		Usage: core.LLMUsage{
 			InputToken:  int32(resp.Usage.InputTokens),
 			OutputToken: int32(resp.Usage.OutputTokens),
-			TotalToken:  int32(resp.Usage.InputTokens + resp.Usage.OutputTokens),
+			// TODO: Fix the total token calculation logic as it is incorrect.
+			TotalToken:       int32(resp.Usage.InputTokens + resp.Usage.OutputTokens),
+			CacheCreateToken: int32(resp.Usage.CacheCreationInputTokens),
+			CacheReadToken:   int32(resp.Usage.CacheReadInputTokens),
 		},
 	}
 	history = append(history, lastMsg)
@@ -132,7 +135,7 @@ func (a AnthropicLLMForwarder) ForwardLLM(
 
 		// multiple contents in 1 message
 		case core.LLMTool:
-			// 本来は複数のLLM Messageを1つのmessageにまとめる必要がある
+			// Multiple LLM messages should be consolidated into a single message.
 			params["messages"] = append(params["messages"].([]J), J{
 				"role": "user",
 				"content": []J{
@@ -153,10 +156,22 @@ func (a AnthropicLLMForwarder) ForwardLLM(
 	content := make([]J, len(llmContexts))
 	for i, v := range llmContexts {
 		if v.ToolCallerID != "" {
+			contentContent := []J{
+				{
+					"type": "text",
+					"text": v.Content,
+				},
+			}
+
+			// cache_control cannot be set for empty text blocks
+			if v.Content != "" {
+				contentContent[0]["cache_control"] = J{"type": "ephemeral"}
+			}
+
 			content[i] = J{
 				"type":        "tool_result",
 				"tool_use_id": v.ToolCallerID,
-				"content":     v.Content,
+				"content":     contentContent,
 			}
 
 			newMsg = core.LLMMessage{
@@ -169,8 +184,14 @@ func (a AnthropicLLMForwarder) ForwardLLM(
 			}
 		} else {
 			params["messages"] = append(params["messages"].([]J), J{
-				"role":    "user",
-				"content": v.Content,
+				"role": "user",
+				"content": []J{
+					{
+						"type":          "text",
+						"text":          v.Content,
+						"cache_control": J{"type": "ephemeral"},
+					},
+				},
 			})
 			newMsg = core.LLMMessage{
 				Role:       core.LLMUser,
@@ -269,10 +290,22 @@ func (a AnthropicLLMForwarder) createParams(input core.StartCompletionInput) (J,
 	}
 
 	body := J{
-		"model":  input.Model,
-		"system": input.SystemPrompt,
+		"model": input.Model,
+		"system": []J{
+			{
+				"type":          "text",
+				"text":          input.SystemPrompt,
+				"cache_control": J{"type": "ephemeral"},
+			},
+		},
 		"messages": []J{
-			{"role": "user", "content": input.StartUserPrompt},
+			{"role": "user", "content": []J{
+				{
+					"type":          "text",
+					"text":          input.StartUserPrompt,
+					"cache_control": J{"type": "ephemeral"},
+				},
+			}},
 		},
 		"temperature": 0.0,
 		"tool_choice": J{

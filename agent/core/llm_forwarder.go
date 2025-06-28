@@ -8,8 +8,6 @@ import (
 	"github.com/clover0/issue-agent/logger"
 )
 
-// TODO: make no OpenAI dependency
-
 type StartCompletionInput struct {
 	Model           string
 	SystemPrompt    string
@@ -51,8 +49,10 @@ type LLMMessage struct {
 }
 
 func (l LLMMessage) ShowAssistantMessage(out logger.Logger) {
-	out.Info(fmt.Sprintf("finish_reason: %s, input token: %d, output token: %d, total token: %d\n",
-		l.FinishReason, l.Usage.InputToken, l.Usage.OutputToken, l.Usage.TotalToken))
+	out.Info(fmt.Sprintf("finish_reason: %s, cache create token: %d, cache read token: %d, "+
+		"input token: %d, output token: %d, total token: %d\n",
+		l.FinishReason, l.Usage.CacheCreateToken, l.Usage.CacheReadToken,
+		l.Usage.InputToken, l.Usage.OutputToken, l.Usage.TotalToken))
 
 	out.Debug("message: \n")
 	out.Debug(fmt.Sprintf("%s\n", l.RawContent))
@@ -87,7 +87,9 @@ const (
 )
 
 type LLMUsage struct {
-	InputToken  int32
-	OutputToken int32
-	TotalToken  int32
+	InputToken       int32
+	OutputToken      int32
+	TotalToken       int32
+	CacheCreateToken int32
+	CacheReadToken   int32
 }
