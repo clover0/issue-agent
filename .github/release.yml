@@ -8,7 +8,7 @@ changelog:
       labels:
         - major
         - breaking-change
-    - title: ✨ Features
+    - title: ✨ Features / Enhancements
       labels:
         - feature
         - enhancement
