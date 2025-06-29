@@ -23,12 +23,19 @@ func NewSubmitRevisionGitHubService(
 	logger logger.Logger,
 	client *github.Client,
 	callerInput functions.SubmitRevisionServiceInput,
-) functions.SubmitRevisionService {
+) (functions.SubmitRevisionService, error) {
+	if callerInput.GitEmail == "" {
+		return SubmitRevisionGitHubService{}, fmt.Errorf("git email is not set")
+	}
+	if callerInput.GitName == "" {
+		return SubmitRevisionGitHubService{}, fmt.Errorf("git  name is not set")
+	}
+
 	return SubmitRevisionGitHubService{
 		logger:      logger,
 		client:      client,
 		callerInput: callerInput,
-	}
+	}, nil
 }
 
 func (s SubmitRevisionGitHubService) SubmitRevision(input functions.SubmitRevisionInput) (submitFileOut functions.SubmitRevisionOutput, _ error) {
@@ -36,14 +43,6 @@ func (s SubmitRevisionGitHubService) SubmitRevision(input functions.SubmitRevisi
 		return fmt.Errorf("submit revision service: "+format, a...)
 	}
 	var err error
-
-	// TODO: validation before this caller
-	if s.callerInput.GitEmail == "" {
-		return submitFileOut, errorf("git email is not set")
-	}
-	if s.callerInput.GitName == "" {
-		return submitFileOut, errorf("git  name is not set")
-	}
 
 	repo, err := git.PlainOpen(".")
 	if err != nil {

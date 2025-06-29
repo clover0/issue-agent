@@ -48,7 +48,7 @@ func OrchestrateAgentsByIssue(
 		return err
 	}
 
-	submitService := agithub.NewSubmitFileGitHubService(
+	submitService, err := agithub.NewSubmitFileGitHubService(
 		lo, gh,
 		functions.SubmitFilesServiceInput{
 			GitHubOwner: conf.Agent.GitHub.Owner,
@@ -58,6 +58,10 @@ func OrchestrateAgentsByIssue(
 			GitName:     conf.Agent.Git.UserName,
 			PRLabels:    conf.Agent.GitHub.PRLabels,
 		})
+	if err != nil {
+		return fmt.Errorf("create submit file service: %w", err)
+	}
+
 	submitRevisionService := agithub.NopSubmitRevisionService{}
 
 	parameter := Parameter{
@@ -135,7 +139,6 @@ func OrchestrateAgentsByComment(
 	comment functions.GetCommentOutput,
 	pr functions.GetPullRequestOutput,
 ) error {
-	// TODO: move selection llm forwarder
 	llmForwarder, err := selectForward(lo, conf.Agent.Model)
 	if err != nil {
 		lo.Error("failed to select forwarder: %s\n", err)
@@ -150,7 +153,7 @@ func OrchestrateAgentsByComment(
 	ghService := agithub.NewGitHubService(conf.Agent.GitHub.Owner, workRepository, gh, lo)
 
 	submitFilesService := agithub.NopSubmitFileService{}
-	submitRevisionService := agithub.NewSubmitRevisionGitHubService(lo, gh,
+	submitRevisionService, err := agithub.NewSubmitRevisionGitHubService(lo, gh,
 		functions.SubmitRevisionServiceInput{
 			GitHubOwner: conf.Agent.GitHub.Owner,
 			Repository:  workRepository,
@@ -159,6 +162,9 @@ func OrchestrateAgentsByComment(
 			GitEmail:    conf.Agent.Git.UserEmail,
 			GitName:     conf.Agent.Git.UserName,
 		})
+	if err != nil {
+		return fmt.Errorf("create submit revision service: %w", err)
+	}
 
 	parameter := Parameter{
 		MaxSteps: conf.Agent.MaxSteps,
@@ -179,10 +185,10 @@ func OrchestrateAgentsByComment(
 			parameter,
 			lo,
 			llmForwarder,
-			CommentingTools(),
+			ReactTools(),
 		))
 
-	tools := slices.Concat(CommentingTools(), InvokeAgentTools())
+	tools := slices.Concat(ReactTools(), InvokeAgentTools())
 
 	lo.Info("allowed functions: %s\n", strings.Join(util.Map(
 		tools,
