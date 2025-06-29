@@ -7,4 +7,5 @@ type GitHubService interface {
 
 	CreateIssueComment(issueNumber string, comment string) (CreateIssueCommentOutput, error)
 	CreateReviewCommentOne(input CreatePullRequestReviewCommentInput) (CreatePullRequestReviewCommentOutput, error)
+	RequestReviewers(prNumber int, reviewers []string, teamReviewers []string) (RequestReviewersOutput, error)
 }

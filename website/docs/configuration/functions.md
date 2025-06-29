@@ -114,5 +114,15 @@ invoke_agent: Run an AI Agent powered by LLM with your system prompt and first u
     first_user_prompt
         The first user prompt is the initial question or command given to the AI agent.
 
+request_reviewers: Request reviewers for a GitHub pull request.
+    pr_number
+        GitHub Pull Request Number to request reviewers for.
+
+    member_reviewers
+        List of member `login`s to request on the pull request.
+
+    team_reviewers
+        List of team `slug`s to request on the pull request.
+
 
 ```
