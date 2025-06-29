@@ -185,10 +185,10 @@ func OrchestrateAgentsByComment(
 			parameter,
 			lo,
 			llmForwarder,
-			ReactTools(),
+			CommentingTools(),
 		))
 
-	tools := slices.Concat(ReactTools(), InvokeAgentTools())
+	tools := slices.Concat(CommentingTools(), InvokeAgentTools())
 
 	lo.Info("allowed functions: %s\n", strings.Join(util.Map(
 		tools,
