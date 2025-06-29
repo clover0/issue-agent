@@ -17,8 +17,7 @@ func PlanTools() []functions.Function {
 	}
 }
 
-// TODO: rename
-func CommentingTools() []functions.Function {
+func ReactTools() []functions.Function {
 	m := functions.FunctionsMap()
 
 	return []functions.Function{
