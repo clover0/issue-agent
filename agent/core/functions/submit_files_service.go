@@ -1,14 +1,12 @@
 package functions
 
 type SubmitFilesServiceInput struct {
-	GitHubOwner   string
-	Repository    string
-	BaseBranch    string
-	GitEmail      string
-	GitName       string
-	PRLabels      []string
-	Reviewers     []string
-	TeamReviewers []string
+	GitHubOwner string
+	Repository  string
+	BaseBranch  string
+	GitEmail    string
+	GitName     string
+	PRLabels    []string
 }
 
 type SubmitFilesType func(input SubmitFilesInput) (SubmitFilesOutput, error)

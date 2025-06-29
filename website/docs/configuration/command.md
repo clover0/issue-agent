@@ -30,10 +30,6 @@ Command and Flags
       Default: info.
     --model
       LLM name. For the model name, check the documentation of each LLM provider.
-    --reviewers
-      The list of GitHub user `login` as reviewers. If you want to add multiple reviewers, separate them with a comma.
-    --team_reviewers
-      The list of GitHub Team `slug` as team_reviewers. If you want to add multiple team reviewers, separate them with a comma.
 
   react:
     Usage:
@@ -81,6 +77,8 @@ Using functions:
 - get_issue
 - create_pull_request_comment
 - get_repository_content
+- invoke_agent
+- request_reviewers
 
 
 ## `react` command
@@ -101,5 +99,5 @@ Using functions:
 - get_repository_content
 
 
-Issue Agent does not save conversation history.
+Issue Agent does not save prompt history.
 Therefore, When user uses the `react` command, the agent will not remember the previous conversation.

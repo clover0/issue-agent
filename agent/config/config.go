@@ -32,8 +32,6 @@ type GitHubConfig struct {
 	CloneRepository *bool    `yaml:"clone_repository"`
 	Owner           string   `yaml:"owner" validate:"required"`
 	PRLabels        []string `yaml:"pr_labels"`
-	Reviewers       []string `yaml:"reviewers"`
-	TeamReviewers   []string `yaml:"team_reviewers"`
 }
 
 type AgentConfig struct {
