@@ -26,12 +26,19 @@ func NewSubmitFileGitHubService(
 	logger logger.Logger,
 	client *github.Client,
 	callerInput functions.SubmitFilesServiceInput,
-) functions.SubmitFilesService {
+) (functions.SubmitFilesService, error) {
+	if callerInput.GitEmail == "" {
+		return SubmitFileGitHubService{}, fmt.Errorf("git email is not set")
+	}
+	if callerInput.GitName == "" {
+		return SubmitFileGitHubService{}, fmt.Errorf("git  name is not set")
+	}
+
 	return SubmitFileGitHubService{
 		logger:      logger,
 		client:      client,
 		callerInput: callerInput,
-	}
+	}, nil
 }
 
 func (s SubmitFileGitHubService) SubmitFiles(input functions.SubmitFilesInput) (submitFileOut functions.SubmitFilesOutput, _ error) {
@@ -39,10 +46,6 @@ func (s SubmitFileGitHubService) SubmitFiles(input functions.SubmitFilesInput) (
 		return fmt.Errorf("submit file service: "+format, a...)
 	}
 	ctx := context.Background()
-
-	if err := s.validateGitConfig(); err != nil {
-		return submitFileOut, errorf("failed to validate git config: %w", err)
-	}
 
 	repo, err := git.PlainOpen(".")
 	if err != nil {
@@ -135,18 +138,6 @@ func (s SubmitFileGitHubService) SubmitFiles(input functions.SubmitFilesInput) (
 		PushedBranch:      currentBranch,
 		PullRequestNumber: *pr.Number,
 	}, nil
-}
-
-// validateGitConfig validate git config.
-func (s SubmitFileGitHubService) validateGitConfig() error {
-	if s.callerInput.GitEmail == "" {
-		return fmt.Errorf("git email is not set")
-	}
-	if s.callerInput.GitName == "" {
-		return fmt.Errorf("git name is not set")
-	}
-
-	return nil
 }
 
 // guardPushToBaseBranch guard pushing to base branch.
