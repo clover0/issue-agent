@@ -18,21 +18,6 @@ type CreatePRInput struct {
 	GithubIssueNumber string
 	WorkRepository    string `validate:"required"`
 	BaseBranch        string `validate:"required"`
-	Reviewers         reviewers
-	TeamReviewers     reviewers
-}
-
-var _ flag.Value = (*reviewers)(nil)
-
-type reviewers []string
-
-func (s *reviewers) String() string {
-	return fmt.Sprintf("%v", *s)
-}
-
-func (s *reviewers) Set(value string) error {
-	*s = append(*s, value)
-	return nil
 }
 
 func (c *CreatePRInput) MergeGitHubArg(pr ArgGitHubCreatePR) *CreatePRInput {
@@ -58,14 +43,6 @@ func (c *CreatePRInput) MergeConfig(conf config.Config) config.Config {
 
 	if c.GitHubOwner != "" {
 		conf.Agent.GitHub.Owner = c.GitHubOwner
-	}
-
-	if len(c.Reviewers) > 0 {
-		conf.Agent.GitHub.Reviewers = c.Reviewers
-	}
-
-	if len(c.TeamReviewers) > 0 {
-		conf.Agent.GitHub.TeamReviewers = c.TeamReviewers
 	}
 
 	return conf
@@ -96,8 +73,6 @@ func CreatePRFlags() (*flag.FlagSet, *CreatePRInput) {
 	common.AddCommonFlags(cmd, flagMapper.Common)
 
 	cmd.StringVar(&flagMapper.BaseBranch, "base_branch", "", "Base Branch for pull request")
-	cmd.Var(&flagMapper.Reviewers, "reviewers", "The list of GitHub user `login` as reviewers. If you want to add multiple reviewers, separate them with a comma.")
-	cmd.Var(&flagMapper.TeamReviewers, "team_reviewers", "The list of GitHub Team `slug` as team_reviewers. If you want to add multiple team reviewers, separate them with a comma.")
 
 	return cmd, flagMapper
 }

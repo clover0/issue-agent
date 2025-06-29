@@ -128,8 +128,6 @@ func TestMergeConfig(t *testing.T) {
 				WorkRepository:    "repo",
 				GithubIssueNumber: "123",
 				BaseBranch:        "main",
-				Reviewers:         []string{"reviewer1", "reviewer2"},
-				TeamReviewers:     []string{"team1", "team2"},
 			},
 			config: config.Config{
 				LogLevel: "info",
@@ -147,9 +145,7 @@ func TestMergeConfig(t *testing.T) {
 				Agent: config.AgentConfig{
 					Model: "claude",
 					GitHub: config.GitHubConfig{
-						Owner:         "new-owner",
-						Reviewers:     []string{"reviewer1", "reviewer2"},
-						TeamReviewers: []string{"team1", "team2"},
+						Owner: "new-owner",
 					},
 				},
 			},
@@ -171,8 +167,7 @@ func TestMergeConfig(t *testing.T) {
 				Agent: config.AgentConfig{
 					Model: "gpt-4",
 					GitHub: config.GitHubConfig{
-						Owner:         "original-owner",
-						TeamReviewers: []string{"original-team"},
+						Owner: "original-owner",
 					},
 				},
 			},
@@ -182,8 +177,7 @@ func TestMergeConfig(t *testing.T) {
 				Agent: config.AgentConfig{
 					Model: "gpt-4",
 					GitHub: config.GitHubConfig{
-						Owner:         "new-owner",
-						TeamReviewers: []string{"original-team"},
+						Owner: "new-owner",
 					},
 				},
 			},
