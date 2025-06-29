@@ -3,6 +3,7 @@ package agithub
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/url"
 	"strconv"
 	"strings"
@@ -233,4 +234,41 @@ func (s GitHubService) CreateReviewCommentOne(review functions.CreatePullRequest
 	}
 
 	return functions.CreatePullRequestReviewCommentOutput{}, nil
+}
+
+func (s GitHubService) RequestReviewers(prNumber int, reviewers []string, teamReviewers []string) (functions.RequestReviewersOutput, error) {
+	c := context.Background()
+
+	_, resp, err := s.client.PullRequests.RequestReviewers(
+		c,
+		s.owner,
+		s.repository,
+		prNumber,
+		github.ReviewersRequest{
+			Reviewers:     reviewers,
+			TeamReviewers: teamReviewers,
+		})
+	if err == nil {
+		return functions.RequestReviewersOutput{}, nil
+	}
+
+	// client error handling
+	if resp != nil && resp.StatusCode >= 400 && resp.StatusCode < 500 {
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return functions.RequestReviewersOutput{}, fmt.Errorf("failed to read response body: %w", err)
+		}
+		defer func(b io.ReadCloser) {
+			err := b.Close()
+			if err != nil {
+				s.logger.Error("failed to close response body: %s", err)
+			}
+		}(resp.Body)
+
+		return functions.RequestReviewersOutput{},
+			fmt.Errorf("client error requesting reviewers=%s, team_reviewers=%s to PR: %s", reviewers, teamReviewers, body)
+	}
+
+	return functions.RequestReviewersOutput{},
+		fmt.Errorf("failed to request reviewers=%s, team_reviewers=%s to PR: %w", reviewers, teamReviewers, err)
 }

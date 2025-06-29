@@ -68,6 +68,9 @@ func InitializeFunctions(
 	if allowFunction(allowFunctions, FuncGetRepositoryContent) {
 		InitGetRepositoryContentFunction(repoService)
 	}
+	if allowFunction(allowFunctions, FuncRequestReviewers) {
+		InitRequestReviewersFunction(repoService)
+	}
 }
 
 // InitializeInvokeAgentFunction initializes the invoke agent function.
@@ -336,6 +339,17 @@ func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, ar
 			return "", fmt.Errorf("failed to unmarshal args: %w", err)
 		}
 		out, err := functionsMap[FuncInvokeAgent].Func.(InvokeAgentType)(input)
+		if err != nil {
+			return "", err
+		}
+		return out.ToLLMString(), nil
+
+	case FuncRequestReviewers:
+		input := RequestReviewersInput{}
+		if err := marshalFuncArgs(argsJson, &input); err != nil {
+			return "", fmt.Errorf("failed to unmarshal args: %w", err)
+		}
+		out, err := functionsMap[FuncRequestReviewers].Func.(RequestReviewersType)(input)
 		if err != nil {
 			return "", err
 		}
