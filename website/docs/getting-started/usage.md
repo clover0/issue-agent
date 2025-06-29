@@ -13,7 +13,7 @@ Choose the GitHub issue you want to resolve.
 ```shell
 $ issue-agent create-pr clover0/example-repository/issues/123 \
   --base_branch main \
-  --model claude-3-5-sonnet-latest
+  --model claude-sonnet-4-20250514
 ```
 
 ## Run with Environment Variables
@@ -26,7 +26,7 @@ $ GITHUB_TOKEN=$(gh auth token) \
   ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY} \
   issue-agent create-pr clover0/example-repository/issues/123 \
     --base_branch your_branch  \
-    --model claude-3-5-sonnet-latest
+    --model claude-sonnet-4-20250514
 ```
 
 
@@ -37,7 +37,7 @@ You can also execute the `issue-agent` command using AWS Bedrock with profile.
 $ GITHUB_TOKEN=$(gh auth token) \
 issue-agent create-pr clover0/example-repository/issues/123 \
   --base_branch your_branch  \
-  --model anthropic.claude-3-5-sonnet-20241022-v2:0 \
+  --model us.anthropic.claude-sonnet-4-20250514-v1:0 \
   --aws_profile {your_profile} \
   --aws_region us-east-1
 ```
