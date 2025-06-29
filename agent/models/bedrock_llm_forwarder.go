@@ -14,8 +14,6 @@ import (
 	"github.com/clover0/issue-agent/util/pointer"
 )
 
-// TODO: refactor using ptr package
-
 type BedrockLLMForwarder struct {
 	Bedrock       BedrockClient
 	forwardLogger logger.Logger
