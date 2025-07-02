@@ -6,7 +6,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/google/go-github/v71/github"
+	"github.com/google/go-github/v73/github"
 
 	"github.com/clover0/issue-agent/agithub"
 	"github.com/clover0/issue-agent/config"
