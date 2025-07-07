@@ -6,7 +6,6 @@ import (
 
 	"github.com/clover0/issue-agent/agithub"
 	"github.com/clover0/issue-agent/cli/command/common"
-	"github.com/clover0/issue-agent/cli/util"
 	"github.com/clover0/issue-agent/config"
 	"github.com/clover0/issue-agent/core"
 	"github.com/clover0/issue-agent/logger"
@@ -21,7 +20,7 @@ func CreatePR(flags []string) error {
 		return fmt.Errorf("failed to parse input: %w", err)
 	}
 
-	conf, err := config.LoadDefault(util.IsPassedConfig(cliIn.Common.Config))
+	conf, err := config.LoadInCommand(cliIn.Common.Config)
 	if err != nil {
 		return fmt.Errorf("failed to load config: %w", err)
 	}

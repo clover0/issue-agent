@@ -42,8 +42,8 @@ func TestParseArgFlags(t *testing.T) {
 
 			gotArg, gotFlags := ParseArgFlags(tt.input)
 
-			assert.Equal(t, tt.wantArg, gotArg)
-			assert.EqualStringSlices(t, tt.wantFlags, gotFlags)
+			assert.Equal(t, gotArg, tt.wantArg)
+			assert.EqualStringSlices(t, gotFlags, tt.wantFlags)
 
 		})
 	}

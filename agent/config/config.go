@@ -14,6 +14,7 @@ import (
 var defaultConfig []byte
 
 const (
+	// ConfigFilePath always has config.yml mounted to
 	ConfigFilePath = "/agent/config/config.yml"
 	DefaultWorkDir = "/agent/repositories"
 
@@ -59,11 +60,12 @@ func isValidLogLevel(fl validator.FieldLevel) bool {
 	return false
 }
 
-func LoadDefault(passedConfig bool) (Config, error) {
-	if !passedConfig {
+// LoadInCommand loads the configuration in command mode.
+// In command, the config file is mounted to a fixed path.
+func LoadInCommand(path string) (Config, error) {
+	if path == "" {
 		return Load("")
 	}
-
 	cf, err := Load(ConfigFilePath)
 	if err != nil {
 		return cf, err
@@ -125,10 +127,6 @@ func setDefaults(conf Config) Config {
 		conf.WorkDir = DefaultWorkDir
 	}
 
-	if conf.Agent.MaxSteps == 0 {
-		conf.Agent.MaxSteps = 70
-	}
-
 	if conf.Agent.Git.UserName == "" {
 		conf.Agent.Git.UserName = "github-actions[bot]"
 	}
@@ -143,22 +141,6 @@ func setDefaults(conf Config) Config {
 	if conf.Agent.GitHub.CloneRepository == nil {
 		clone := true
 		conf.Agent.GitHub.CloneRepository = &clone
-	}
-
-	// TODO: default value
-	if len(conf.Agent.AllowFunctions) == 0 {
-		conf.Agent.AllowFunctions = []string{
-			"submit_files",
-			"get_pull_request",
-			// "get_web_page_from_url",
-			// "get_web_search_result",
-			"list_files",
-			"modify_file",
-			"open_file",
-			"put_file",
-			"search_files",
-			"remove_file",
-		}
 	}
 
 	return conf
