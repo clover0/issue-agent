@@ -286,10 +286,10 @@ func TestParseGitHubArg(t *testing.T) {
 
 			if tt.wantErr {
 				assert.HasError(t, err)
-			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tt.want, got)
+				return
 			}
+			assert.NoError(t, err)
+			assert.Equal(t, got, tt.want)
 		})
 	}
 }
