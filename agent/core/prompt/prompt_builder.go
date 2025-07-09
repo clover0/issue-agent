@@ -8,10 +8,10 @@ import (
 	"github.com/clover0/issue-agent/core/functions"
 )
 
-func BuildRequirementPrompt(promptTpl Template, language string, baseBranch string, issue functions.GetIssueOutput) (Prompt, error) {
+func BuildPlanningPrompt(promptTpl Template, language string, baseBranch string, issue functions.GetIssueOutput) (Prompt, error) {
 	tmpl, err := FindPromptTemplate(promptTpl, "planner")
 	if err != nil {
-		return Prompt{}, fmt.Errorf("failed to find requirement prompt template: %w", err)
+		return Prompt{}, fmt.Errorf("failed to find planning prompt template: %w", err)
 	}
 
 	return BuildPrompt(tmpl, map[string]any{

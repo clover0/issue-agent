@@ -8,7 +8,7 @@ import (
 	"github.com/clover0/issue-agent/test/assert"
 )
 
-func TestBuildRequirementPrompt(t *testing.T) {
+func TestBuildPlanningPromptPrompt(t *testing.T) {
 	t.Parallel()
 
 	t.Run("success", func(t *testing.T) {
@@ -30,7 +30,7 @@ func TestBuildRequirementPrompt(t *testing.T) {
 			Content: "This is a test issue",
 		}
 
-		p, err := prompt.BuildRequirementPrompt(promptTpl, "English", "main", issue)
+		p, err := prompt.BuildPlanningPrompt(promptTpl, "English", "main", issue)
 
 		assert.Nil(t, err)
 		assert.Equal(t, p.SystemPrompt, "System: English issue 123")
@@ -56,7 +56,7 @@ func TestBuildRequirementPrompt(t *testing.T) {
 			Content: "This is a test issue",
 		}
 
-		_, err := prompt.BuildRequirementPrompt(promptTpl, "English", "main", issue)
+		_, err := prompt.BuildPlanningPrompt(promptTpl, "English", "main", issue)
 
 		assert.HasError(t, err)
 	})
