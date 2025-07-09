@@ -101,19 +101,17 @@ func OrchestrateAgentsByIssue(
 		return fmt.Errorf("failed to get issue: %w", err)
 	}
 
-	prompt, err := coreprompt.BuildRequirementPrompt(promptTemplate, conf.Language, baseBranch, issue)
+	prompt, err := coreprompt.BuildPlanningPrompt(promptTemplate, conf.Language, baseBranch, issue)
 	if err != nil {
-		lo.Error("failed build requirement prompt: %s\n", err)
-		return err
+		return fmt.Errorf("orchestrator builds planning prompt: %w", err)
 	}
-	requirementAgent, err := RunAgent("requirementAgent",
+	planningAgent, err := RunAgent("planningAgent",
 		prompt, parameter, lo, &dataStore, llmForwarder, PlanTools())
 	if err != nil {
-		lo.Error("requirement agent failed: %s\n", err)
 		return err
 	}
 
-	instruction := requirementAgent.LastHistory().RawContent
+	instruction := planningAgent.LastHistory().RawContent
 	prompt, err = coreprompt.BuildDeveloperPrompt(promptTemplate, conf.Language, baseBranch, issue, instruction)
 	if err != nil {
 		lo.Error("failed build developer prompt: %s\n", err)
@@ -237,8 +235,7 @@ func RunAgent(
 	)
 
 	if _, err := ag.Work(); err != nil {
-		lo.Error("requirement agent failed: %s\n", err)
-		return &Agent{}, err
+		return &Agent{}, fmt.Errorf("agent %s failed: %w", name, err)
 	}
 
 	return ag, nil
