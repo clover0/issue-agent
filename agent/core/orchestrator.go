@@ -22,7 +22,7 @@ import (
 // TODO: refactor many arguments
 // TODO: no dependent on issue command
 func OrchestrateAgentsByIssue(
-	ctx context.Context,
+	_ context.Context,
 	lo logger.Logger,
 	conf config.Config,
 	baseBranch string,
@@ -33,13 +33,12 @@ func OrchestrateAgentsByIssue(
 ) error {
 	llmForwarder, err := selectForward(lo, conf.Agent.Model)
 	if err != nil {
-		lo.Error("failed to select forwarder: %s\n", err)
-		return err
+		return fmt.Errorf("select forwarder: %w", err)
 	}
 
 	promptTemplate, err := coreprompt.LoadPrompt()
 	if err != nil {
-		return fmt.Errorf("failed to load prompt template: %w", err)
+		return fmt.Errorf("load prompt template: %w", err)
 	}
 
 	// check if the base branch exists
@@ -98,7 +97,7 @@ func OrchestrateAgentsByIssue(
 
 	issue, err := ghService.GetIssue(workRepository, issueNumber)
 	if err != nil {
-		return fmt.Errorf("failed to get issue: %w", err)
+		return fmt.Errorf("get issue: %w", err)
 	}
 
 	prompt, err := coreprompt.BuildPlanningPrompt(promptTemplate, conf.Language, baseBranch, issue)
@@ -114,13 +113,11 @@ func OrchestrateAgentsByIssue(
 	instruction := planningAgent.LastHistory().RawContent
 	prompt, err = coreprompt.BuildDeveloperPrompt(promptTemplate, conf.Language, baseBranch, issue, instruction)
 	if err != nil {
-		lo.Error("failed build developer prompt: %s\n", err)
-		return err
+		return fmt.Errorf("orchestrator builds developer prompt: %w", err)
 	}
 
 	if _, err := RunAgent("developerAgent", prompt, parameter, lo, &dataStore, llmForwarder, tools); err != nil {
-		lo.Error("developer agent failed: %s\n", err)
-		return err
+		return fmt.Errorf("orchestrator developer agent: %w", err)
 	}
 
 	lo.Info("agents finished work\n")
@@ -139,13 +136,12 @@ func OrchestrateAgentsByComment(
 ) error {
 	llmForwarder, err := selectForward(lo, conf.Agent.Model)
 	if err != nil {
-		lo.Error("failed to select forwarder: %s\n", err)
-		return err
+		return fmt.Errorf("select forwarder: %w", err)
 	}
 
 	promptTemplate, err := coreprompt.LoadPrompt()
 	if err != nil {
-		return fmt.Errorf("failed to load prompt template: %w", err)
+		return fmt.Errorf("load prompt template: %w", err)
 	}
 
 	ghService := agithub.NewGitHubService(conf.Agent.GitHub.Owner, workRepository, gh, lo)
@@ -198,7 +194,7 @@ func OrchestrateAgentsByComment(
 
 	prompt, err := coreprompt.BuildCommentReactorPrompt(promptTemplate, conf.Language, comment, pr)
 	if err != nil {
-		lo.Error("failed build commentReactor prompt: %s\n", err)
+		lo.Error("orchestrator builds comment reactor prompt: %s\n", err)
 		return err
 	}
 
@@ -207,8 +203,7 @@ func OrchestrateAgentsByComment(
 		tools,
 	)
 	if err != nil {
-		lo.Error("developer agent failed: %s\n", err)
-		return err
+		return fmt.Errorf("orchestrator comment reactor agent: %w", err)
 	}
 	lo.Info("agents finished work\n")
 
