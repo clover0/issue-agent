@@ -5,7 +5,6 @@ import (
 
 	"github.com/clover0/issue-agent/core/functions"
 	"github.com/clover0/issue-agent/core/prompt"
-	"github.com/clover0/issue-agent/core/store"
 	"github.com/clover0/issue-agent/logger"
 )
 
@@ -41,8 +40,6 @@ func (a AgentInvoker) Invoke(input functions.InvokeAgentInput) (functions.Invoke
 		return functions.InvokeAgentOutput{}, fmt.Errorf("first_user_prompt is required")
 	}
 
-	agentStore := store.NewStore()
-
 	l := a.logg.AddPrefix(fmt.Sprintf("[agent][%s]", input.Name))
 	agent := NewAgent(
 		a.params,
@@ -53,7 +50,6 @@ func (a AgentInvoker) Invoke(input functions.InvokeAgentInput) (functions.Invoke
 			StartUserPrompt: input.FirstUserPrompt,
 		},
 		a.forwarder,
-		&agentStore,
 		a.tools,
 	)
 
