@@ -6,11 +6,11 @@ import (
 	"text/template"
 )
 
-type PromptTemplate interface {
+type Template interface {
 	Build() (Prompt, error)
 }
 
-func ParseTemplate[T any](templateStr string, values T) (string, error) {
+func ParseTemplate(templateStr string, values any) (string, error) {
 	tpl, err := template.New("prompt").Parse(templateStr)
 	if err != nil {
 		return "", err

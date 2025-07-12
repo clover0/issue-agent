@@ -23,31 +23,31 @@ const (
 	LogError = "error"
 )
 
-type GitConfig struct {
+type Git struct {
 	UserName  string `yaml:"user_name"`
 	UserEmail string `yaml:"user_email"`
 }
 
-type GitHubConfig struct {
+type GitHub struct {
 	NoSubmit        *bool    `yaml:"no_submit"`
 	CloneRepository *bool    `yaml:"clone_repository"`
 	Owner           string   `yaml:"owner" validate:"required"`
 	PRLabels        []string `yaml:"pr_labels"`
 }
 
-type AgentConfig struct {
-	Model          string       `yaml:"model" validate:"required"`
-	MaxSteps       int          `yaml:"max_steps" validate:"gte=0"`
-	Git            GitConfig    `yaml:"git"`
-	GitHub         GitHubConfig `yaml:"github"`
-	AllowFunctions []string     `yaml:"allow_functions"`
+type Agent struct {
+	Model          string   `yaml:"model" validate:"required"`
+	MaxSteps       int      `yaml:"max_steps" validate:"gte=0"`
+	Git            Git      `yaml:"git"`
+	GitHub         GitHub   `yaml:"github"`
+	AllowFunctions []string `yaml:"allow_functions"`
 }
 
 type Config struct {
-	Language string      `yaml:"language"`
-	WorkDir  string      `yaml:"workdir"`
-	LogLevel string      `yaml:"log_level" validate:"log_level"`
-	Agent    AgentConfig `yaml:"agent" validate:"required"`
+	Language string `yaml:"language"`
+	WorkDir  string `yaml:"workdir"`
+	LogLevel string `yaml:"log_level" validate:"log_level"`
+	Agent    Agent  `yaml:"agent" validate:"required"`
 }
 
 func isValidLogLevel(fl validator.FieldLevel) bool {
@@ -102,7 +102,7 @@ func Load(path string) (Config, error) {
 	return cnfg, nil
 }
 
-func ValidateConfig(config Config) error {
+func Validate(config Config) error {
 	validate := validator.New()
 	if err := validate.RegisterValidation("log_level", isValidLogLevel); err != nil {
 		return err

@@ -99,9 +99,9 @@ func TestMergeConfig(t *testing.T) {
 			config: config.Config{
 				LogLevel: "info",
 				Language: "English",
-				Agent: config.AgentConfig{
+				Agent: config.Agent{
 					Model: "gpt-4",
-					GitHub: config.GitHubConfig{
+					GitHub: config.GitHub{
 						Owner: "original-owner",
 					},
 				},
@@ -109,9 +109,9 @@ func TestMergeConfig(t *testing.T) {
 			want: config.Config{
 				LogLevel: "info",
 				Language: "English",
-				Agent: config.AgentConfig{
+				Agent: config.Agent{
 					Model: "gpt-4",
-					GitHub: config.GitHubConfig{
+					GitHub: config.GitHub{
 						Owner: "original-owner",
 					},
 				},
@@ -132,9 +132,9 @@ func TestMergeConfig(t *testing.T) {
 			config: config.Config{
 				LogLevel: "info",
 				Language: "English",
-				Agent: config.AgentConfig{
+				Agent: config.Agent{
 					Model: "gpt-4",
-					GitHub: config.GitHubConfig{
+					GitHub: config.GitHub{
 						Owner: "original-owner",
 					},
 				},
@@ -142,9 +142,9 @@ func TestMergeConfig(t *testing.T) {
 			want: config.Config{
 				LogLevel: "debug",
 				Language: "Japanese",
-				Agent: config.AgentConfig{
+				Agent: config.Agent{
 					Model: "claude",
-					GitHub: config.GitHubConfig{
+					GitHub: config.GitHub{
 						Owner: "new-owner",
 					},
 				},
@@ -164,9 +164,9 @@ func TestMergeConfig(t *testing.T) {
 			config: config.Config{
 				LogLevel: "info",
 				Language: "English",
-				Agent: config.AgentConfig{
+				Agent: config.Agent{
 					Model: "gpt-4",
-					GitHub: config.GitHubConfig{
+					GitHub: config.GitHub{
 						Owner: "original-owner",
 					},
 				},
@@ -174,9 +174,9 @@ func TestMergeConfig(t *testing.T) {
 			want: config.Config{
 				LogLevel: "debug",
 				Language: "English",
-				Agent: config.AgentConfig{
+				Agent: config.Agent{
 					Model: "gpt-4",
-					GitHub: config.GitHubConfig{
+					GitHub: config.GitHub{
 						Owner: "new-owner",
 					},
 				},

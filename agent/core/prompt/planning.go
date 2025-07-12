@@ -1,6 +1,6 @@
 package prompt
 
-type PlanningPrompt struct {
+type Planning struct {
 	Language     string
 	BaseBranch   string
 	IssueTitle   string
@@ -8,7 +8,7 @@ type PlanningPrompt struct {
 	IssueNumber  string
 }
 
-func (p PlanningPrompt) GetSystemPromptTemplate() string {
+func (p Planning) SystemPromptTemplate() string {
 	return `
 You are a software development engineer with expertise in the latest technologies, programming, best practices.
 You will be instructed by a user to accomplish the task.
@@ -38,7 +38,7 @@ The plan is passed as input to the agent doing the development.
 `
 }
 
-func (p PlanningPrompt) GetUserPromptTemplate() string {
+func (p Planning) UserPromptTemplate() string {
 	return `
 The task is bellow:
 
@@ -57,13 +57,13 @@ Title: {{.IssueTitle}}
 `
 }
 
-func (p PlanningPrompt) Build() (Prompt, error) {
-	systemPrompt, err := ParseTemplate(p.GetSystemPromptTemplate(), p)
+func (p Planning) Build() (Prompt, error) {
+	systemPrompt, err := ParseTemplate(p.SystemPromptTemplate(), p)
 	if err != nil {
 		return Prompt{}, err
 	}
 
-	userPrompt, err := ParseTemplate(p.GetUserPromptTemplate(), p)
+	userPrompt, err := ParseTemplate(p.UserPromptTemplate(), p)
 	if err != nil {
 		return Prompt{}, err
 	}
