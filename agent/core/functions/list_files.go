@@ -35,7 +35,7 @@ Each line contains the file mode, byte size, and name. If you want to list subdi
 		},
 	}
 
-	functionsMap[FuncListFiles] = f
+	register(f)
 
 	return f
 }

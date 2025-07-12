@@ -26,7 +26,7 @@ func InitGetRepositoryContentFunction(service GitHubService) Function {
 		},
 	}
 
-	functionsMap[FuncGetRepositoryContent] = f
+	register(f)
 
 	return f
 }

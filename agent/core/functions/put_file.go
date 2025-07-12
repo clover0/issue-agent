@@ -32,7 +32,7 @@ func InitPutFileFunction() Function {
 		},
 	}
 
-	functionsMap[FuncPutFile] = f
+	register(f)
 
 	return f
 }

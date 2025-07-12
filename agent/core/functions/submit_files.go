@@ -28,7 +28,7 @@ func InitSubmitFilesGitHubFunction(service SubmitFilesService) Function {
 		},
 	}
 
-	functionsMap[FuncSubmitFiles] = f
+	register(f)
 
 	return f
 }

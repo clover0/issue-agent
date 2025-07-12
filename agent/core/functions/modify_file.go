@@ -33,7 +33,7 @@ func InitModifyFileFunction() Function {
 		},
 	}
 
-	functionsMap[FuncModifyFile] = f
+	register(f)
 
 	return f
 }

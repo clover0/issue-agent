@@ -27,7 +27,7 @@ func InitOpenFileFunction() Function {
 		},
 	}
 
-	functionsMap[FuncOpenFile] = f
+	register(f)
 
 	return f
 }

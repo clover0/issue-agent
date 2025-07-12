@@ -25,7 +25,7 @@ func InitRemoveFileFunction() Function {
 		},
 	}
 
-	functionsMap[FuncRemoveFile] = f
+	register(f)
 
 	return f
 }

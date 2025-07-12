@@ -98,6 +98,10 @@ type Function struct {
 
 var functionsMap = map[string]Function{}
 
+func register(f Function) {
+	functionsMap[f.Name.String()] = f
+}
+
 // TODO: no dependent on openai-go
 func (f Function) ToFunctionCalling() openai.FunctionDefinitionParam {
 	return openai.FunctionDefinitionParam{

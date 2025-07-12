@@ -24,7 +24,7 @@ func InitSubmitRevisionFunction(service SubmitRevisionService) Function {
 		},
 	}
 
-	functionsMap[FuncSubmitRevision] = f
+	register(f)
 
 	return f
 }

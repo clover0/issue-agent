@@ -34,7 +34,7 @@ func InitSearchFilesFunction() Function {
 		},
 	}
 
-	functionsMap[FuncSearchFiles] = f
+	register(f)
 
 	return f
 }

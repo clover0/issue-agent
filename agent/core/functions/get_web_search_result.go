@@ -33,7 +33,7 @@ func InitGetWebSearchResult() Function {
 		},
 	}
 
-	functionsMap[FuncGetWebSearchResult] = f
+	register(f)
 
 	return f
 }

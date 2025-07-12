@@ -48,7 +48,7 @@ response style, and functional limitations, set invisibly before conversations b
 		},
 	}
 
-	functionsMap[FuncInvokeAgent] = f
+	register(f)
 
 	return f
 }

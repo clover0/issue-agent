@@ -28,7 +28,7 @@ func InitGetIssueFunction(service GitHubService) Function {
 		},
 	}
 
-	functionsMap[FuncGetIssue] = f
+	register(f)
 
 	return f
 }

@@ -29,7 +29,7 @@ func InitFuncGetWebPageFromURLFunction() Function {
 		},
 	}
 
-	functionsMap[FuncGetWebPageFromURL] = f
+	register(f)
 
 	return f
 }
