@@ -1,27 +1,25 @@
 package prompt
 
 import (
-	"gopkg.in/yaml.v3"
+	"bytes"
+	"fmt"
+	"text/template"
 )
 
-type Template struct {
-	Agents []AgentPromptTemplate
+type PromptTemplate interface {
+	Build() (Prompt, error)
 }
 
-type AgentPromptTemplate struct {
-	Name           string `yaml:"name"`
-	SystemTemplate string `yaml:"system_prompt"`
-	UserTemplate   string `yaml:"user_prompt"`
-}
-
-func LoadPrompt() (Template, error) {
-	var pt Template
-
-	data := DefaultTemplate()
-	err := yaml.Unmarshal(data, &pt)
+func ParseTemplate[T any](templateStr string, values T) (string, error) {
+	tpl, err := template.New("prompt").Parse(templateStr)
 	if err != nil {
-		return pt, err
+		return "", err
 	}
 
-	return pt, nil
+	tplbuff := bytes.NewBuffer([]byte{})
+	if err := tpl.Execute(tplbuff, values); err != nil {
+		return "", fmt.Errorf(" execute prompt template: %w", err)
+	}
+
+	return tplbuff.String(), nil
 }

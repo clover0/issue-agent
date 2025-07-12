@@ -36,11 +36,6 @@ func OrchestrateAgentsByIssue(
 		return fmt.Errorf("select forwarder: %w", err)
 	}
 
-	promptTemplate, err := coreprompt.LoadPrompt()
-	if err != nil {
-		return fmt.Errorf("load prompt template: %w", err)
-	}
-
 	// check if the base branch exists
 	ghService := agithub.NewGitHubService(conf.Agent.GitHub.Owner, workRepository, gh, lo)
 	if _, err = ghService.GetBranch(baseBranch); err != nil {
@@ -100,7 +95,13 @@ func OrchestrateAgentsByIssue(
 		return fmt.Errorf("get issue: %w", err)
 	}
 
-	prompt, err := coreprompt.BuildPlanningPrompt(promptTemplate, conf.Language, baseBranch, issue)
+	prompt, err := coreprompt.PlanningPrompt{
+		Language:     conf.Language,
+		BaseBranch:   baseBranch,
+		IssueTitle:   issue.Title,
+		IssueContent: issue.Content,
+		IssueNumber:  issue.Path,
+	}.Build()
 	if err != nil {
 		return fmt.Errorf("orchestrator builds planning prompt: %w", err)
 	}
@@ -111,7 +112,14 @@ func OrchestrateAgentsByIssue(
 	}
 
 	instruction := planningAgent.LastHistory().RawContent
-	prompt, err = coreprompt.BuildDeveloperPrompt(promptTemplate, conf.Language, baseBranch, issue, instruction)
+	prompt, err = coreprompt.DeveloperPrompt{
+		Language:     conf.Language,
+		BaseBranch:   baseBranch,
+		IssueTitle:   issue.Title,
+		IssueContent: issue.Content,
+		IssueNumber:  issue.Path,
+		Instruction:  instruction,
+	}.Build()
 	if err != nil {
 		return fmt.Errorf("orchestrator builds developer prompt: %w", err)
 	}
@@ -137,11 +145,6 @@ func OrchestrateAgentsByComment(
 	llmForwarder, err := selectForward(lo, conf.Agent.Model)
 	if err != nil {
 		return fmt.Errorf("select forwarder: %w", err)
-	}
-
-	promptTemplate, err := coreprompt.LoadPrompt()
-	if err != nil {
-		return fmt.Errorf("load prompt template: %w", err)
 	}
 
 	ghService := agithub.NewGitHubService(conf.Agent.GitHub.Owner, workRepository, gh, lo)
@@ -192,7 +195,13 @@ func OrchestrateAgentsByComment(
 
 	dataStore := corestore.NewStore()
 
-	prompt, err := coreprompt.BuildCommentReactorPrompt(promptTemplate, conf.Language, comment, pr)
+	prompt, err := coreprompt.CommentReactorPrompt{
+		Language:      conf.Language,
+		WorkingBranch: pr.Head,
+		PRNumber:      pr.PRNumber,
+		Comment:       comment.Content,
+		PRLLMString:   pr.ToLLMString(),
+	}.Build()
 	if err != nil {
 		lo.Error("orchestrator builds comment reactor prompt: %s\n", err)
 		return err
