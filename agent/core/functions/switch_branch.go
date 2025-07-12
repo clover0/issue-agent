@@ -33,7 +33,7 @@ func InitSwitchBranchFunction() Function {
 		},
 	}
 
-	functionsMap[FuncSwitchBranch] = f
+	register(f)
 
 	return f
 }

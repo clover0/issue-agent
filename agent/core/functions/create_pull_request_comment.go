@@ -26,7 +26,7 @@ func InitCreatePullRequestCommentFunction(service GitHubService) Function {
 		},
 	}
 
-	functionsMap[FuncCreatePullRequestComment] = f
+	register(f)
 
 	return f
 }

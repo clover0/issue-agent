@@ -40,7 +40,7 @@ func InitCreatePullRequestReviewCommentFunction(service GitHubService) Function 
 		},
 	}
 
-	functionsMap[FuncCreatePullRequestReviewComment] = f
+	register(f)
 
 	return f
 }

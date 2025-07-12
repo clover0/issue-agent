@@ -28,7 +28,7 @@ func InitGetPullRequestFunction(service GitHubService) Function {
 		},
 	}
 
-	functionsMap[FuncGetPullRequest] = f
+	register(f)
 
 	return f
 }

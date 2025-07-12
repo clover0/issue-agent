@@ -36,7 +36,7 @@ func InitRequestReviewersFunction(service GitHubService) Function {
 		},
 	}
 
-	functionsMap[FuncRequestReviewers] = f
+	register(f)
 
 	return f
 }
