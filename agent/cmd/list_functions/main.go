@@ -24,7 +24,6 @@ func main() {
 	revisionService := agithub.NopSubmitRevisionService{}
 
 	functions.InitializeFunctions(
-		*conf.Agent.GitHub.NoSubmit,
 		agithub.NewGitHubService(conf.Agent.GitHub.Owner, "repo", ghClient, lo),
 		submitService,
 		revisionService,

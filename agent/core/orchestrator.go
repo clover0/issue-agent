@@ -64,7 +64,6 @@ func OrchestrateAgentsByIssue(
 	}
 
 	functions.InitializeFunctions(
-		*conf.Agent.GitHub.NoSubmit,
 		ghService,
 		submitService,
 		submitRevisionService,
@@ -169,7 +168,6 @@ func OrchestrateAgentsByComment(
 	}
 
 	functions.InitializeFunctions(
-		*conf.Agent.GitHub.NoSubmit,
 		ghService,
 		submitFilesService,
 		submitRevisionService,

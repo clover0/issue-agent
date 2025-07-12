@@ -29,7 +29,6 @@ type Git struct {
 }
 
 type GitHub struct {
-	NoSubmit        *bool    `yaml:"no_submit"`
 	CloneRepository *bool    `yaml:"clone_repository"`
 	Owner           string   `yaml:"owner" validate:"required"`
 	PRLabels        []string `yaml:"pr_labels"`
@@ -130,14 +129,11 @@ func setDefaults(conf Config) Config {
 	if conf.Agent.Git.UserName == "" {
 		conf.Agent.Git.UserName = "github-actions[bot]"
 	}
+
 	if conf.Agent.Git.UserEmail == "" {
 		conf.Agent.Git.UserEmail = "41898282+github-actions[bot]@users.noreply.github.com"
 	}
 
-	if conf.Agent.GitHub.NoSubmit == nil {
-		noSubmit := false
-		conf.Agent.GitHub.NoSubmit = &noSubmit
-	}
 	if conf.Agent.GitHub.CloneRepository == nil {
 		clone := true
 		conf.Agent.GitHub.CloneRepository = &clone

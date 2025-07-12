@@ -13,7 +13,6 @@ import (
 )
 
 func InitializeFunctions(
-	noSubmit bool,
 	repoService GitHubService,
 	submitFilesService SubmitFilesService,
 	submitRevisionService SubmitRevisionService,
@@ -31,8 +30,7 @@ func InitializeFunctions(
 	if allowFunction(allowFunctions, FuncModifyFile) {
 		InitModifyFileFunction()
 	}
-	// TODO:
-	if !noSubmit && allowFunction(allowFunctions, FuncSubmitFiles) {
+	if allowFunction(allowFunctions, FuncSubmitFiles) {
 		InitSubmitFilesGitHubFunction(submitFilesService)
 	}
 	if allowFunction(allowFunctions, FuncGetWebSearchResult) {
