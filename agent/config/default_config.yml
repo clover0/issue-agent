@@ -33,9 +33,6 @@ agent:
 
   # GitHub environment for agent
   github:
-    # Don't submit files to GitHub by Pull Request.
-    no_submit: false
-
     # Whether to clone repository to the workdir
     clone_repository: true
 

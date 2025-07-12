@@ -80,7 +80,6 @@ func TestLoad(t *testing.T) {
 		assert.Equal(t, cfg.Agent.MaxSteps, 70)
 		assert.Equal(t, cfg.Agent.Git.UserName, "github-actions[bot]")
 		assert.Equal(t, cfg.Agent.Git.UserEmail, "41898282+github-actions[bot]@users.noreply.github.com")
-		assert.Equal(t, *cfg.Agent.GitHub.NoSubmit, false)
 		assert.Equal(t, *cfg.Agent.GitHub.CloneRepository, true)
 		if len(cfg.Agent.AllowFunctions) == 0 {
 			t.Errorf("wanted AllowFunctions to have elements, but it was empty")
@@ -261,14 +260,12 @@ func TestSetDefaults(t *testing.T) {
 		assert.Equal(t, cfg.WorkDir, config.DefaultWorkDir)
 		assert.Equal(t, cfg.Agent.Git.UserName, "github-actions[bot]")
 		assert.Equal(t, cfg.Agent.Git.UserEmail, "41898282+github-actions[bot]@users.noreply.github.com")
-		assert.Equal(t, *cfg.Agent.GitHub.NoSubmit, false)
 		assert.Equal(t, *cfg.Agent.GitHub.CloneRepository, true)
 	})
 
 	t.Run("preserve existing values", func(t *testing.T) {
 		t.Parallel()
 
-		noSubmit := true
 		clone := false
 		cfg := config.Config{
 			LogLevel: config.LogInfo,
@@ -281,7 +278,6 @@ func TestSetDefaults(t *testing.T) {
 					UserEmail: "test@example.com",
 				},
 				GitHub: config.GitHub{
-					NoSubmit:        &noSubmit,
 					CloneRepository: &clone,
 					Owner:           "test-owner",
 				},
@@ -297,7 +293,6 @@ func TestSetDefaults(t *testing.T) {
 		assert.Equal(t, cfg.Agent.MaxSteps, 50)
 		assert.Equal(t, cfg.Agent.Git.UserName, "test-user")
 		assert.Equal(t, cfg.Agent.Git.UserEmail, "test@example.com")
-		assert.Equal(t, *cfg.Agent.GitHub.NoSubmit, true)
 		assert.Equal(t, *cfg.Agent.GitHub.CloneRepository, false)
 		assert.Equal(t, len(cfg.Agent.AllowFunctions), 1)
 		assert.Equal(t, cfg.Agent.AllowFunctions[0], "custom-function")
