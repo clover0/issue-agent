@@ -27,7 +27,7 @@ func React(flags []string) error {
 
 	conf = cliIn.MergeConfig(conf)
 
-	if err := config.ValidateConfig(conf); err != nil {
+	if err := config.Validate(conf); err != nil {
 		return err
 	}
 

@@ -180,15 +180,15 @@ func TestValidateConfig(t *testing.T) {
 
 		cfg := config.Config{
 			LogLevel: config.LogDebug,
-			Agent: config.AgentConfig{
+			Agent: config.Agent{
 				Model: "gpt-4",
-				GitHub: config.GitHubConfig{
+				GitHub: config.GitHub{
 					Owner: "test-owner",
 				},
 			},
 		}
 
-		err := config.ValidateConfig(cfg)
+		err := config.Validate(cfg)
 
 		assert.Nil(t, err)
 	})
@@ -198,15 +198,15 @@ func TestValidateConfig(t *testing.T) {
 
 		cfg := config.Config{
 			LogLevel: "warning", // Invalid log level
-			Agent: config.AgentConfig{
+			Agent: config.Agent{
 				Model: "gpt-4",
-				GitHub: config.GitHubConfig{
+				GitHub: config.GitHub{
 					Owner: "test-owner",
 				},
 			},
 		}
 
-		err := config.ValidateConfig(cfg)
+		err := config.Validate(cfg)
 
 		assert.HasError(t, err)
 	})
@@ -216,14 +216,14 @@ func TestValidateConfig(t *testing.T) {
 
 		cfg := config.Config{
 			LogLevel: config.LogDebug,
-			Agent: config.AgentConfig{
-				GitHub: config.GitHubConfig{
+			Agent: config.Agent{
+				GitHub: config.GitHub{
 					Owner: "test-owner",
 				},
 			},
 		}
 
-		err := config.ValidateConfig(cfg)
+		err := config.Validate(cfg)
 
 		assert.HasError(t, err)
 	})
@@ -233,15 +233,15 @@ func TestValidateConfig(t *testing.T) {
 
 		cfg := config.Config{
 			LogLevel: config.LogDebug,
-			Agent: config.AgentConfig{
+			Agent: config.Agent{
 				Model:  "gpt-4",
-				GitHub: config.GitHubConfig{
+				GitHub: config.GitHub{
 					// Owner is missing
 				},
 			},
 		}
 
-		err := config.ValidateConfig(cfg)
+		err := config.Validate(cfg)
 
 		assert.HasError(t, err)
 	})
@@ -274,13 +274,13 @@ func TestSetDefaults(t *testing.T) {
 			LogLevel: config.LogInfo,
 			Language: "Japanese",
 			WorkDir:  "/custom/workdir",
-			Agent: config.AgentConfig{
+			Agent: config.Agent{
 				MaxSteps: 50,
-				Git: config.GitConfig{
+				Git: config.Git{
 					UserName:  "test-user",
 					UserEmail: "test@example.com",
 				},
-				GitHub: config.GitHubConfig{
+				GitHub: config.GitHub{
 					NoSubmit:        &noSubmit,
 					CloneRepository: &clone,
 					Owner:           "test-owner",
