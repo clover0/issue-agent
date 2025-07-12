@@ -12,7 +12,6 @@ import (
 	"github.com/clover0/issue-agent/config"
 	"github.com/clover0/issue-agent/core/functions"
 	coreprompt "github.com/clover0/issue-agent/core/prompt"
-	corestore "github.com/clover0/issue-agent/core/store"
 	"github.com/clover0/issue-agent/logger"
 	"github.com/clover0/issue-agent/util"
 )
@@ -87,8 +86,6 @@ func OrchestrateAgentsByIssue(
 	), ","))
 	lo.Info("agents make a pull request to %s/%s\n", conf.Agent.GitHub.Owner, workRepository)
 
-	dataStore := corestore.NewStore()
-
 	issue, err := ghService.GetIssue(workRepository, issueNumber)
 	if err != nil {
 		return fmt.Errorf("get issue: %w", err)
@@ -105,7 +102,7 @@ func OrchestrateAgentsByIssue(
 		return fmt.Errorf("orchestrator builds planning prompt: %w", err)
 	}
 	planningAgent, err := RunAgent("planningAgent",
-		prompt, parameter, lo, &dataStore, llmForwarder, PlanTools())
+		prompt, parameter, lo, llmForwarder, PlanTools())
 	if err != nil {
 		return err
 	}
@@ -123,7 +120,7 @@ func OrchestrateAgentsByIssue(
 		return fmt.Errorf("orchestrator builds developer prompt: %w", err)
 	}
 
-	if _, err := RunAgent("developerAgent", prompt, parameter, lo, &dataStore, llmForwarder, tools); err != nil {
+	if _, err := RunAgent("developerAgent", prompt, parameter, lo, llmForwarder, tools); err != nil {
 		return fmt.Errorf("orchestrator developer agent: %w", err)
 	}
 
@@ -191,8 +188,6 @@ func OrchestrateAgentsByComment(
 	), ","))
 	lo.Info("agents will push to %s/%s branch %s\n", conf.Agent.GitHub.Owner, workRepository, pr.Head)
 
-	dataStore := corestore.NewStore()
-
 	prompt, err := coreprompt.CommentReactor{
 		Language:      conf.Language,
 		WorkingBranch: pr.Head,
@@ -206,7 +201,7 @@ func OrchestrateAgentsByComment(
 	}
 
 	_, err = RunAgent("commentReactorAgent",
-		prompt, parameter, lo, &dataStore, llmForwarder,
+		prompt, parameter, lo, llmForwarder,
 		tools,
 	)
 	if err != nil {
@@ -222,7 +217,6 @@ func RunAgent(
 	prompt coreprompt.Prompt,
 	parameter Parameter,
 	lo logger.Logger,
-	dataStore *corestore.Store,
 	llmForwarder LLMForwarder,
 	tools []functions.Function,
 ) (AgentLike, error) {
@@ -232,7 +226,6 @@ func RunAgent(
 		lo,
 		prompt,
 		llmForwarder,
-		dataStore,
 		tools,
 	)
 

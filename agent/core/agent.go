@@ -6,7 +6,6 @@ import (
 
 	"github.com/clover0/issue-agent/core/functions"
 	"github.com/clover0/issue-agent/core/prompt"
-	"github.com/clover0/issue-agent/core/store"
 	"github.com/clover0/issue-agent/logger"
 )
 
@@ -14,7 +13,6 @@ type AgentLike interface {
 	Work() (lastOutput string, err error)
 	History() []LLMMessage
 	LastHistory() LLMMessage
-	ChangedFiles() []store.File
 }
 
 type Agent struct {
@@ -25,7 +23,6 @@ type Agent struct {
 	llmForwarder LLMForwarder
 	prompt       prompt.Prompt
 	history      []LLMMessage
-	store        *store.Store
 	tools        []functions.Function
 }
 
@@ -35,7 +32,6 @@ func NewAgent(
 	logg logger.Logger,
 	prompt prompt.Prompt,
 	forwarder LLMForwarder,
-	store *store.Store,
 	tools []functions.Function,
 ) AgentLike {
 	return &Agent{
@@ -45,7 +41,6 @@ func NewAgent(
 		logg:         logg,
 		prompt:       prompt,
 		llmForwarder: forwarder,
-		store:        store,
 		tools:        tools,
 	}
 }
@@ -89,7 +84,6 @@ func (a *Agent) Work() (lastOutput string, err error) {
 				var returningStr string
 				returningStr, err = functions.ExecFunction(
 					a.logg.AddPrefix(stepLabel),
-					a.store,
 					fnCtx.Function.Name,
 					fnCtx.FunctionArgs.String(),
 				)
@@ -148,8 +142,4 @@ func (a *Agent) History() []LLMMessage {
 
 func (a *Agent) LastHistory() LLMMessage {
 	return a.history[len(a.history)-1]
-}
-
-func (a *Agent) ChangedFiles() []store.File {
-	return a.store.ChangedFiles()
 }

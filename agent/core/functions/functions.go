@@ -8,7 +8,6 @@ import (
 
 	"github.com/openai/openai-go"
 
-	corestore "github.com/clover0/issue-agent/core/store"
 	"github.com/clover0/issue-agent/logger"
 )
 
@@ -142,7 +141,7 @@ func marshalFuncArgs(args string, input any) error {
 
 const defaultSuccessReturning = "tool use succeeded."
 
-func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, argsJson string) (string, error) {
+func ExecFunction(l logger.Logger, funcName FuncName, argsJson string) (string, error) {
 	// TODO: make large switch statement smaller
 	l.Info("functions: do %s\n", funcName)
 	switch funcName {
@@ -173,11 +172,10 @@ func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, ar
 		if err := marshalFuncArgs(argsJson, &input); err != nil {
 			return "", fmt.Errorf("failed to unmarshal args: %w", err)
 		}
-		file, err := PutFile(input)
+		_, err := PutFile(input)
 		if err != nil {
 			return "", err
 		}
-		StoreFileAfterPutFile(store, file)
 		return defaultSuccessReturning, nil
 
 	case FuncModifyFile:
@@ -185,11 +183,10 @@ func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, ar
 		if err := marshalFuncArgs(argsJson, &input); err != nil {
 			return "", fmt.Errorf("failed to unmarshal args: %w", err)
 		}
-		file, err := ModifyFile(input)
+		_, err := ModifyFile(input)
 		if err != nil {
 			return "", err
 		}
-		StoreFileAfterModifyFile(store, file)
 		return defaultSuccessReturning, nil
 
 	case FuncSubmitFiles:
@@ -201,9 +198,6 @@ func ExecFunction(l logger.Logger, store *corestore.Store, funcName FuncName, ar
 		if err != nil {
 			return "", err
 		}
-
-		// NOTE: we would like to use any key, but for ease of implementation, we keep this as a simple implementation.
-		SubmitFilesAfter(store, corestore.LastSubmissionKey, out)
 
 		return fmt.Sprintf("%s\n%s\n",
 			defaultSuccessReturning, out.Message), nil
