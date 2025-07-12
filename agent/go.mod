@@ -5,7 +5,7 @@ go 1.24.4
 require (
 	github.com/aws/aws-sdk-go-v2 v1.36.5
 	github.com/aws/aws-sdk-go-v2/config v1.29.17
-	github.com/aws/aws-sdk-go-v2/service/bedrockruntime v1.30.2
+	github.com/aws/aws-sdk-go-v2/service/bedrockruntime v1.31.0
 	github.com/go-git/go-git/v5 v5.16.2
 	github.com/go-playground/validator/v10 v10.26.0
 	github.com/google/go-github/v73 v73.0.0
