@@ -7,31 +7,31 @@ import (
 	"github.com/clover0/issue-agent/test/assert"
 )
 
-func TestDeveloperPrompt_Build(t *testing.T) {
+func TestCommentReactorPrompt_Build(t *testing.T) {
 	t.Parallel()
 
 	tests := map[string]struct {
-		input prompt.DeveloperPrompt
+		input prompt.CommentReactor
 		want  prompt.Prompt
 	}{
 		"with all fields populated": {
-			input: prompt.DeveloperPrompt{
-				Language:     "Japanese",
-				BaseBranch:   "main",
-				IssueTitle:   "Test Issue",
-				IssueContent: "This is a test issue content",
-				IssueNumber:  "123",
-				Instruction:  "Test instruction",
+			input: prompt.CommentReactor{
+				Language:      "Japanese",
+				WorkingBranch: "feature/test",
+				PRNumber:      "42",
+				Comment:       "This is a test comment",
+				PRLLMString:   "PR LLM String",
 			},
 			want: prompt.Prompt{
 				SystemPrompt: `
 You are a software development engineer with expertise in the latest technologies, programming, best practices.
 You will understand the codebase of the git repository and complete the task.
-User instructs you to accomplish the task with plans.
+User instructs you to accomplish the task with GitHub comment on a Pull Request.
 
 <system-environment>
 * You are in the root directory of the repository.
-* Git Base branch is main.
+* Git working branch is feature/test.
+* Opening GitHub Pull Request Number is 42.
 </system-environment>
 
 <constraints>
@@ -42,7 +42,6 @@ User instructs you to accomplish the task with plans.
 </constraints>
 
 <important-rules>
-* First create a working branch using switch_branch.
 * Indentation is very important! When editing files, insert appropriate indentation at the beginning of each line.
 * Adhering to the coding style of other source code in the repository.
 * If a 'tool use' does not work, try another tool or change the arguments before running it again. A command that fails once will not work again without modification.
@@ -52,57 +51,42 @@ User instructs you to accomplish the task with plans.
 * Use only the standard library of the programming language or use only libraries used in the repository.
 * When creating a new implementation, check carefully if it exists in any other directories.
 * Plan and run a check to see how the code you have changed works correctly without linting or compile, and fix it.
-* Finally you must create Pull Request using submit_files tool with submission-template in Japanese.
 </important-rules>
-
-<submission-template>
-Write the reason for the changes here.
-Write what was added or created along with the reasons here.
-
-# Issue
- #123
-</submission-template>
 `,
 				StartUserPrompt: `
-The task is bellow:
-
-<task>
-Issue Number: 123
-Title: Test Issue
-This is a test issue content
-</task>
-
-<what-to-do-last>
-* Finally you must create Pull Request with submission-template in Japanese.
-</what-to-do-last>
+Read the instructions.
 
 <instructions>
-* Understand the overall structure of the repository's codebase before proceeding.
-* Create or edit files as necessary to write code to complete the task.
-* You should follow development plan bellow.
-Test instruction
+* Read pull request.
+* Follow the comment and complete the task.
 </instructions>
+
+<comment>
+This is a test comment
+</comment>
+
+PR LLM String
 `,
 			},
 		},
 		"with minimal fields": {
-			input: prompt.DeveloperPrompt{
-				Language:     "English",
-				BaseBranch:   "develop",
-				IssueTitle:   "",
-				IssueContent: "",
-				IssueNumber:  "",
-				Instruction:  "",
+			input: prompt.CommentReactor{
+				Language:      "English",
+				WorkingBranch: "main",
+				PRNumber:      "",
+				Comment:       "",
+				PRLLMString:   "",
 			},
 			want: prompt.Prompt{
 				SystemPrompt: `
 You are a software development engineer with expertise in the latest technologies, programming, best practices.
 You will understand the codebase of the git repository and complete the task.
-User instructs you to accomplish the task with plans.
+User instructs you to accomplish the task with GitHub comment on a Pull Request.
 
 <system-environment>
 * You are in the root directory of the repository.
-* Git Base branch is develop.
+* Git working branch is main.
+* Opening GitHub Pull Request Number is .
 </system-environment>
 
 <constraints>
@@ -113,7 +97,6 @@ User instructs you to accomplish the task with plans.
 </constraints>
 
 <important-rules>
-* First create a working branch using switch_branch.
 * Indentation is very important! When editing files, insert appropriate indentation at the beginning of each line.
 * Adhering to the coding style of other source code in the repository.
 * If a 'tool use' does not work, try another tool or change the arguments before running it again. A command that fails once will not work again without modification.
@@ -123,36 +106,21 @@ User instructs you to accomplish the task with plans.
 * Use only the standard library of the programming language or use only libraries used in the repository.
 * When creating a new implementation, check carefully if it exists in any other directories.
 * Plan and run a check to see how the code you have changed works correctly without linting or compile, and fix it.
-* Finally you must create Pull Request using submit_files tool with submission-template in English.
 </important-rules>
-
-<submission-template>
-Write the reason for the changes here.
-Write what was added or created along with the reasons here.
-
-# Issue
- #
-</submission-template>
 `,
 				StartUserPrompt: `
-The task is bellow:
-
-<task>
-Issue Number: 
-Title: 
-
-</task>
-
-<what-to-do-last>
-* Finally you must create Pull Request with submission-template in English.
-</what-to-do-last>
+Read the instructions.
 
 <instructions>
-* Understand the overall structure of the repository's codebase before proceeding.
-* Create or edit files as necessary to write code to complete the task.
-* You should follow development plan bellow.
-
+* Read pull request.
+* Follow the comment and complete the task.
 </instructions>
+
+<comment>
+
+</comment>
+
+
 `,
 			},
 		},

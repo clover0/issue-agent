@@ -11,11 +11,11 @@ func TestPlanningPrompt_Build(t *testing.T) {
 	t.Parallel()
 
 	tests := map[string]struct {
-		input prompt.PlanningPrompt
+		input prompt.Planning
 		want  prompt.Prompt
 	}{
 		"with all fields populated": {
-			input: prompt.PlanningPrompt{
+			input: prompt.Planning{
 				Language:     "Japanese",
 				BaseBranch:   "main",
 				IssueTitle:   "Test Issue",
@@ -69,7 +69,7 @@ This is a test issue content
 			},
 		},
 		"with minimal fields": {
-			input: prompt.PlanningPrompt{
+			input: prompt.Planning{
 				Language:     "English",
 				BaseBranch:   "develop",
 				IssueTitle:   "",

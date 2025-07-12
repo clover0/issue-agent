@@ -95,7 +95,7 @@ func OrchestrateAgentsByIssue(
 		return fmt.Errorf("get issue: %w", err)
 	}
 
-	prompt, err := coreprompt.PlanningPrompt{
+	prompt, err := coreprompt.Planning{
 		Language:     conf.Language,
 		BaseBranch:   baseBranch,
 		IssueTitle:   issue.Title,
@@ -112,7 +112,7 @@ func OrchestrateAgentsByIssue(
 	}
 
 	instruction := planningAgent.LastHistory().RawContent
-	prompt, err = coreprompt.DeveloperPrompt{
+	prompt, err = coreprompt.Developer{
 		Language:     conf.Language,
 		BaseBranch:   baseBranch,
 		IssueTitle:   issue.Title,
@@ -195,7 +195,7 @@ func OrchestrateAgentsByComment(
 
 	dataStore := corestore.NewStore()
 
-	prompt, err := coreprompt.CommentReactorPrompt{
+	prompt, err := coreprompt.CommentReactor{
 		Language:      conf.Language,
 		WorkingBranch: pr.Head,
 		PRNumber:      pr.PRNumber,
