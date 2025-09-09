@@ -1,6 +1,6 @@
 module github.com/clover0/issue-agent
 
-go 1.24
+go 1.24.0
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.36.5
@@ -10,7 +10,7 @@ require (
 	github.com/go-playground/validator/v10 v10.27.0
 	github.com/google/go-github/v73 v73.0.0
 	github.com/openai/openai-go v1.10.1
-	golang.org/x/net v0.42.0
+	golang.org/x/net v0.44.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -51,8 +51,8 @@ require (
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/tidwall/sjson v1.2.5 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
-	golang.org/x/crypto v0.40.0 // indirect
-	golang.org/x/sys v0.34.0 // indirect
-	golang.org/x/text v0.27.0 // indirect
+	golang.org/x/crypto v0.42.0 // indirect
+	golang.org/x/sys v0.36.0 // indirect
+	golang.org/x/text v0.29.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )
