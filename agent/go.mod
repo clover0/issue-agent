@@ -1,6 +1,6 @@
 module github.com/clover0/issue-agent
 
-go 1.24
+go 1.25.1
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.36.5
