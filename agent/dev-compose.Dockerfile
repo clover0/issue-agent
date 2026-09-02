@@ -1,5 +1,5 @@
 # For development with docker compose.
 
-FROM golang:1.24.5-bookworm@sha256:69adc37c19ac6ef724b561b0dc675b27d8c719dfe848db7dd1092a7c9ac24bc6 AS devlopment
+FROM golang:1.27.1-bookworm@sha256:648f440f42a0958804efb24df176f806f9d353b41f1c0627f666428e40310f6b AS devlopment
 
 WORKDIR /usr/local/agent
